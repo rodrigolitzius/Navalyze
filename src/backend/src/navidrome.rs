@@ -24,6 +24,12 @@ impl Session {
     pub async fn new(login_request: LoginRequest) -> Result<Self, reqwest::Error> {
         let client = reqwest::Client::builder().tls_danger_accept_invalid_certs(true).build()?;
 
+        let login_request = LoginRequest {
+            username: login_request.username,
+            password: login_request.password,
+            url: login_request.url.trim_end_matches('/').to_string()
+        };
+
         let mut body = HashMap::new();
         body.insert("username", login_request.username);
         body.insert("password", login_request.password);

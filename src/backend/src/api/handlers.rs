@@ -4,12 +4,12 @@ use axum::{
 };
 
 use serde_json::json;
+use serde::Deserialize;
 use uuid::Uuid;
 use std::{collections::HashMap, str::FromStr};
 
 use crate::api::{
-    ApiState, LoginSession, response::{*},
-    login::{build_user_track_hashmap, LoginRequest}
+    ApiState, LoginSession, response::{*}
 };
 
 use crate::{
@@ -18,6 +18,13 @@ use crate::{
 };
 
 pub struct Auth{uuid: Uuid}
+
+#[derive(Deserialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+    pub url: String
+}
 
 impl<S> FromRequestParts<S> for Auth
 where
@@ -95,7 +102,7 @@ pub async fn login(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome_session = Session::new(login_request).await;
 
-    let mut navidrome_session = match navidrome_session {
+    let navidrome_session = match navidrome_session {
         Ok(v) => v,
         Err(e) => {
             match e {
@@ -113,7 +120,7 @@ pub async fn login(
     };
 
     // TODO: The build_user_track_hashmap function is SUPER SLOW, and blocks the servers response. Make it go vroom vroom
-    let tracks_hashmap = build_user_track_hashmap(&state.scrobbles, &mut navidrome_session).await;
+    let tracks_hashmap = navidrome_session.build_track_hashmap(&state.scrobbles).await;
     let uuid = Uuid::new_v4();
 
     // let session_id = Uuid::new_v4();

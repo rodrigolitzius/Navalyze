@@ -4,7 +4,8 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use serde_json;
 
-use crate::api::login::LoginRequest;
+use crate::api::handlers::LoginRequest;
+use crate::db_analyser::Scrobble;
 
 #[allow(unused)]
 pub struct Session {
@@ -96,5 +97,22 @@ impl Session {
         let json: serde_json::Value = response.json().await?;
 
         return Ok(json);
+    }
+
+    pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> HashMap<String, serde_json::Value> {
+        let mut result = HashMap::new();
+
+        for scrobble in scrobbles {
+            if scrobble.user_id == self.user_id {
+                if result.contains_key(&scrobble.media_file_id) {continue;}
+
+                let song = self.song(&scrobble.media_file_id).await;
+                if let Err(_) = song {continue;}
+
+                result.insert(scrobble.media_file_id.clone(), song.unwrap());
+            }
+        }
+
+        return result;
     }
 }

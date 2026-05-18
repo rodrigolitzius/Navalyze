@@ -1,16 +1,14 @@
 pub mod handlers;
-pub mod login;
 pub mod response;
 
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
+use uuid::Uuid;
 
 use crate::{
     navidrome::{Session},
     db_analyser::Scrobble
 };
-
-use uuid::Uuid;
 
 #[allow(unused)]
 pub struct LoginSession {

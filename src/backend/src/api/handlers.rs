@@ -8,12 +8,12 @@ use uuid::Uuid;
 use std::{collections::HashMap, str::FromStr};
 
 use crate::api::{
-    ApiState, LoginSession,
+    ApiState, LoginSession, response::{*},
     login::{build_user_track_hashmap, LoginRequest}
 };
 
 use crate::{
-    navidrome::{Session},
+    navidrome::{Session, NavidromeSessionError},
     util::get_param_default
 };
 
@@ -55,7 +55,7 @@ pub async fn recent(
     State(state): State<ApiState>,
     Query(query): Query<HashMap<String, String>>,
     auth: Auth
-) -> Result<String, StatusCode> {
+) -> Result<String, ApiError> {
     let mut limit = get_param_default(&query, "limit", 0) as usize;
     let offset = get_param_default(&query, "offset", 0) as usize;
 
@@ -66,7 +66,9 @@ pub async fn recent(
     let session = state.sessions.read().await;
     let session = match session.get(&auth.uuid) {
         Some(v) => v,
-        None => {return Err(StatusCode::INTERNAL_SERVER_ERROR);}
+        None => {
+            return Err(ApiError::Internal("Could not find token".into()));
+        }
     };
 
     let mut result = String::new();
@@ -90,19 +92,27 @@ pub async fn recent(
 pub async fn login(
     State(state): State<ApiState>,
     Json(login_request): Json<LoginRequest>
-) -> (StatusCode, Json<serde_json::Value>) {
+) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome_session = Session::new(login_request).await;
 
-    if let Err(e) = navidrome_session {
-        if let Some(s) = e.status() {
-            return (s, Json(json!({"status": "error"})));
-        } else {
-            return (StatusCode::NOT_FOUND, Json(json!({"status": "error"})));
+    let mut navidrome_session = match navidrome_session {
+        Ok(v) => v,
+        Err(e) => {
+            match e {
+                NavidromeSessionError::Reqwest(e2) => {
+                    return Err(ApiError::Internal(e2.to_string()))
+                },
+                NavidromeSessionError::Unreachable(e2) => {
+                    return Err(ApiError::LoginNavidromeUnreachable(e2.to_string()));
+                },
+                NavidromeSessionError::Unauthorized => {
+                    return Err(ApiError::Unauthorized("Incorrect credentials".into()));
+                }
+            }
         }
-    }
+    };
 
     // TODO: The build_user_track_hashmap function is SUPER SLOW, and blocks the servers response. Make it go vroom vroom
-    let mut navidrome_session = navidrome_session.expect("The session should be valid from this point. Did the function not return?");
     let tracks_hashmap = build_user_track_hashmap(&state.scrobbles, &mut navidrome_session).await;
     let uuid = Uuid::new_v4();
 
@@ -113,5 +123,5 @@ pub async fn login(
 
     state.sessions.write().await.insert(login_session.uuid, login_session);
 
-    return (StatusCode::OK, Json(json!({"status": "success", "id": uuid})));
+    return Ok(Json(json!({"id": uuid})));
 }

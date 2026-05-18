@@ -20,9 +20,20 @@ struct LoginResponse {
     id: String
 }
 
+pub enum NavidromeSessionError {
+    Reqwest(reqwest::Error),
+    Unreachable(reqwest::Error),
+    Unauthorized,
+}
+
 impl Session {
-    pub async fn new(login_request: LoginRequest) -> Result<Self, reqwest::Error> {
-        let client = reqwest::Client::builder().tls_danger_accept_invalid_certs(true).build()?;
+    pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {
+        let client = match reqwest::Client::builder().tls_danger_accept_invalid_certs(true).build() {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(NavidromeSessionError::Reqwest(e));
+            }
+        };
 
         let login_request = LoginRequest {
             username: login_request.username,
@@ -38,8 +49,21 @@ impl Session {
             .post(format!("{}/auth/login", login_request.url))
             .json(&body)
             .send()
-            .await?
-            .error_for_status()?;
+            .await;
+
+        let response = match response {
+            Ok(v) => v,
+            Err(e) => {
+                return Err(NavidromeSessionError::Unreachable(e));
+            }
+        };
+
+        let response = match response.error_for_status() {
+            Ok(v) => v,
+            Err(_) => {
+                return Err(NavidromeSessionError::Unauthorized);
+            }
+        };
 
         let login_response: LoginResponse = response.json().await.expect("Required fields are missing from Navidrome's response");
 

@@ -1,6 +1,6 @@
 use axum::{
     extract::{FromRef, FromRequestParts, Json, Query, State, Path},
-    http::{StatusCode, HeaderMap, method},
+    http::{StatusCode, HeaderMap, method, header},
     body::Bytes
 };
 
@@ -161,6 +161,7 @@ pub async fn login(
 pub async fn relay(
     State(state): State<ApiState>,
     Path(tail): Path<String>,
+    Query(query): Query<HashMap<String, String>>,
     method: method::Method,
     headers: HeaderMap,
     auth: Auth,
@@ -174,10 +175,17 @@ pub async fn relay(
         }
     };
 
+    let mut client_queries: Vec<(String, String)> = Vec::new();
+    for query in query.iter().into_iter() {
+        client_queries.push((query.0.clone(), query.1.clone()));
+    }
+
     let url = format!("{}/rest/{}", session.navidrome_native.url, tail);
+
     let response = session.navidrome_subsonic.client
         .request(method, url)
         .query(&session.navidrome_subsonic.default_params)
+        .query(&client_queries)
         .headers(headers)
         .body(body)
         .send()
@@ -190,13 +198,20 @@ pub async fn relay(
         }
     };
 
-    let result = (
-        response.status(),
-        response.headers().clone(),
-        response.bytes().await.unwrap()
-    );
+    let status = response.status();
+    let mut headers = response.headers().clone();
+    let body = response.bytes().await.unwrap();
 
-    return Ok(result)
+    headers.remove(header::CONNECTION);
+    headers.remove(header::PROXY_AUTHENTICATE);
+    headers.remove(header::PROXY_AUTHORIZATION);
+    headers.remove(header::TE);
+    headers.remove(header::TRAILER);
+    headers.remove(header::TRANSFER_ENCODING);
+    headers.remove(header::UPGRADE);
+    headers.remove("keep-alive");
+
+    return Ok((status, headers, body))
 }
 
 // TODO: Add a function to get a session from the state.

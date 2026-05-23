@@ -9,7 +9,7 @@ use std::{sync::Arc};
 use clap::{Parser};
 
 use crate::{
-    handlers::{login::*, recent::*, relay::*},
+    handlers::{login::*, recent::*, relay::*, artists::*},
     navidrome::{Scrobble, build_scrobble},
     api::{ApiState}
 };
@@ -31,6 +31,7 @@ async fn start_backend(state: ApiState) {
     let app = Router::new()
         .route("/recent", get(recent))
         .route("/relay/{*tail}", get(relay))
+        .route("/most-played/artists", get(most_played_artists))
         .route("/login", post(login))
         .layer(cors)
         .with_state(state);

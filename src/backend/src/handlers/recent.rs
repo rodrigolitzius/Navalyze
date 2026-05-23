@@ -12,13 +12,7 @@ pub async fn recent(
         limit = state.scrobbles.len();
     }
 
-    let session = state.sessions.read().await;
-    let session = match session.get(&auth.uuid) {
-        Some(v) => v,
-        None => {
-            return Err(ApiError::Internal("Could not find token".into()));
-        }
-    };
+    let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
     let mut result: Vec<serde_json::Value> = Vec::new();
     for scrobble in session.scrobbles.iter().skip(offset).take(limit) {

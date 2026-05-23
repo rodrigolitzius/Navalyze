@@ -9,13 +9,7 @@ pub async fn relay(
     auth: Auth,
     body: Bytes,
 ) -> Result<(StatusCode, HeaderMap, Bytes), ApiError> {
-    let session = state.sessions.read().await;
-    let session = match session.get(&auth.uuid) {
-        Some(v) => v,
-        None => {
-            return Err(ApiError::Internal("Could not find token".into()));
-        }
-    };
+    let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
     let mut client_queries: Vec<(String, String)> = Vec::new();
     for query in query.iter().into_iter() {

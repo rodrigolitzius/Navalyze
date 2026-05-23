@@ -1,8 +1,10 @@
 pub mod login;
 pub mod recent;
 pub mod relay;
+pub mod artists;
 
 use std::{str::FromStr, collections::HashMap};
+use tokio::sync::{RwLock, RwLockReadGuard};
 use serde::Deserialize;
 use serde_json::json;
 use uuid::Uuid;
@@ -19,6 +21,19 @@ use crate::{
 };
 
 pub struct Auth{uuid: Uuid}
+
+#[derive(Deserialize)]
+struct Artist {
+    id: String,
+    name: String,
+    _missing: bool
+}
+
+#[derive(Deserialize)]
+struct ArtistCount {
+    plays: u64,
+    name: String
+}
 
 #[derive(Deserialize)]
 pub struct RawLoginRequest {
@@ -85,4 +100,21 @@ where T: FromStr {
     let limit: T = limit.unwrap().parse().unwrap_or(default);
 
     return limit;
+}
+
+async fn get_session_from_uuid<'a>(uuid: &Uuid, sessions: &'a RwLock<HashMap<Uuid, LoginSession>>) -> Result<RwLockReadGuard<'a, LoginSession>, ApiError> {
+    let session = sessions.read().await;
+
+    let result = RwLockReadGuard::try_map(session, |f| {
+        f.get(uuid)
+    });
+
+    let result = match result {
+        Ok(v) => v,
+        Err(_) => {
+            return Err(ApiError::Internal("Could not find token".into()));
+        }
+    };
+
+    return Ok(result);
 }

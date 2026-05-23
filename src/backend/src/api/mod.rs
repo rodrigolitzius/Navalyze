@@ -1,12 +1,11 @@
-pub mod handlers;
-pub mod response;
+pub mod error;
 
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
 use crate::{
-    db_analyser::Scrobble, navidrome::{NavidromeNativeSession, NavidromeSubsonicSession}
+    navidrome::Scrobble, navidrome::{NavidromeNativeSession, NavidromeSubsonicSession}
 };
 
 #[allow(unused)]

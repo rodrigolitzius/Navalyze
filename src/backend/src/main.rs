@@ -1,19 +1,18 @@
-mod db_analyser;
 mod navidrome;
-mod util;
-
+mod handlers;
 mod api;
 
-use crate::{
-    db_analyser::{Scrobble, build_scrobble},
-    api::{ApiState, handlers::{login, recent, relay}}
-};
-
-use std::{sync::Arc};
-use rusqlite::{Connection, OpenFlags};
-use tower_http::cors::{Any, CorsLayer};
 use axum::{Router, routing::{get, post}};
+use tower_http::cors::{Any, CorsLayer};
+use rusqlite::{Connection, OpenFlags};
+use std::{sync::Arc};
 use clap::{Parser};
+
+use crate::{
+    handlers::{login::*, recent::*, relay::*},
+    navidrome::{Scrobble, build_scrobble},
+    api::{ApiState}
+};
 
 const APP_NAME: &'static str = "Navalyze";
 

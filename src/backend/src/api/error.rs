@@ -1,6 +1,6 @@
 use axum::{Json, response::IntoResponse};
 use reqwest::StatusCode;
-use serde_json::{self, json};
+use serde_json::json;
 
 pub enum ApiError {
     // Login

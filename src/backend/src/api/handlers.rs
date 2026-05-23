@@ -21,11 +21,28 @@ use crate::{
 pub struct Auth{uuid: Uuid}
 
 #[derive(Deserialize)]
+pub struct RawLoginRequest {
+    pub username: String,
+    pub password: String,
+    pub url: String
+}
+
+#[derive(Deserialize)]
 #[derive(Clone)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,
     pub url: String
+}
+
+impl From<RawLoginRequest> for LoginRequest {
+    fn from(value: RawLoginRequest) -> Self {
+        return LoginRequest {
+            username: value.username,
+            password: value.password,
+            url: value.url.trim_end_matches('/').to_string()
+        };
+    }
 }
 
 impl<S> FromRequestParts<S> for Auth
@@ -99,8 +116,10 @@ pub async fn recent(
 
 pub async fn login(
     State(state): State<ApiState>,
-    Json(login_request): Json<LoginRequest>
+    Json(login_request): Json<RawLoginRequest>
 ) -> Result<Json<serde_json::Value>, ApiError> {
+    let login_request: LoginRequest = login_request.into();
+
     let navidrome_native = NavidromeNativeSession::new(login_request.clone()).await;
     let navidrome_subsonic = NavidromeSubsonicSession::new(login_request).await;
 

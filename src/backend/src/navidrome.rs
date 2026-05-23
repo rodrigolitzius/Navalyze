@@ -37,18 +37,6 @@ pub enum NavidromeSessionError {
     Unauthorized,
 }
 
-// TODO: Not a great way to do it. Whoever is reading the login request
-// should NOT have to call sanitize before reading
-impl LoginRequest {
-    fn sanitize(self) -> Self {
-        return LoginRequest {
-            username: self.username,
-            password: self.password,
-            url: self.url.trim_end_matches('/').to_string()
-        };
-    }
-}
-
 pub fn validate_login_response(response: Result<reqwest::Response, reqwest::Error>) -> Result<reqwest::Response, NavidromeSessionError> {
     let response = match response {
         Ok(v) => v,
@@ -69,8 +57,6 @@ pub fn validate_login_response(response: Result<reqwest::Response, reqwest::Erro
 
 impl NavidromeNativeSession {
     pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {
-        let login_request = login_request.sanitize();
-
         let client = match reqwest::Client::builder().tls_danger_accept_invalid_certs(true).build() {
             Ok(v) => v,
             Err(e) => {
@@ -142,8 +128,6 @@ impl NavidromeNativeSession {
 impl NavidromeSubsonicSession {
     // TODO: Actually test if this fails if the login request has invalid credentials
     pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {
-        let login_request = login_request.sanitize();
-
         let salt: String = rand::rng()
             .sample_iter(Alphanumeric)
             .take(8)

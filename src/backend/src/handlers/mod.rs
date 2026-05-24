@@ -68,29 +68,29 @@ where
     ApiState: axum::extract::FromRef<S>,
     S: Send + Sync
 {
-    type Rejection = StatusCode;
+    type Rejection = ApiError;
 
     async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
         let state = ApiState::from_ref(state);
 
         let auth_header = match parts.headers.get("Authorization") {
-            None => {return Err(StatusCode::UNAUTHORIZED)},
+            None => {return Err(ApiError::Unauthorized("Missing Authorization header".into()))},
             Some(v) => v
         };
 
         let header_string = match auth_header.to_str() {
             Ok(v) => v,
-            Err(_) => {return Err(StatusCode::UNAUTHORIZED)}
+            Err(_) => {return Err(ApiError::Unauthorized("Invalid Authorization header".into()))}
         };
 
         let uuid = match Uuid::from_str(header_string) {
             Ok(v) => v,
-            Err(_) => {return Err(StatusCode::UNAUTHORIZED);}
+            Err(_) => {return Err(ApiError::Unauthorized("Authorization header is not and UUID".into()));}
         };
 
         return match state.sessions.read().await.contains_key(&uuid) {
             true => Ok(Auth{uuid: uuid}),
-            false => Err(StatusCode::UNAUTHORIZED)
+            false => {return Err(ApiError::Unauthorized("You don't have permission to access this".into()))}
         }
     }
 }

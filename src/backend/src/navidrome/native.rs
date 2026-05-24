@@ -45,7 +45,6 @@ impl NavidromeNativeSession {
         });
     }
 
-    // TODO: Make a struct to deserialize from this json output
     pub async fn song(self: &Self, id: &str) -> Result<serde_json::Value, reqwest::Error> {
         let response = self.client.get(format!("{}/api/song/{}", self.url, id))
             .send()

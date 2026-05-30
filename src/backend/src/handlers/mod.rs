@@ -6,7 +6,7 @@ pub mod artists;
 use std::{str::FromStr, collections::HashMap};
 use tokio::sync::{RwLock, RwLockReadGuard};
 use num_traits::Bounded;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -31,10 +31,12 @@ struct Artist {
     missing: bool
 }
 
-#[derive(Deserialize)]
-struct ArtistCount {
+#[derive(Serialize, Clone)]
+struct ArtistStat {
+    name: String,
+    id: String,
     plays: u64,
-    name: String
+    played_min: f64
 }
 
 #[derive(Deserialize)]

@@ -5,12 +5,13 @@ use crate::{
 
 pub async fn most_played_artists(
     State(state): State<ApiState>,
+    Query(query): Query<HashMap<String, String>>,
     auth: Auth,
     range: Range<u64>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    let mut artist_count: HashMap<String, ArtistCount> = HashMap::new();
+    let mut artist_count: HashMap<String, ArtistStat> = HashMap::new();
 
     let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
 
@@ -20,27 +21,35 @@ pub async fn most_played_artists(
             None => continue
         };
 
+        let duration = song_data["duration"].as_f64().unwrap();
+
         for artist in song_data["participants"]["artist"].as_array().unwrap().iter() {
             let artist: Artist = serde_json::from_value((artist).clone()).unwrap();
 
             match artist_count.get_mut(&artist.id) {
-                Some(v) => (*v).plays += 1,
+                Some(v) => {
+                    (*v).plays += 1;
+                    (*v).played_min += duration
+                },
                 None => {
                     artist_count.insert(
-                        artist.id,
-                        ArtistCount {name: artist.name, plays: 1}
+                        artist.id.clone(),
+                        ArtistStat {id: artist.id, name: artist.name, plays: 1, played_min: duration}
                     );
                 }
             };
         }
     }
 
-    let mut all_artists: Vec<(String, String, u64)> = Vec::new();
-    for (id, artist) in artist_count {
-        all_artists.push((id, artist.name, artist.plays));
+    let mut limit = get_param_default(&query, "limit", artist_count.len());
+    if limit > artist_count.len() {
+        limit = artist_count.len()
     }
 
-    all_artists.sort_by(|a, b| { b.2.cmp(&a.2)});
+    let mut all_artists: Vec<ArtistStat> = artist_count.into_values().collect();
 
-    return Ok(Json(serde_json::to_value(all_artists).unwrap()));
+    all_artists.sort_by(|a, b| { b.played_min.total_cmp(&a.played_min)});
+    let select = all_artists[..limit].to_vec();
+
+    return Ok(Json(serde_json::to_value(select).unwrap()));
 }

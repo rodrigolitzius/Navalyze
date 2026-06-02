@@ -22,6 +22,7 @@ pub async fn recent(
         };
 
         result.push(json!({
+            "id": music_info["id"],
             "title": music_info["title"],
             "artist": music_info["artist"],
             "album": music_info["album"],

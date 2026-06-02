@@ -11,7 +11,7 @@ html {
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background-color: #030303;
-    color: #350c0c;
+    color: #a18f8f;
     min-height: 100vh;
     padding: 40px 24px;
     line-height: 1.6;
@@ -436,7 +436,35 @@ body::after {
     z-index: 1;
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
 }
-/* dashboard esqueci de colocar aqui */
+/* dashboard aqui */
+.music-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    list-style: none;
+}
+
+.music-item:last-child {
+    border-bottom: none;
+}
+
+.music-title {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.music-artist {
+    color: #94a3b8;
+    font-size: 0.88rem;
+}
+
+.music-album {
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
 /* ===== Dashboard fim ===== */
 
 @keyframes slideDown {

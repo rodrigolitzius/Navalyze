@@ -22,29 +22,29 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch(server_url + '/dev/recent', {
         headers: { 'Authorization': token }
     })
-        .then(function (r) { return r.text(); })   // texto puro, não json
-        .then(function (texto) {
-            const linhas = texto.trim().split('\n').filter(Boolean).slice(0, 6);
+        .then(function (r) { return r.json(); })   // recebe json agora rodri
+        .then(function (dados) {
+            const itens = dados.slice(0, 6);
 
-            if (linhas.length === 0) {
+            if (itens.length === 0) {
                 lista.innerHTML = '<li style="color:#94a3b8;">Nenhuma música encontrada.</li>';
                 return;
             }
 
             lista.innerHTML = '';
-            linhas.forEach(function (linha) {
-                const match = linha.match(/"(.+?)"\s*-\s*"(.+?)"/);
-                const titulo = match ? match[1] : linha;
-                const artista = match ? match[2].split('•')[0].trim() : '';
-
+            itens.forEach(function (musica) {
+                const titulo = musica.title || 'sem título';
+                const artista = musica.artist || '';
+                const album = musica.album || '';
                 const li = document.createElement('li');
                 li.className = 'music-item';
                 li.innerHTML =
                     // TODO: trocar o emoji por <img src="URL_DA_CAPA"> quando tiver o endpoint
                     '<div class="album-cover">🎵</div>' +
                     '<div class="music-info">' +
-                        '<span class="music-title">' + titulo + '</span>' +
-                        '<span class="music-artist">' + artista + '</span>' +
+                        '<div class="music-title">' + titulo + '</div>' +
+                        '<div class="music-artist">' + artista + '</div>' +
+                        '<div class="music-album">' + album + '</div>' +
                     '</div>';
                 lista.appendChild(li);
             });

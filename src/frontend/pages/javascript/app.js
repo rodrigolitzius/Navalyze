@@ -24,9 +24,10 @@ form.addEventListener('submit', function(event) {
         body: JSON.stringify({ username: nome, password: senha, url: nd_url })
     }).then(function(response) {
         if (!response.ok) {
-            const error = new Error('HTTP ' + response.status);
-            error.code = response.status;
-            throw error;
+            return response.json().catch(() => ({})).then(function(data) {
+                const msg = data.error || 'Erro HTTP ' + response.status;
+                throw new Error(msg);
+            });
         }
         return response.json().then(function(json) {
             if (json.id) {
@@ -38,9 +39,7 @@ form.addEventListener('submit', function(event) {
             }
         });
     }).catch(function(error) {
-        if (error.code == 401) alert('Acesso negado. Verifique suas credenciais');
-        else if (error.code == 404) alert('Servidor Navidrome não encontrado');
-        else alert('Servidor retornou um erro: ' + error.message);
+        alert(error.message);
     }).finally(function() {
         btn.textContent = textooriginal;
         btn.disabled = false;

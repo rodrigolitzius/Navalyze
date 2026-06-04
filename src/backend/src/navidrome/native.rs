@@ -45,18 +45,18 @@ impl NavidromeNativeSession {
         });
     }
 
-    pub async fn song(self: &Self, id: &str) -> Result<serde_json::Value, reqwest::Error> {
+    pub async fn song(self: &Self, id: &str) -> Result<SongData, reqwest::Error> {
         let response = self.client.get(format!("{}/api/song/{}", self.url, id))
             .send()
             .await?
             .error_for_status()?;
 
-        let json: serde_json::Value = response.json().await?;
+        let json: SongData = response.json::<SongData>().await?;
 
         return Ok(json);
     }
 
-    pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> HashMap<String, serde_json::Value> {
+    pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> HashMap<String, SongData> {
         let mut result = HashMap::new();
 
         for scrobble in scrobbles {

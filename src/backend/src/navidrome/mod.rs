@@ -5,10 +5,9 @@ use axum::http::{HeaderMap, HeaderValue};
 use rand::{distr::Alphanumeric};
 use std::collections::HashMap;
 use reqwest::{self, Method};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use reqwest::Client;
 use rand::RngExt;
-use serde_json;
 
 use crate::handlers::LoginRequest;
 use crate::api::{Range, error::*};
@@ -44,9 +43,35 @@ pub struct Scrobble {
 }
 
 #[derive(Deserialize)]
-struct LoginResponse {
-    token: String,
-    id: String
+pub struct LoginResponse {
+    pub token: String,
+    pub id: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SongData {
+    pub id: String,
+    pub title: String,
+    pub artist: String,
+    pub album: String,
+    pub duration: f64,
+    pub participants: Participants
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Participants {
+    #[serde(rename = "artist")]
+    pub artists: Vec<Artist>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Artist {
+    pub id: String,
+    pub name: String,
+    pub missing: bool,
 }
 
 impl Scrobble {

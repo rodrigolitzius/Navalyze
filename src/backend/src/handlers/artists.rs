@@ -11,42 +11,40 @@ pub async fn most_played_artists(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    let mut artist_count: HashMap<String, ArtistStat> = HashMap::new();
+    let mut artist_stat: HashMap<String, ArtistStat> = HashMap::new();
 
     let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
 
-    for v in scrobbles.iter() {
-        let song_data = match session.tracks_hashmap.get(&v.media_file_id) {
+    for scrobble in scrobbles.iter() {
+        let song_data = match session.tracks_hashmap.get(&scrobble.media_file_id) {
             Some(v) => v,
             None => continue
         };
 
-        let duration = song_data["duration"].as_f64().unwrap();
+        let duration = song_data.duration;
 
-        for artist in song_data["participants"]["artist"].as_array().unwrap().iter() {
-            let artist: Artist = serde_json::from_value((artist).clone()).unwrap();
-
-            match artist_count.get_mut(&artist.id) {
+        for artist in song_data.participants.artists.iter() {
+            match artist_stat.get_mut(&artist.id) {
                 Some(v) => {
                     (*v).plays += 1;
                     (*v).played_min += duration
                 },
                 None => {
-                    artist_count.insert(
+                    artist_stat.insert(
                         artist.id.clone(),
-                        ArtistStat {id: artist.id, name: artist.name, plays: 1, played_min: duration}
+                        ArtistStat {id: artist.id.clone(), name: artist.name.clone(), plays: 1, played_min: duration}
                     );
                 }
             };
         }
     }
 
-    let mut limit = get_param_default(&query, "limit", artist_count.len());
-    if limit > artist_count.len() {
-        limit = artist_count.len()
+    let mut limit = get_param_default(&query, "limit", artist_stat.len());
+    if limit > artist_stat.len() {
+        limit = artist_stat.len() - 1
     }
 
-    let mut all_artists: Vec<ArtistStat> = artist_count.into_values().collect();
+    let mut all_artists: Vec<ArtistStat> = artist_stat.into_values().collect();
 
     all_artists.sort_by(|a, b| { b.played_min.total_cmp(&a.played_min)});
     let select = all_artists[..limit].to_vec();

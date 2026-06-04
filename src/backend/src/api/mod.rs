@@ -4,9 +4,7 @@ use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use crate::{
-    navidrome::Scrobble, navidrome::{NavidromeNativeSession, NavidromeSubsonicSession}
-};
+use crate::navidrome::{NavidromeNativeSession, NavidromeSubsonicSession, Scrobble, SongData};
 
 #[allow(unused)]
 pub struct LoginSession {
@@ -14,7 +12,7 @@ pub struct LoginSession {
     pub navidrome_subsonic: NavidromeSubsonicSession,
     pub uuid: uuid::Uuid,
     pub scrobbles: Vec<Scrobble>,
-    pub tracks_hashmap: HashMap<String, serde_json::Value>,
+    pub tracks_hashmap: HashMap<String, SongData>,
 }
 
 #[derive(Clone)]

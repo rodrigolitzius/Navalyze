@@ -23,14 +23,6 @@ use crate::{
 
 pub struct Auth{uuid: Uuid}
 
-#[allow(unused)]
-#[derive(Deserialize)]
-struct Artist {
-    id: String,
-    name: String,
-    missing: bool
-}
-
 #[derive(Serialize, Clone)]
 struct ArtistStat {
     name: String,

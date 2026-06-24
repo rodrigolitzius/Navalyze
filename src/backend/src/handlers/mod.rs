@@ -8,7 +8,7 @@ pub mod tracks;
 use std::{str::FromStr, collections::HashMap};
 use tokio::sync::{RwLock, RwLockReadGuard};
 use num_traits::Bounded;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use serde_json::json;
 use uuid::Uuid;
 
@@ -24,14 +24,6 @@ use crate::{
 };
 
 pub struct Auth{uuid: Uuid}
-
-#[derive(Serialize, Clone)]
-struct ArtistStat {
-    name: String,
-    id: String,
-    plays: u64,
-    played_hours: f64
-}
 
 #[derive(Deserialize)]
 pub struct RawLoginRequest {

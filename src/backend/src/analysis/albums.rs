@@ -19,8 +19,9 @@ pub struct AlbumStat {
 impl<'a> GroupScrobble<'a> for AlbumStat {
     type Result = HashMap<String, AlbumStat>;
     type Source = (Vec<&'a Scrobble>, &'a HashMap<String, SongData>);
+    type Include = Option<Vec<String>>;
 
-    fn group(source: Self::Source) -> Self::Result {
+    fn group(source: Self::Source, include: Self::Include) -> Self::Result {
         let mut album_stat: Self::Result = HashMap::new();
 
         for scrobble in source.0.iter() {
@@ -28,6 +29,13 @@ impl<'a> GroupScrobble<'a> for AlbumStat {
                 Some(v) => v,
                 None => continue
             };
+
+            match &include {
+                Some(v) => {
+                    if !v.contains(&song_data.album_id.clone()) {continue}
+                }
+                None => {}
+            }
 
             let duration_hour = song_data.duration / (60.0*60.0);
 

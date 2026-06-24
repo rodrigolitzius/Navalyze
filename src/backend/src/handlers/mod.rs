@@ -2,6 +2,7 @@ pub mod login;
 pub mod recent;
 pub mod relay;
 pub mod artists;
+pub mod artist;
 pub mod albums;
 pub mod tracks;
 
@@ -50,7 +51,6 @@ impl From<RawLoginRequest> for LoginRequest {
     }
 }
 
-// TODO: Make this implementation use ApiError
 impl<S> FromRequestParts<S> for Auth
 where
     ApiState: axum::extract::FromRef<S>,

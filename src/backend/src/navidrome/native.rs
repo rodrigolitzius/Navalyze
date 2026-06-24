@@ -19,7 +19,7 @@ impl NavidromeNativeSession {
             .send()
             .await;
 
-        let response = validate_login_response(response)?;
+        let response = validate_reqwest_response(response)?;
 
         let login_response: LoginResponse = response
             .json()

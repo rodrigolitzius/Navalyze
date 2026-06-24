@@ -23,6 +23,7 @@ pub struct NavidromeNativeSession {
 #[allow(unused)]
 pub struct NavidromeSubsonicSession {
     pub default_params: Vec<(String, String)>,
+    pub url: String,
     pub client: reqwest::Client,
     pub salt: String,
     pub token: String
@@ -31,6 +32,7 @@ pub struct NavidromeSubsonicSession {
 pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
     Unreachable(reqwest::Error),
+    ParseJson(serde_json::Error),
     Unauthorized,
 }
 
@@ -46,6 +48,21 @@ pub struct Scrobble {
 pub struct LoginResponse {
     pub token: String,
     pub id: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArtistGetArtist {
+    pub name: String,
+    pub album_count: u64,
+    pub album: Vec<AlbumGetArtist>
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AlbumGetArtist {
+    pub id: String,
+    pub year: u64
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -101,12 +118,22 @@ impl From<NavidromeSessionError> for ApiError {
             ),
             NavidromeSessionError::Unauthorized => ApiError::Unauthorized(
                 "Invalid credentials".into()
+            ),
+
+            NavidromeSessionError::ParseJson(e) => ApiError::Internal(
+                format!("Could not parse Navidrome's response: {}", e.to_string())
             )
         }
     }
 }
 
-pub fn validate_login_response(response: Result<reqwest::Response, reqwest::Error>) -> Result<reqwest::Response, NavidromeSessionError> {
+impl From<serde_json::Error> for NavidromeSessionError {
+    fn from(value: serde_json::Error) -> Self {
+        return Self::ParseJson(value);
+    }
+}
+
+pub fn validate_reqwest_response(response: Result<reqwest::Response, reqwest::Error>) -> Result<reqwest::Response, NavidromeSessionError> {
     let response = match response {
         Ok(v) => v,
         Err(e) => {

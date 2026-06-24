@@ -18,8 +18,9 @@ pub struct ArtistStat {
 impl<'a> GroupScrobble<'a> for ArtistStat {
     type Result = HashMap<String, ArtistStat>;
     type Source = (Vec<&'a Scrobble>, &'a HashMap<String, SongData>);
+    type Include = ();
 
-    fn group(source: Self::Source) -> Self::Result {
+    fn group(source: Self::Source, _include: Self::Include) -> Self::Result {
         let mut artist_stat: Self::Result = HashMap::new();
 
         for scrobble in source.0.iter() {

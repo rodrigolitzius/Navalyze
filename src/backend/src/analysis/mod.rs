@@ -5,6 +5,7 @@ pub mod artists;
 pub trait GroupScrobble<'a> {
     type Result;
     type Source;
+    type Include;
 
-    fn group(source: Self::Source) -> Self::Result;
+    fn group(source: Self::Source, include: Self::Include) -> Self::Result;
 }

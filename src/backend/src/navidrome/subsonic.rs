@@ -1,3 +1,5 @@
+use serde::de::Error;
+
 use crate::{navidrome::*};
 
 impl NavidromeSubsonicSession {
@@ -17,6 +19,7 @@ impl NavidromeSubsonicSession {
         default_params.push(("t".to_string(), hash.clone()));
         default_params.push(("c".to_string(), crate::APP_NAME.to_string()));
         default_params.push(("v".to_string(), "1.8.0".to_string()));
+        default_params.push(("f".to_string(), "json".to_string()));
 
         let response = reqwest::Client::new()
             .request(Method::GET, format!("{}/rest/ping", login_request.url))
@@ -24,15 +27,49 @@ impl NavidromeSubsonicSession {
             .send()
             .await;
 
-        let _response = validate_login_response(response)?;
+        let _response = validate_reqwest_response(response)?;
 
         let result = Self {
             default_params: default_params,
+            url: login_request.url,
             client: reqwest::Client::new(),
             salt: salt,
             token: hash
         };
 
         return Ok(result)
+    }
+
+    pub async fn get_artist(&self, id: String) -> Result<ArtistGetArtist, NavidromeSessionError> {
+        let url = format!("{}/rest/getArtist?id={}", self.url, id);
+
+        let mut client_queries: Vec<(String, String)> = Vec::new();
+        client_queries.push(("id".to_string(), id));
+
+        let response = self.client
+            .get(url)
+            .query(&self.default_params)
+            .query(&client_queries)
+            .send()
+            .await;
+
+        let response = validate_reqwest_response(response)?;
+
+        let artist: serde_json::Value = response.json().await.unwrap();
+        let artist = artist
+            .get("subsonic-response").ok_or(
+                NavidromeSessionError::ParseJson(
+                    serde_json::Error::missing_field("The result does not contain the \"subsonic-response\" field")
+                )
+            )?
+            .get("artist").ok_or(
+                NavidromeSessionError::ParseJson(
+                    serde_json::Error::missing_field("The result does not contain the \"artist\" field")
+                )
+            )?;
+
+        let artist: ArtistGetArtist = serde_json::from_value::<ArtistGetArtist>(artist.clone())?;
+
+        return Ok(artist);
     }
 }

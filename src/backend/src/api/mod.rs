@@ -15,7 +15,6 @@ use crate::{
     storage::Storage,
 };
 
-#[allow(unused)]
 pub struct LoginSession {
     pub navidrome_native: NavidromeNativeSession,
     pub navidrome_subsonic: NavidromeSubsonicSession,

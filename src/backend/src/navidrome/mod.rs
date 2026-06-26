@@ -2,14 +2,31 @@ pub mod native;
 pub mod subsonic;
 
 use rusqlite::Row;
+use uuid::Uuid;
 
-use crate::api::{
-    error::ApiError,
-    Range
-};
+use crate::{api::{
+    Range, error::ApiError
+}, navidrome::{native::AlbumData, subsonic::ResponseArtist}};
 
 #[derive(Clone)]
-#[allow(unused)]
+pub struct Artist {
+    #[allow(unused)]
+    pub id: String,
+    pub name: String,
+    pub album_count: u64,
+    pub music_brainz_id: Option<Uuid>,
+    pub albums: Vec<Album>
+}
+
+#[derive(Clone)]
+pub struct Album {
+    pub id: String,
+    #[allow(unused)]
+    pub name: String,
+    pub year: u64,
+}
+
+#[derive(Clone)]
 pub struct Scrobble {
     pub media_file_id: String,
     pub user_id: String,
@@ -21,6 +38,37 @@ pub enum NavidromeSessionError {
     Unreachable(reqwest::Error),
     ParseJson(serde_json::Error),
     Unauthorized,
+}
+
+impl Artist {
+    pub fn from_navidrome(artist: ResponseArtist, albums: Vec<AlbumData>) -> Artist {
+        let mut new_albums: Vec<Album> = Vec::new();
+        for album in albums {
+            new_albums.push(album.into());
+        }
+
+        let album_length = new_albums.len();
+
+        let result = Artist {
+            albums: new_albums,
+            album_count: album_length as u64,
+            id: artist.id,
+            music_brainz_id: artist.music_brainz_id,
+            name: artist.name
+        };
+
+        return result;
+    }
+}
+
+impl From<AlbumData> for Album {
+    fn from(value: AlbumData) -> Self {
+        return Self {
+            id: value.id,
+            name: value.name,
+            year: value.year
+        };
+    }
 }
 
 impl Scrobble {

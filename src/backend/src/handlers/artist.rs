@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::{
     handlers::*,
     analysis::{GroupScrobble, albums::AlbumStat},
-    navidrome::{Scrobble, subsonic::ResponseArtistAlbum}
+    navidrome::{Scrobble, Artist}
 };
 
 #[derive(Serialize)]
@@ -33,37 +33,29 @@ pub async fn artist_info(
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
     let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
 
-    let artist_info = session.navidrome_subsonic.get_artist(id.clone()).await?;
+    let artist_info = session.navidrome_subsonic.get_artist(&id).await?;
+    let artist_albums = session.navidrome_native.album(&id).await?;
 
-    let mut artist_info_albums: HashMap<String, ResponseArtistAlbum> = HashMap::new();
-    for album in artist_info.album {
-        let _ = artist_info_albums.insert(album.id.clone(), album);
-    }
+    let artist = Artist::from_navidrome(artist_info, artist_albums);
 
-    let ids: Vec<String> = artist_info_albums.clone().into_keys().collect();
+    let album_ids: Vec<String> = artist.albums.iter().map(|a| a.id.clone()).collect();
 
-    println!("Trying to find these IDs for artist {} ({})", id.clone(), artist_info.name);
-    println!("{:?}", ids);
-
-    let album_stat_albums = AlbumStat::group((scrobbles, &session.tracks_hashmap), Some(ids.clone()));
-
-    println!("Grouping returned: {:?}", album_stat_albums.clone().into_values().map(|s| s.id).collect::<Vec<String>>());
+    let album_stat = AlbumStat::group((scrobbles, &session.tracks_hashmap), Some(album_ids.clone()));
 
     let mut response_albums: Vec<AlbumResponse> = Vec::new();
-    for id in ids {
-        let stat = album_stat_albums.get(&id).ok_or(ApiError::Internal("Missing IDs".into()))?;
-        let get_artist = artist_info_albums.get(&id).ok_or(ApiError::Internal("Missing IDs".into()))?;
+    for album in artist.albums {
+        let stat = album_stat.get(&album.id).ok_or(ApiError::Internal("Missing IDs".into()))?;
 
         response_albums.push(AlbumResponse {
-            id: id,
+            id: album.id,
             name: stat.name.clone(),
             played_hours: stat.played_hours,
             plays: stat.plays,
-            year: get_artist.year,
+            year: album.year,
         });
     }
 
-    let mbz_artist = match artist_info.music_brainz_id {
+    let mbz_artist = match artist.music_brainz_id {
         Some(v) => state.storage.get_artist(session.db_domain_id, v).await?,
         None => None
     };
@@ -85,8 +77,8 @@ pub async fn artist_info(
     let result = ArtistResponse {
         artist_type: artist_type,
         gender: gender,
-        name: artist_info.name,
-        album_count: artist_info.album_count,
+        name: artist.name,
+        album_count: artist.album_count,
         albums: response_albums
     };
 

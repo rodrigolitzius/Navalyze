@@ -8,7 +8,7 @@ use crate::{
     navidrome::{
         native::{NavidromeNativeSession, LoginResponse, SongData},
         NavidromeSessionError,
-        Scrobble,
+        Scrobble, AlbumData,
         validate_reqwest_response
     },
     handlers::LoginRequest
@@ -89,5 +89,25 @@ impl NavidromeNativeSession {
         }
 
         return Ok(result);
+    }
+
+    pub async fn album(&self, artist_id: &String) -> Result<Vec<AlbumData>, NavidromeSessionError> {
+        let url = format!("{}/api/album", &self.url);
+
+        let mut queries: Vec<(String, String)> = Vec::new();
+
+        queries.push(("artist_id".into(), artist_id.clone()));
+
+        let response = self.client
+            .get(url)
+            .query(&queries)
+            .send()
+            .await;
+
+        let response = validate_reqwest_response(response)?;
+
+        let response = response.json::<serde_json::Value>().await.unwrap();
+
+        return Ok(serde_json::from_value::<Vec<AlbumData>>(response)?);
     }
 }

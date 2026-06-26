@@ -10,7 +10,7 @@ use reqwest::{Client, Method};
 
 use crate::{
     navidrome::{
-        subsonic::{ResponseArtist, ResponseArtistAlbum, NavidromeSubsonicSession},
+        subsonic::{ResponseArtist, NavidromeSubsonicSession},
         NavidromeSessionError,
         validate_reqwest_response
     },
@@ -20,9 +20,8 @@ use crate::{
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct RawResponseArtist {
+    id: String,
     name: String,
-    album_count: u64,
-    album: Vec<ResponseArtistAlbum>,
     music_brainz_id: String
 }
 
@@ -65,19 +64,17 @@ impl NavidromeSubsonicSession {
         let result = Self {
             default_params: default_params,
             url: login_request.url,
-            client: client,
-            salt: salt,
-            token: hash
+            client: client
         };
 
         return Ok(result)
     }
 
-    pub async fn get_artist(&self, id: String) -> Result<ResponseArtist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: &String) -> Result<ResponseArtist, NavidromeSessionError> {
         let url = format!("{}/rest/getArtist?id={}", self.url, id);
 
         let mut client_queries: Vec<(String, String)> = Vec::new();
-        client_queries.push(("id".to_string(), id));
+        client_queries.push(("id".to_string(), id.clone()));
 
         let response = self.client
             .get(url)
@@ -104,9 +101,8 @@ impl NavidromeSubsonicSession {
         let artist: RawResponseArtist = serde_json::from_value::<RawResponseArtist>(artist.clone())?;
 
         let artist = ResponseArtist {
+            id: artist.id,
             name: artist.name,
-            album_count: artist.album_count,
-            album: artist.album,
             music_brainz_id: match Uuid::from_str(&artist.music_brainz_id) {
                 Ok(v) => Some(v),
                 Err(_) => None,

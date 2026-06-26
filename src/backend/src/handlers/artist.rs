@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::{
     handlers::*,
     analysis::{GroupScrobble, albums::AlbumStat},
-    navidrome::{Scrobble, AlbumGetArtist}
+    navidrome::{Scrobble, subsonic::ResponseArtistAlbum}
 };
 
 #[derive(Serialize)]
@@ -33,16 +33,21 @@ pub async fn artist_info(
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
     let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
 
-    let artist_info = session.navidrome_subsonic.get_artist(id).await?;
+    let artist_info = session.navidrome_subsonic.get_artist(id.clone()).await?;
 
-    let mut artist_info_albums: HashMap<String, AlbumGetArtist> = HashMap::new();
+    let mut artist_info_albums: HashMap<String, ResponseArtistAlbum> = HashMap::new();
     for album in artist_info.album {
         let _ = artist_info_albums.insert(album.id.clone(), album);
     }
 
     let ids: Vec<String> = artist_info_albums.clone().into_keys().collect();
 
+    println!("Trying to find these IDs for artist {} ({})", id.clone(), artist_info.name);
+    println!("{:?}", ids);
+
     let album_stat_albums = AlbumStat::group((scrobbles, &session.tracks_hashmap), Some(ids.clone()));
+
+    println!("Grouping returned: {:?}", album_stat_albums.clone().into_values().map(|s| s.id).collect::<Vec<String>>());
 
     let mut response_albums: Vec<AlbumResponse> = Vec::new();
     for id in ids {

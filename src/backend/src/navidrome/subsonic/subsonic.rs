@@ -1,15 +1,28 @@
 use std::str::FromStr;
+use rand::{RngExt, distr::Alphanumeric};
 
-use serde::de::Error;
+use serde::{
+    Deserialize,
+    de::Error
+};
+use uuid::Uuid;
+use reqwest::{Client, Method};
 
-use crate::{navidrome::*};
+use crate::{
+    navidrome::{
+        subsonic::{ResponseArtist, ResponseArtistAlbum, NavidromeSubsonicSession},
+        NavidromeSessionError,
+        validate_reqwest_response
+    },
+    handlers::LoginRequest
+};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct RawArtistGetArtist {
+struct RawResponseArtist {
     name: String,
     album_count: u64,
-    album: Vec<AlbumGetArtist>,
+    album: Vec<ResponseArtistAlbum>,
     music_brainz_id: String
 }
 
@@ -60,7 +73,7 @@ impl NavidromeSubsonicSession {
         return Ok(result)
     }
 
-    pub async fn get_artist(&self, id: String) -> Result<ArtistGetArtist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: String) -> Result<ResponseArtist, NavidromeSessionError> {
         let url = format!("{}/rest/getArtist?id={}", self.url, id);
 
         let mut client_queries: Vec<(String, String)> = Vec::new();
@@ -88,9 +101,9 @@ impl NavidromeSubsonicSession {
                 )
             )?;
 
-        let artist: RawArtistGetArtist = serde_json::from_value::<RawArtistGetArtist>(artist.clone())?;
+        let artist: RawResponseArtist = serde_json::from_value::<RawResponseArtist>(artist.clone())?;
 
-        let artist = ArtistGetArtist {
+        let artist = ResponseArtist {
             name: artist.name,
             album_count: artist.album_count,
             album: artist.album,

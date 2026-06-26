@@ -2,10 +2,17 @@ pub mod error;
 
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    mbz::MbzSession, navidrome::{NavidromeNativeSession, NavidromeSubsonicSession, Scrobble, SongData}, sqlite::InternalDB, storage::Storage
+    mbz::MbzSession, navidrome::{
+        native::{NavidromeNativeSession, SongData},
+        subsonic::{NavidromeSubsonicSession},
+        Scrobble
+    },
+    sqlite::InternalDB,
+    storage::Storage,
 };
 
 #[allow(unused)]
@@ -16,6 +23,14 @@ pub struct LoginSession {
     pub scrobbles: Vec<Scrobble>,
     pub tracks_hashmap: HashMap<String, SongData>,
     pub db_domain_id: i64
+}
+
+#[derive(Deserialize)]
+#[derive(Clone)]
+pub struct LoginRequest {
+    pub username: String,
+    pub password: String,
+    pub url: String
 }
 
 #[derive(Clone)]

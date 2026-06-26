@@ -1,6 +1,9 @@
 use crate::{
     handlers::*,
-    navidrome::*
+    navidrome::{
+        native::NavidromeNativeSession, subsonic::NavidromeSubsonicSession,
+        Scrobble
+    }
 };
 
 pub async fn login(

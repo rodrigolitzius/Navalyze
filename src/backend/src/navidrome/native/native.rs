@@ -1,4 +1,18 @@
-use crate::{navidrome::*};
+use reqwest::Client;
+
+use std::collections::HashMap;
+
+use reqwest::header::{HeaderMap, HeaderValue};
+
+use crate::{
+    navidrome::{
+        native::{NavidromeNativeSession, LoginResponse, SongData},
+        NavidromeSessionError,
+        Scrobble,
+        validate_reqwest_response
+    },
+    handlers::LoginRequest
+};
 
 impl NavidromeNativeSession {
     pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {

@@ -11,8 +11,13 @@ pub struct NavidromeSubsonicSession {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicResponseArtistField {
+    pub artist: SubsonicResponseArtist
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ResponseArtist {
+pub struct SubsonicResponseArtist {
     pub id: String,
     pub name: String,
     pub music_brainz_id: Option<Uuid>

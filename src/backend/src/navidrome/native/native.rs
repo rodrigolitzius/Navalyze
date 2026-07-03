@@ -8,10 +8,10 @@ use crate::{
     navidrome::{
         native::{NavidromeNativeSession, LoginResponse, SongData},
         NavidromeSessionError,
-        Scrobble, AlbumData,
-        validate_reqwest_response
+        Scrobble, AlbumData
     },
-    handlers::LoginRequest
+    handlers::LoginRequest,
+    reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
 
 impl NavidromeNativeSession {
@@ -31,14 +31,10 @@ impl NavidromeNativeSession {
             .post(format!("{}/auth/login", login_request.url))
             .json(&body)
             .send()
-            .await;
-
-        let response = validate_reqwest_response(response)?;
-
-        let login_response: LoginResponse = response
-            .json()
             .await
-            .expect("Required fields are missing from Navidrome's response");
+            .map_reqwest_api_err()?;
+
+        let login_response: LoginResponse = response.into_json().await?;
 
         let mut default_headers = HeaderMap::new();
         default_headers.insert(
@@ -70,13 +66,10 @@ impl NavidromeNativeSession {
         let response = self.client
             .get(&url)
             .send()
-            .await;
+            .await
+            .map_reqwest_api_err()?;
 
-        let response = validate_reqwest_response(response)?;
-
-        let response = response.json::<Vec<SongData>>().await.map_err(|e|
-            NavidromeSessionError::Reqwest(e)
-        )?;
+        let response = response.into_json::<Vec<SongData>>().await?;
 
         let media_file_ids: Vec<&String> = scrobbles.iter().map(|s| {&s.media_file_id}).collect();
 
@@ -102,12 +95,11 @@ impl NavidromeNativeSession {
             .get(url)
             .query(&queries)
             .send()
-            .await;
+            .await
+            .map_reqwest_api_err()?;
 
-        let response = validate_reqwest_response(response)?;
+        let response: Vec<AlbumData> = response.into_json().await?;
 
-        let response = response.json::<serde_json::Value>().await.unwrap();
-
-        return Ok(serde_json::from_value::<Vec<AlbumData>>(response)?);
+        return Ok(response);
     }
 }

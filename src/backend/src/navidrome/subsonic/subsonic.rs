@@ -1,29 +1,16 @@
-use std::str::FromStr;
 use rand::{RngExt, distr::Alphanumeric};
 
-use serde::{
-    Deserialize,
-    de::Error
-};
-use uuid::Uuid;
 use reqwest::{Client, Method};
 
 use crate::{
     navidrome::{
-        subsonic::{ResponseArtist, NavidromeSubsonicSession},
-        NavidromeSessionError,
-        validate_reqwest_response
+        subsonic::{SubsonicResponseArtist, SubsonicResponseArtistField, NavidromeSubsonicSession},
+        SubsonicResponse,
+        NavidromeSessionError
     },
-    handlers::LoginRequest
+    handlers::LoginRequest,
+    reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RawResponseArtist {
-    id: String,
-    name: String,
-    music_brainz_id: String
-}
 
 impl NavidromeSubsonicSession {
     // TODO: Actually test if this fails if the login request has invalid credentials
@@ -53,13 +40,12 @@ impl NavidromeSubsonicSession {
             }
         };
 
-        let response = client
+        let _response = client
             .request(Method::GET, url)
             .query(&default_params)
             .send()
-            .await;
-
-        let _response = validate_reqwest_response(response)?;
+            .await
+            .map_reqwest_api_err()?;
 
         let result = Self {
             default_params: default_params,
@@ -70,7 +56,7 @@ impl NavidromeSubsonicSession {
         return Ok(result)
     }
 
-    pub async fn get_artist(&self, id: &String) -> Result<ResponseArtist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: &String) -> Result<SubsonicResponseArtist, NavidromeSessionError> {
         let url = format!("{}/rest/getArtist?id={}", self.url, id);
 
         let mut client_queries: Vec<(String, String)> = Vec::new();
@@ -81,34 +67,11 @@ impl NavidromeSubsonicSession {
             .query(&self.default_params)
             .query(&client_queries)
             .send()
-            .await;
+            .await
+            .map_reqwest_api_err()?;
 
-        let response = validate_reqwest_response(response)?;
+        let artist: SubsonicResponse<SubsonicResponseArtistField> = response.into_json().await?;
 
-        let artist: serde_json::Value = response.json().await.unwrap();
-        let artist = artist
-            .get("subsonic-response").ok_or(
-                NavidromeSessionError::ParseJson(
-                    serde_json::Error::missing_field("The result does not contain the \"subsonic-response\" field")
-                )
-            )?
-            .get("artist").ok_or(
-                NavidromeSessionError::ParseJson(
-                    serde_json::Error::missing_field("The result does not contain the \"artist\" field")
-                )
-            )?;
-
-        let artist: RawResponseArtist = serde_json::from_value::<RawResponseArtist>(artist.clone())?;
-
-        let artist = ResponseArtist {
-            id: artist.id,
-            name: artist.name,
-            music_brainz_id: match Uuid::from_str(&artist.music_brainz_id) {
-                Ok(v) => Some(v),
-                Err(_) => None,
-            }
-        };
-
-        return Ok(artist);
+        return Ok(artist.subsonic_response.artist);
     }
 }

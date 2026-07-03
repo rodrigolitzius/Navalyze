@@ -1,12 +1,20 @@
 pub mod native;
 pub mod subsonic;
 
+use reqwest::StatusCode;
 use rusqlite::Row;
 use uuid::Uuid;
+use serde::Deserialize;
 
 use crate::{api::{
     Range, error::ApiError
-}, navidrome::{native::AlbumData, subsonic::ResponseArtist}};
+}, navidrome::{native::AlbumData, subsonic::SubsonicResponseArtist}, reqwest::ReqwestApiError};
+
+#[derive(Deserialize)]
+pub struct SubsonicResponse<T> {
+    #[serde(rename = "subsonic-response")]
+    subsonic_response: T
+}
 
 #[derive(Clone)]
 pub struct Artist {
@@ -36,11 +44,12 @@ pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
     Unreachable(reqwest::Error),
     ParseJson(serde_json::Error),
+    Status(StatusCode),
     Unauthorized,
 }
 
 impl Artist {
-    pub fn from_navidrome(artist: ResponseArtist, albums: Vec<AlbumData>) -> Artist {
+    pub fn from_navidrome(artist: SubsonicResponseArtist, albums: Vec<AlbumData>) -> Artist {
         let mut new_albums: Vec<Album> = Vec::new();
         for album in albums {
             new_albums.push(album.into());
@@ -96,7 +105,23 @@ impl From<NavidromeSessionError> for ApiError {
 
             NavidromeSessionError::ParseJson(e) => ApiError::Internal(
                 format!("Could not parse Navidrome's response: {}", e.to_string())
+            ),
+
+            NavidromeSessionError::Status(s) => ApiError::Internal(
+                format!("Navidrome returned an unexpected status code: {}", s.as_str())
             )
+        }
+    }
+}
+
+impl From<ReqwestApiError> for NavidromeSessionError {
+    fn from(value: ReqwestApiError) -> Self {
+        return match value {
+            ReqwestApiError::Connection(e) => NavidromeSessionError::Unreachable(e),
+            ReqwestApiError::Other(e) => NavidromeSessionError::Unreachable(e),
+            ReqwestApiError::Unauthorized(_) => NavidromeSessionError::Unauthorized,
+            ReqwestApiError::Status(s) => NavidromeSessionError::Status(s),
+            ReqwestApiError::ParseJson(e) => NavidromeSessionError::ParseJson(e)
         }
     }
 }
@@ -105,24 +130,6 @@ impl From<serde_json::Error> for NavidromeSessionError {
     fn from(value: serde_json::Error) -> Self {
         return Self::ParseJson(value);
     }
-}
-
-pub fn validate_reqwest_response(response: Result<reqwest::Response, reqwest::Error>) -> Result<reqwest::Response, NavidromeSessionError> {
-    let response = match response {
-        Ok(v) => v,
-        Err(e) => {
-            return Err(NavidromeSessionError::Unreachable(e));
-        }
-    };
-
-    let response = match response.error_for_status() {
-        Ok(v) => v,
-        Err(_) => {
-            return Err(NavidromeSessionError::Unauthorized);
-        }
-    };
-
-    return Ok(response);
 }
 
 pub fn build_scrobble(row: &Row) -> Result<Scrobble, rusqlite::Error> {

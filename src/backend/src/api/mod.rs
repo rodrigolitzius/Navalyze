@@ -26,6 +26,7 @@ pub struct LoginSession {
 
 #[derive(Deserialize)]
 #[derive(Clone)]
+#[allow(unused)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,

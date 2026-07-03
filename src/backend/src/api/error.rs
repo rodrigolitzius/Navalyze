@@ -28,6 +28,14 @@ impl From<StorageError> for ApiError {
 
             StorageError::Rusqlite(e) => ApiError::Internal(
                 format!("Internal database error: {}", e.to_string())
+            ),
+
+            StorageError::MbzStatus(s) => ApiError::Internal(
+                format!("MusicBrainz returned an unexpected status code: {}", s.as_str())
+            ),
+
+            StorageError::MbzEmptyArtistList => ApiError::Internal(
+                format!("MusicBrainz's artist response was empty")
             )
         }
     }

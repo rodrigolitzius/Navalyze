@@ -5,6 +5,7 @@ mod mbz;
 mod sqlite;
 mod storage;
 mod analysis;
+mod reqwest;
 
 use axum::{Router, routing::{get, post}};
 use tower_http::cors::{Any, CorsLayer};

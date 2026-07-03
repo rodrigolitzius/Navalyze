@@ -1,4 +1,4 @@
-use crate::mbz::*;
+use crate::{mbz::*, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}};
 
 impl MbzSession {
     pub fn new(token: Uuid) -> Self {
@@ -24,28 +24,11 @@ impl MbzSession {
         let response = self.client
             .get(format!("{MBZ_URL}/metadata/artist?artist_mbids={}&inc=artist", id))
             .send()
-            .await?
-            .error_for_status()
-            .unwrap();
+            .await
+            .map_reqwest_api_err()?;
 
-        let json = response.json::<serde_json::Value>().await?;
+        let artists = response.into_json::<Vec<MbzArtist>>().await?;
 
-        let json = match json.as_array() {
-            Some(v) => v,
-            None => {
-                return Err(MbzError::ParseJson(serde_json::Error::custom("Mbz response is not an array")))
-            }
-        };
-
-        let json = match json.iter().nth(0) {
-            Some(v) => v,
-            None => {
-                return Err(MbzError::ParseJson(serde_json::Error::custom("Mbz response is empty")))
-            }
-        };
-
-        return Ok(
-            serde_json::from_value::<MbzArtist>(json.clone())?
-        );
+        artists.into_iter().next().ok_or(MbzError::EmptyArtistList)
     }
 }

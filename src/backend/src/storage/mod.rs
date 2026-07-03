@@ -1,5 +1,7 @@
 mod storage;
 
+use reqwest::StatusCode;
+
 use crate::{
     mbz::{MbzError, MbzSession},
     sqlite::InternalDB
@@ -15,14 +17,18 @@ pub struct Storage {
 pub enum StorageError {
     Rusqlite(rusqlite::Error),
     Reqwest(reqwest::Error),
-    ParseJson(serde_json::Error)
+    ParseJson(serde_json::Error),
+    MbzStatus(StatusCode),
+    MbzEmptyArtistList
 }
 
 impl From<MbzError> for StorageError {
     fn from(value: MbzError) -> Self {
         return match value {
             MbzError::ParseJson(e) => StorageError::ParseJson(e),
-            MbzError::Reqwest(e) => StorageError::Reqwest(e)
+            MbzError::Reqwest(e) => StorageError::Reqwest(e),
+            MbzError::UnexpectedStatus(s) => StorageError::MbzStatus(s),
+            MbzError::EmptyArtistList => StorageError::MbzEmptyArtistList
         }
     }
 }

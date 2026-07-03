@@ -20,7 +20,7 @@ impl InternalDB {
             );
 
             CREATE TABLE IF NOT EXISTS artist (
-                id TEXT NOT NULL UNIQUE,
+                id TEXT NOT NULL,
                 domain_id INTEGER NOT NULL,
                 json TEXT NOT NULL,
 
@@ -32,13 +32,14 @@ impl InternalDB {
     }
 
     pub fn add_domain(&self, domain: String) -> Result<i64, rusqlite::Error> {
-        let id = self.open()?.query_row(format!("
-            INSERT INTO domain (domain)
-            VALUES ('{}')
-            ON CONFLICT(domain)
-            DO UPDATE SET domain = excluded.domain
-            RETURNING id
-            ", domain).as_str(), [],
+        let id = self.open()?.query_row("
+                INSERT INTO domain (domain)
+                VALUES (?)
+                ON CONFLICT(domain)
+                DO UPDATE SET domain = excluded.domain
+                RETURNING id
+            ",
+            [domain],
             |row| {row.get::<usize, i64>(0)}
         );
 
@@ -46,32 +47,34 @@ impl InternalDB {
     }
 
     pub fn add_artist(&self, domain_id: i64, artist_id: uuid::Uuid, json: serde_json::Value) -> Result<(), rusqlite::Error> {
-        let db = self.open()?;
-        db.execute(format!("
-            INSERT INTO artist (id, domain_id, json) VALUES ('{}', {}, '{}')
-        ", artist_id, domain_id, json).as_str(), [])?;
+        let _changed = self.open()?.execute("
+                INSERT INTO artist (id, domain_id, json)
+                VALUES (?, ?, ?)
+            ",
+            [artist_id.to_string(), domain_id.to_string(), json.to_string()]
+        )?;
 
         return Ok(());
     }
 
     pub fn get_artist(&self, domain_id: i64, artist_id: uuid::Uuid) -> Result<Option<String>, rusqlite::Error> {
-        let db = self.open()?;
-        let mut stmt = db.prepare(format!("
-            SELECT json FROM artist
-            WHERE domain_id={} AND id='{}'
-            LIMIT 1
-        ", domain_id, artist_id).as_str())?;
+        let artist = self.open()?.query_row("
+                SELECT json FROM artist
+                WHERE domain_id=? AND id=?
+                LIMIT 1
+            ",
+            [domain_id.to_string(), artist_id.to_string()],
+            |row| row.get::<usize, String>(0)
+        );
 
-        let queried_artists = stmt.query_map([], |row| {
-            let json: String = row.get("json")?;
-            return Ok(json);
-        })?;
+        let artist = match artist {
+            Err(e) => match e {
+                rusqlite::Error::QueryReturnedNoRows => {return Ok(None)},
+                _ => Err(e)?
+            }
+            Ok(v) => v
+        };
 
-        let mut artists: Vec<String> = Vec::new();
-        for artist in queried_artists {
-            artists.push(artist?);
-        }
-
-        return Ok(artists.into_iter().nth(0));
+        return Ok(Some(artist));
     }
 }

@@ -1,7 +1,7 @@
 use crate::{
     handlers::*,
-    navidrome::*,
-    analysis::tracks::TrackStat
+    analysis::tracks::TrackStat,
+    navidrome::scrobble::Scrobble
 };
 
 pub async fn most_played_tracks(
@@ -12,7 +12,8 @@ pub async fn most_played_tracks(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
+    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    let scrobbles = Scrobble::filter_range(scrobbles, range);
 
     let tracks_stat = TrackStat::group(scrobbles, &session.tracks_hashmap);
 

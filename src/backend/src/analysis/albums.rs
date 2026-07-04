@@ -3,7 +3,7 @@ use std::{collections::HashMap};
 use serde::Serialize;
 
 use crate::{
-    navidrome::{Scrobble, native::SongData}
+    navidrome::{scrobble::Scrobble, native::SongData}
 };
 
 #[derive(Serialize, Clone)]
@@ -18,8 +18,7 @@ pub struct AlbumStat {
 impl AlbumStat {
     pub fn group(
         scrobbles: Vec<&Scrobble>,
-        track_hashmap: &HashMap<String, SongData>,
-        include: Option<Vec<String>>
+        track_hashmap: &HashMap<String, SongData>
     ) -> HashMap<String, AlbumStat> {
         let mut album_stat: HashMap<String, AlbumStat> = HashMap::new();
 
@@ -28,13 +27,6 @@ impl AlbumStat {
                 Some(v) => v,
                 None => continue
             };
-
-            match &include {
-                Some(v) => {
-                    if !v.contains(&song_data.album_id.clone()) {continue}
-                }
-                None => {}
-            }
 
             let duration_hour = song_data.duration / (60.0*60.0);
 

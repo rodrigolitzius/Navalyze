@@ -9,7 +9,7 @@ use crate::{
     mbz::MbzSession, navidrome::{
         native::{NavidromeNativeSession, SongData},
         subsonic::{NavidromeSubsonicSession},
-        Scrobble
+        scrobble::Scrobble
     },
     sqlite::InternalDB,
     storage::Storage,

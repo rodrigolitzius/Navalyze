@@ -1,14 +1,17 @@
 pub mod native;
 pub mod subsonic;
+pub mod scrobble;
 
 use reqwest::StatusCode;
 use rusqlite::Row;
 use uuid::Uuid;
 use serde::Deserialize;
 
-use crate::{api::{
-    Range, error::ApiError
-}, navidrome::{native::AlbumData, subsonic::SubsonicResponseArtist}, reqwest::ReqwestApiError};
+use crate::{
+    api::{error::ApiError},
+    navidrome::{native::AlbumData, subsonic::SubsonicResponseArtist, scrobble::Scrobble},
+    reqwest::ReqwestApiError,
+};
 
 #[derive(Deserialize)]
 pub struct SubsonicResponse<T> {
@@ -31,13 +34,6 @@ pub struct Album {
     #[allow(unused)]
     pub name: String,
     pub year: u64,
-}
-
-#[derive(Clone)]
-pub struct Scrobble {
-    pub media_file_id: String,
-    pub user_id: String,
-    pub submission_time: u64
 }
 
 pub enum NavidromeSessionError {
@@ -73,20 +69,6 @@ impl From<AlbumData> for Album {
             name: value.name,
             year: value.year
         };
-    }
-}
-
-impl Scrobble {
-    pub fn filter_range(scrobbles: &Vec<Scrobble>, range: Range<u64>) -> Vec<&Scrobble> {
-        let mut refs: Vec<&Scrobble> = Vec::new();
-
-        for scrobble in scrobbles {
-            if range.contains(&scrobble.submission_time) {
-                refs.push(&scrobble);
-            }
-        }
-
-        return refs;
     }
 }
 

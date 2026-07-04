@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Serialize;
 
 use crate::{
-    navidrome::{Scrobble, native::SongData}
+    navidrome::{scrobble::Scrobble, native::SongData}
 };
 
 #[derive(Serialize, Clone)]

@@ -15,7 +15,7 @@ use clap::{Parser};
 
 use crate::{
     handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*},
-    navidrome::{Scrobble, build_scrobble},
+    navidrome::{scrobble::Scrobble, build_scrobble},
     api::{ApiState}
 };
 

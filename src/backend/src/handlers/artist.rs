@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::{
     handlers::*,
     analysis::{albums::AlbumStat, artist::ArtistStat},
-    navidrome::{Scrobble, Artist}
+    navidrome::{scrobble::Scrobble, Artist}
 };
 
 #[derive(Serialize)]
@@ -31,15 +31,19 @@ pub async fn artist_info(
     range: Range<u64>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
-    let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
+
+    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    let scrobbles = Scrobble::filter_range(scrobbles, range);
 
     let artist = Artist::from_navidrome(
         session.navidrome_subsonic.get_artist(&id).await?,
         session.navidrome_native.album(&id).await?
     );
 
-    let album_ids: Vec<String> = artist.albums.iter().map(|a| a.id.clone()).collect();
-    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap, Some(album_ids.clone()));
+    let album_ids: Vec<&String> = artist.albums.iter().map(|a| &a.id).collect();
+    let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &album_ids);
+
+    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
 
     let mbz_artist = match artist.music_brainz_id {
         Some(v) => state.storage.get_artist(session.db_domain_id, v).await?,

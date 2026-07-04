@@ -1,7 +1,7 @@
 use crate::{
     handlers::*,
-    navidrome::*,
-    analysis::albums::AlbumStat
+    analysis::albums::AlbumStat,
+    navidrome::scrobble::Scrobble
 };
 
 pub async fn most_played_albums(
@@ -12,9 +12,10 @@ pub async fn most_played_albums(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    let scrobbles = Scrobble::filter_range(&session.scrobbles, range);
+    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    let scrobbles = Scrobble::filter_range(scrobbles, range);
 
-    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap, None);
+    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
 
     let mut limit = get_param_default(&query, "limit", album_stat.len());
     if limit > album_stat.len() {

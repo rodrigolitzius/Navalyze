@@ -2,7 +2,7 @@ use crate::{
     handlers::*,
     navidrome::{
         native::NavidromeNativeSession, subsonic::NavidromeSubsonicSession,
-        Scrobble
+        scrobble::Scrobble
     }
 };
 

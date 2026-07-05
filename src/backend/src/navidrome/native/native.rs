@@ -101,27 +101,48 @@ impl NavidromeNativeSession {
     }
 
     pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> Result<HashMap<String, SongData>, NavidromeSessionError> {
-        let url = format!("{}/api/song/", self.url);
+        let songs = self.song(Vec::new()).await?;
+        let media_file_ids: Vec<&String> = scrobbles.iter().map(|s| {&s.media_file_id}).collect();
+
+        let songs = songs.into_iter().filter(|s| media_file_ids.contains(&&s.0)).collect();
+
+        return Ok(songs);
+    }
+
+    pub async fn album(&self, artist_id: &String) -> Result<Vec<AlbumData>, NavidromeSessionError> {
+        let url = format!("{}/api/album", &self.url);
 
         let mut queries: Vec<(String, String)> = Vec::new();
-        queries.push(("_start".into(), "0".into()));
-        queries.push(("_end".into(), "-1".into()));
+
+        queries.push(("artist_id".into(), artist_id.clone()));
+
+        let response = self.client
+            .get(url)
+            .query(&queries)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let response: Vec<AlbumData> = response.into_json().await?;
+
+        return Ok(response);
+    }
+
+    pub async fn song(&self, queries: Vec<(String, String)>) -> Result<HashMap<String, SongData>, NavidromeSessionError> {
+        let url = format!("{}/api/song/", self.url);
 
         let response = self.client
             .get(&url)
+            .query(&queries)
             .send()
             .await
             .map_reqwest_api_err()?;
 
         let response = response.into_json::<Vec<DeserializeSongData>>().await?;
 
-        let media_file_ids: Vec<&String> = scrobbles.iter().map(|s| {&s.media_file_id}).collect();
-
         let mut result = HashMap::new();
 
         for song_data in response {
-            if !media_file_ids.contains(&&song_data.id) {continue;}
-
             let mut all_artists: Vec<IntermediaryArtist> = Vec::new();
 
             match song_data.participants.artists {
@@ -175,26 +196,6 @@ impl NavidromeNativeSession {
             result.insert(song_data.id.clone(), song_data);
         }
 
-
         return Ok(result);
-    }
-
-    pub async fn album(&self, artist_id: &String) -> Result<Vec<AlbumData>, NavidromeSessionError> {
-        let url = format!("{}/api/album", &self.url);
-
-        let mut queries: Vec<(String, String)> = Vec::new();
-
-        queries.push(("artist_id".into(), artist_id.clone()));
-
-        let response = self.client
-            .get(url)
-            .query(&queries)
-            .send()
-            .await
-            .map_reqwest_api_err()?;
-
-        let response: Vec<AlbumData> = response.into_json().await?;
-
-        return Ok(response);
     }
 }

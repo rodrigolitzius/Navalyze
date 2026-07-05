@@ -4,8 +4,7 @@ use reqwest::{Client, Method};
 
 use crate::{
     navidrome::{
-        subsonic::{SubsonicResponseArtist, SubsonicResponseArtistField, NavidromeSubsonicSession},
-        SubsonicResponse,
+        subsonic::{SubsonicResponseArtist, SubsonicResponseArtistField, NavidromeSubsonicSession, SubsonicResponse},
         NavidromeSessionError
     },
     handlers::LoginRequest,

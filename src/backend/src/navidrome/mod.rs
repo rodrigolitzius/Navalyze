@@ -5,7 +5,6 @@ pub mod scrobble;
 use reqwest::StatusCode;
 use rusqlite::Row;
 use uuid::Uuid;
-use serde::Deserialize;
 use bitflags::bitflags;
 
 use crate::{
@@ -13,12 +12,6 @@ use crate::{
     navidrome::{native::AlbumData, subsonic::SubsonicResponseArtist, scrobble::Scrobble},
     reqwest::ReqwestApiError,
 };
-
-#[derive(Deserialize)]
-pub struct SubsonicResponse<T> {
-    #[serde(rename = "subsonic-response")]
-    subsonic_response: T
-}
 
 bitflags! {
     #[derive(Clone)]

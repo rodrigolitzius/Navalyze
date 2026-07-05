@@ -14,7 +14,7 @@ use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
-    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*},
+    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*},
     navidrome::{scrobble::Scrobble, build_scrobble},
     api::{ApiState}
 };
@@ -43,6 +43,7 @@ async fn start_backend(state: ApiState) {
         .route("/most-played/albums", get(most_played_albums))
         .route("/most-played/tracks", get(most_played_tracks))
         .route("/artist/{*id}", get(artist_info))
+        .route("/album/{*id}", get(album_info))
         .route("/login", post(login))
         .layer(cors)
         .with_state(state);

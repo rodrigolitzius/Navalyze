@@ -40,8 +40,7 @@ pub async fn artist_info(
         session.navidrome_native.album(&id).await?
     );
 
-    let album_ids: Vec<&String> = artist.albums.iter().map(|a| &a.id).collect();
-    let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &album_ids);
+    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
     let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
 

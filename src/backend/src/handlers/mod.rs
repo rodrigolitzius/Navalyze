@@ -4,6 +4,7 @@ pub mod relay;
 pub mod artists;
 pub mod artist;
 pub mod albums;
+pub mod album;
 pub mod tracks;
 
 use std::{str::FromStr, collections::HashMap};

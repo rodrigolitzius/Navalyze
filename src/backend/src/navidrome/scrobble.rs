@@ -37,6 +37,7 @@ impl Scrobble {
         }).collect();
     }
 
+    #[allow(unused)]
     pub fn filter_artist<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &HashMap<String, SongData>, artist_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
         return scrobbles.into_iter().filter(|s| {
             let song_data = match tracks_hashmap.get(&s.media_file_id) {
@@ -44,15 +45,15 @@ impl Scrobble {
                 None => return false
             };
 
-            for artist in &song_data.participants.artists {
-                if !(artist_ids.contains(&&artist.id)) {continue;}
-                else {return true}
-            };
+            for artist in &song_data.artists {
+                if artist_ids.contains(&&artist.id) {return true};
+            }
 
             return false;
         }).collect();
     }
 
+    #[allow(unused)]
     pub fn filter_track<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &HashMap<String, SongData>, track_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
         return scrobbles.into_iter().filter(|s| {
             let song_data = match tracks_hashmap.get(&s.media_file_id) {

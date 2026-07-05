@@ -6,6 +6,7 @@ use reqwest::StatusCode;
 use rusqlite::Row;
 use uuid::Uuid;
 use serde::Deserialize;
+use bitflags::bitflags;
 
 use crate::{
     api::{error::ApiError},
@@ -17,6 +18,29 @@ use crate::{
 pub struct SubsonicResponse<T> {
     #[serde(rename = "subsonic-response")]
     subsonic_response: T
+}
+
+bitflags! {
+    #[derive(Clone)]
+    pub struct ArtistRole: u8 {
+        const ARTIST   = 0b00000001;
+        const ALBUM    = 0b00000010;
+        const COMPOSER = 0b00000100;
+    }
+}
+
+impl From<Vec<&str>> for ArtistRole {
+    fn from(value: Vec<&str>) -> Self {
+        let mut result = ArtistRole::empty();
+
+        for s in value {
+            if s == "artist" {result |= ArtistRole::ARTIST}
+            if s == "album" {result |= ArtistRole::ALBUM}
+            if s == "composer" {result |= ArtistRole::COMPOSER}
+        }
+
+        return result;
+    }
 }
 
 #[derive(Clone)]

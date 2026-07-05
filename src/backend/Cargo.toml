@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
+bitflags = "2.13.0"
 clap = { version = "4.6.0", features = ["derive"] }
 md5 = "0.8.0"
 num-traits = "0.2.19"

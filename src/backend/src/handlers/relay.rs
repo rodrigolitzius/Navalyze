@@ -16,13 +16,9 @@ pub async fn relay(
         client_queries.push((query.0.clone(), query.1.clone()));
     }
 
-    let url = format!("{}/rest/{}", session.navidrome_subsonic.url, tail);
-
     headers.remove(header::HOST);
 
-    let response = session.navidrome_subsonic.client
-        .request(method, url)
-        .query(&session.navidrome_subsonic.default_params)
+    let response = session.navidrome_interface.subsonic_relay(method, &tail)
         .query(&client_queries)
         .headers(headers)
         .body(body)

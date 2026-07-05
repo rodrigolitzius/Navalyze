@@ -2,26 +2,17 @@ use serde::Serialize;
 
 use crate::{
     handlers::*,
-    analysis::{albums::AlbumStat, artist::ArtistStat},
-    navidrome::{scrobble::Scrobble, Artist}
+    analysis::{albums::AlbumStat},
+    navidrome::interface::{scrobble::Scrobble}
 };
 
 #[derive(Serialize)]
-struct ArtistResponse {
+struct Response {
     name: String,
     album_count: u64,
     artist_type: Option<String>,
     gender: Option<String>,
-    albums: Vec<AlbumResponse>
-}
-
-#[derive(Serialize)]
-struct AlbumResponse {
-    id: String,
-    name: String,
-    year: u64,
-    plays: u64,
-    played_hours: f64
+    albums: Vec<AlbumStat>
 }
 
 pub async fn artist_info(
@@ -35,40 +26,28 @@ pub async fn artist_info(
     let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
     let scrobbles = Scrobble::filter_range(scrobbles, range);
 
-    let artist = Artist::from_navidrome(
-        session.navidrome_subsonic.get_artist(&id).await?,
-        session.navidrome_native.album(&id).await?
-    );
+    let artist = session.navidrome_interface.get_artist(&id).await?;
 
-    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
-
-    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
-
-    let mbz_artist = match artist.music_brainz_id {
+    let mbz_artist = match artist.mbz_id {
         Some(v) => state.storage.get_artist(session.db_domain_id, v).await?,
         None => None
     };
 
-    let mut artist_stat = ArtistStat::get(artist, album_stat, mbz_artist);
+    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
-    artist_stat.albums.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
+    let albums_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
 
-    let albums_response: Vec<AlbumResponse> = artist_stat.albums.iter().map(|a| {
-        AlbumResponse {
-            id: a.id.clone(),
-            name: a.name.clone(),
-            played_hours: a.played_hours,
-            plays: a.plays,
-            year: a.year
-        }
-    }).collect();
+    let (artist_type, gender) = match mbz_artist {
+        Some(v) => (Some(v.artist_type), v.gender),
+        None => (None, None)
+    };
 
-    let result = ArtistResponse {
-        artist_type: artist_stat.artist_type,
-        gender: artist_stat.gender,
-        name: artist_stat.name,
-        album_count: artist_stat.albums.len() as u64,
-        albums: albums_response
+    let result = Response {
+        name: artist.name,
+        artist_type: artist_type,
+        gender: gender,
+        album_count: albums_stat.len() as u64,
+        albums: albums_stat.into_values().collect()
     };
 
     return Ok(Json(serde_json::to_value(result).unwrap()));

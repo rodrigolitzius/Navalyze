@@ -1,9 +1,9 @@
 use crate::{
     handlers::*,
-    navidrome::{
-        native::NavidromeNativeSession, subsonic::NavidromeSubsonicSession,
-        scrobble::Scrobble
-    }
+    navidrome::{interface::{
+        scrobble::Scrobble,
+        NavidromeInterface
+    }}
 };
 
 pub async fn login(
@@ -12,17 +12,16 @@ pub async fn login(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let login_request: LoginRequest = login_request.into();
 
-    let navidrome_native = NavidromeNativeSession::new(login_request.clone()).await?;
-    let navidrome_subsonic = NavidromeSubsonicSession::new(login_request.clone()).await?;
+    let navidrome_interface = NavidromeInterface::new(login_request.clone()).await?;
 
     let mut scrobbles: Vec<Scrobble> = Vec::new();
     for scrobble in state.scrobbles.iter() {
-        if scrobble.user_id != navidrome_native.user_id {continue;}
+        if scrobble.user_id != *navidrome_interface.user_id() {continue;}
 
         scrobbles.push(scrobble.clone());
     }
 
-    let tracks_hashmap = navidrome_native.build_track_hashmap(&scrobbles).await?;
+    let tracks_hashmap = navidrome_interface.build_track_hashmap(&scrobbles).await?;
     let uuid = Uuid::new_v4();
 
     let db_domain_id = match state.storage.db.add_domain(login_request.url.clone()) {
@@ -33,7 +32,7 @@ pub async fn login(
     };
 
     let login_session = LoginSession {
-        navidrome_native, navidrome_subsonic, tracks_hashmap, uuid, scrobbles, db_domain_id
+        navidrome_interface, tracks_hashmap, uuid, scrobbles, db_domain_id
     };
 
     state.sessions.write().await.insert(login_session.uuid, login_session);

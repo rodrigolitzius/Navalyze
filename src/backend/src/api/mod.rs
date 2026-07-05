@@ -6,9 +6,8 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    mbz::MbzSession, navidrome::{
-        native::{NavidromeNativeSession, SongData},
-        subsonic::{NavidromeSubsonicSession},
+    mbz::MbzSession, navidrome::interface::{
+        NavidromeInterface, TrackHashmap,
         scrobble::Scrobble
     },
     sqlite::InternalDB,
@@ -16,11 +15,10 @@ use crate::{
 };
 
 pub struct LoginSession {
-    pub navidrome_native: NavidromeNativeSession,
-    pub navidrome_subsonic: NavidromeSubsonicSession,
+    pub navidrome_interface: NavidromeInterface,
     pub uuid: uuid::Uuid,
     pub scrobbles: Vec<Scrobble>,
-    pub tracks_hashmap: HashMap<String, SongData>,
+    pub tracks_hashmap: TrackHashmap,
     pub db_domain_id: i64
 }
 

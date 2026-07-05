@@ -19,7 +19,7 @@ pub struct SubsonicResponse<T> {
 // ==== ARTIST ====
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SubsonicResponseArtist {
+pub struct SubsonicArtist {
     pub id: String,
     pub name: String,
     pub music_brainz_id: Option<Uuid>
@@ -27,5 +27,20 @@ pub struct SubsonicResponseArtist {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubsonicResponseArtistField {
-    pub artist: SubsonicResponseArtist
+    pub artist: SubsonicArtist
+}
+
+// ==== ALBUM ====
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SubsonicAlbum {
+    pub id: String,
+    pub name: String,
+    pub year: u64,
+    pub artist: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicResponseAlbumField {
+    pub album: SubsonicAlbum
 }

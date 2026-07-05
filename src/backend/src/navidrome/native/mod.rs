@@ -1,9 +1,9 @@
 pub mod native;
 
 use reqwest::{self};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 
-use crate::navidrome::ArtistRole;
+use crate::navidrome::interface::ArtistRole;
 
 pub struct NavidromeNativeSession {
     pub user_id: String,
@@ -20,28 +20,18 @@ pub struct LoginResponse {
     pub id: String
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AlbumData {
+pub struct NativeSongArtist {
     pub id: String,
     pub name: String,
-
-    #[serde(rename = "minOriginalYear")]
-    pub year: u64
+    pub role: ArtistRole
 }
 
-pub struct SongData {
+pub struct NativeSongData {
     pub id: String,
     pub title: String,
     pub artist: String,
     pub album: String,
     pub album_id: String,
     pub duration: f64,
-    pub artists: Vec<Artist>
-}
-
-pub struct Artist {
-    pub id: String,
-    pub name: String,
-    pub role: ArtistRole
+    pub artists: Vec<NativeSongArtist>
 }

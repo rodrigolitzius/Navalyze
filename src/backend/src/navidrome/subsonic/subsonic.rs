@@ -4,8 +4,10 @@ use reqwest::{Client, Method};
 
 use crate::{
     navidrome::{
-        subsonic::{SubsonicResponseArtist, SubsonicResponseArtistField, NavidromeSubsonicSession, SubsonicResponse},
-        NavidromeSessionError
+        subsonic::{SubsonicArtist, SubsonicResponseArtistField, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum},
+        interface::{
+            error::NavidromeSessionError
+        }
     },
     handlers::LoginRequest,
     reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
@@ -55,16 +57,12 @@ impl NavidromeSubsonicSession {
         return Ok(result)
     }
 
-    pub async fn get_artist(&self, id: &String) -> Result<SubsonicResponseArtist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: &String) -> Result<SubsonicArtist, NavidromeSessionError> {
         let url = format!("{}/rest/getArtist?id={}", self.url, id);
-
-        let mut client_queries: Vec<(String, String)> = Vec::new();
-        client_queries.push(("id".to_string(), id.clone()));
 
         let response = self.client
             .get(url)
             .query(&self.default_params)
-            .query(&client_queries)
             .send()
             .await
             .map_reqwest_api_err()?;
@@ -72,5 +70,20 @@ impl NavidromeSubsonicSession {
         let artist: SubsonicResponse<SubsonicResponseArtistField> = response.into_json().await?;
 
         return Ok(artist.subsonic_response.artist);
+    }
+
+    pub async fn get_album(&self, id: &String) -> Result<SubsonicAlbum, NavidromeSessionError> {
+        let url = format!("{}/rest/getAlbum?id={}", self.url, id);
+
+        let response = self.client
+            .get(url)
+            .query(&self.default_params)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let artist: SubsonicResponse<SubsonicResponseAlbumField> = response.into_json().await?;
+
+        return Ok(artist.subsonic_response.album);
     }
 }

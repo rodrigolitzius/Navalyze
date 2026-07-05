@@ -1,7 +1,7 @@
 use crate::{
     handlers::*,
     analysis::artists::ArtistStat,
-    navidrome::{scrobble::Scrobble, ArtistRole}
+    navidrome::interface::{scrobble::Scrobble, ArtistRole}
 };
 
 pub async fn most_played_artists(

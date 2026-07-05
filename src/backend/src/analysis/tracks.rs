@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Serialize;
 
 use crate::{
-    navidrome::{scrobble::Scrobble, native::SongData}
+    navidrome::interface::{scrobble::Scrobble, TrackHashmap}
 };
 
 #[derive(Serialize, Clone)]
@@ -18,7 +18,7 @@ pub struct TrackStat {
 impl TrackStat {
     pub fn group(
         scrobbles: Vec<&Scrobble>,
-        track_hashmap: &HashMap<String, SongData>
+        track_hashmap: &TrackHashmap
     ) -> HashMap<String, TrackStat> {
         let mut track_stat: HashMap<String, TrackStat> = HashMap::new();
 

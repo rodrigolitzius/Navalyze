@@ -1,7 +1,7 @@
 use crate::{
     handlers::*,
     analysis::albums::AlbumStat,
-    navidrome::scrobble::Scrobble
+    navidrome::interface::scrobble::Scrobble
 };
 
 pub async fn most_played_albums(

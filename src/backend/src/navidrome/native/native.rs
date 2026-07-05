@@ -6,54 +6,45 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    navidrome::{
-        native::{NavidromeNativeSession, LoginResponse, SongData, Artist},
-        NavidromeSessionError,
-        Scrobble, AlbumData,
-        ArtistRole
-    },
-    handlers::LoginRequest,
-    reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
+    handlers::LoginRequest, navidrome::{
+        interface::{
+            ArtistRole, error::NavidromeSessionError
+        }, native::{LoginResponse, NativeSongArtist, NativeSongData, NavidromeNativeSession},
+    }, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DeserializeSongData {
-    pub id: String,
-    pub title: String,
-    pub artist: String,
-    pub album: String,
-    pub album_id: String,
-    pub duration: f64,
-    pub participants: DeserializeParticipants
+struct DeserializeSongData {
+    id: String,
+    title: String,
+    artist: String,
+    album: String,
+    album_id: String,
+    duration: f64,
+    participants: DeserializeParticipants
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DeserializeParticipants {
+struct DeserializeParticipants {
     #[serde(rename = "artist")]
-    pub artists: Option<Vec<DeserializeArtist>>,
+    artists: Option<Vec<DeserializeArtist>>,
 
     #[serde(rename = "albumartist")]
-    pub album_artists: Option<Vec<DeserializeArtist>>,
+    album_artists: Option<Vec<DeserializeArtist>>,
 
     #[serde(rename = "composer")]
-    pub composers: Option<Vec<DeserializeArtist>>
+    composers: Option<Vec<DeserializeArtist>>
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DeserializeArtist {
+struct DeserializeArtist {
     id: String,
     name: String
 }
 
-pub struct IntermediaryArtist {
-    id: String,
-    name: String,
-    role: ArtistRole
-}
-
-impl IntermediaryArtist {
-    pub fn from_deserialize_artist(artist: DeserializeArtist, role: ArtistRole) -> Self {
+impl NativeSongArtist {
+    fn from_deserialize_artist(artist: DeserializeArtist, role: ArtistRole) -> Self {
         return Self {id: artist.id, name: artist.name, role: role};
     }
 }
@@ -100,35 +91,7 @@ impl NavidromeNativeSession {
         });
     }
 
-    pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> Result<HashMap<String, SongData>, NavidromeSessionError> {
-        let songs = self.song(Vec::new()).await?;
-        let media_file_ids: Vec<&String> = scrobbles.iter().map(|s| {&s.media_file_id}).collect();
-
-        let songs = songs.into_iter().filter(|s| media_file_ids.contains(&&s.0)).collect();
-
-        return Ok(songs);
-    }
-
-    pub async fn album(&self, artist_id: &String) -> Result<Vec<AlbumData>, NavidromeSessionError> {
-        let url = format!("{}/api/album", &self.url);
-
-        let mut queries: Vec<(String, String)> = Vec::new();
-
-        queries.push(("artist_id".into(), artist_id.clone()));
-
-        let response = self.client
-            .get(url)
-            .query(&queries)
-            .send()
-            .await
-            .map_reqwest_api_err()?;
-
-        let response: Vec<AlbumData> = response.into_json().await?;
-
-        return Ok(response);
-    }
-
-    pub async fn song(&self, queries: Vec<(String, String)>) -> Result<HashMap<String, SongData>, NavidromeSessionError> {
+    pub async fn song(&self, queries: Vec<(String, String)>) -> Result<HashMap<String, NativeSongData>, NavidromeSessionError> {
         let url = format!("{}/api/song/", self.url);
 
         let response = self.client
@@ -143,11 +106,11 @@ impl NavidromeNativeSession {
         let mut result = HashMap::new();
 
         for song_data in response {
-            let mut all_artists: Vec<IntermediaryArtist> = Vec::new();
+            let mut all_artists: Vec<NativeSongArtist> = Vec::new();
 
             match song_data.participants.artists {
                 Some(v) => {
-                    let mut inter_artists = v.into_iter().map(|a| IntermediaryArtist::from_deserialize_artist(a, ArtistRole::ARTIST)).collect();
+                    let mut inter_artists = v.into_iter().map(|a| NativeSongArtist::from_deserialize_artist(a, ArtistRole::ARTIST)).collect();
                     all_artists.append(&mut inter_artists);
                 },
                 None => {}
@@ -155,7 +118,7 @@ impl NavidromeNativeSession {
 
             match song_data.participants.album_artists {
                 Some(v) => {
-                    let mut inter_artists = v.into_iter().map(|a| IntermediaryArtist::from_deserialize_artist(a, ArtistRole::ALBUM)).collect();
+                    let mut inter_artists = v.into_iter().map(|a| NativeSongArtist::from_deserialize_artist(a, ArtistRole::ALBUM)).collect();
                     all_artists.append(&mut inter_artists);
                 },
                 None => {}
@@ -163,18 +126,18 @@ impl NavidromeNativeSession {
 
             match song_data.participants.composers {
                 Some(v) => {
-                    let mut inter_artists = v.into_iter().map(|a| IntermediaryArtist::from_deserialize_artist(a, ArtistRole::COMPOSER)).collect();
+                    let mut inter_artists = v.into_iter().map(|a| NativeSongArtist::from_deserialize_artist(a, ArtistRole::COMPOSER)).collect();
                     all_artists.append(&mut inter_artists);
                 },
                 None => {}
             }
 
-            let mut artists: HashMap<String, Artist> = HashMap::new();
+            let mut artists: HashMap<String, NativeSongArtist> = HashMap::new();
 
             for artist in all_artists {
                 match artists.get_mut(&artist.id) {
                     None => {
-                        artists.insert(artist.id.clone(), Artist { id: artist.id, name: artist.name, role: artist.role });
+                        artists.insert(artist.id.clone(), NativeSongArtist { id: artist.id, name: artist.name, role: artist.role });
                     }
 
                     Some(v) => {
@@ -183,7 +146,7 @@ impl NavidromeNativeSession {
                 }
             }
 
-            let song_data = SongData {
+            let song_data = NativeSongData {
                 id: song_data.id,
                 title: song_data.title,
                 artist: song_data.artist,

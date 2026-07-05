@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use crate::{api::Range, navidrome::native::SongData};
+use crate::{api::Range, navidrome::interface::TrackHashmap};
 
 #[derive(Clone)]
 pub struct Scrobble {
@@ -26,7 +24,7 @@ impl Scrobble {
         return refs;
     }
 
-    pub fn filter_album<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &HashMap<String, SongData>, album_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
+    pub fn filter_album<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, album_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
         return scrobbles.into_iter().filter(|s| {
             let song_data = match tracks_hashmap.get(&s.media_file_id) {
                 Some(v) => v,
@@ -38,7 +36,7 @@ impl Scrobble {
     }
 
     #[allow(unused)]
-    pub fn filter_artist<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &HashMap<String, SongData>, artist_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
+    pub fn filter_artist<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, artist_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
         return scrobbles.into_iter().filter(|s| {
             let song_data = match tracks_hashmap.get(&s.media_file_id) {
                 Some(v) => v,
@@ -54,7 +52,7 @@ impl Scrobble {
     }
 
     #[allow(unused)]
-    pub fn filter_track<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &HashMap<String, SongData>, track_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
+    pub fn filter_track<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, track_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
         return scrobbles.into_iter().filter(|s| {
             let song_data = match tracks_hashmap.get(&s.media_file_id) {
                 Some(v) => v,

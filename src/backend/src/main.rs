@@ -9,13 +9,13 @@ mod reqwest;
 
 use axum::{Router, routing::{get, post}};
 use tower_http::cors::{Any, CorsLayer};
-use rusqlite::{Connection, OpenFlags};
+use rusqlite::{Connection, OpenFlags, Row};
 use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
     handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*},
-    navidrome::{scrobble::Scrobble, build_scrobble},
+    navidrome::interface::{scrobble::Scrobble},
     api::{ApiState}
 };
 
@@ -50,6 +50,17 @@ async fn start_backend(state: ApiState) {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.expect("Failed to bind server");
     axum::serve(listener, app).await.expect("Failed to serve server");
+}
+
+pub fn build_scrobble(row: &Row) -> Result<Scrobble, rusqlite::Error> {
+    let media_file_id: String = row.get("media_file_id")?;
+    let user_id: String = row.get("user_id")?;
+    let submission_time: i64 = row.get("submission_time")?;
+
+    return Ok(Scrobble {
+        media_file_id, user_id,
+        submission_time: submission_time as u64
+    });
 }
 
 #[tokio::main]

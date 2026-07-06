@@ -1,9 +1,10 @@
-use crate::{handlers::*};
+use crate::{handlers::*, navidrome::interface::scrobble::Scrobble};
 
 pub async fn recent(
     Query(query): Query<HashMap<String, String>>,
     State(state): State<ApiState>,
-    auth: Auth
+    auth: Auth,
+    range: Range<u64>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let mut limit = get_param_default(&query, "limit", 0) as usize;
     let offset = get_param_default(&query, "offset", 0) as usize;
@@ -14,8 +15,11 @@ pub async fn recent(
 
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
+    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    let scrobbles = Scrobble::filter_range(scrobbles, range);
+
     let mut result: Vec<serde_json::Value> = Vec::new();
-    for scrobble in session.scrobbles.iter().skip(offset).take(limit) {
+    for scrobble in scrobbles.iter().skip(offset).take(limit) {
         let music_info = match session.tracks_hashmap.get(&scrobble.media_file_id) {
             Some(v) => v,
             None => {continue;}

@@ -7,12 +7,22 @@ use crate::{
 };
 
 #[derive(Serialize)]
+struct ResponseAlbum {
+    name: String,
+    artist: String,
+    id: String,
+    plays: u64,
+    played_hours: f64,
+    year: u64
+}
+
+#[derive(Serialize)]
 struct Response {
     name: String,
     album_count: u64,
     artist_type: Option<String>,
     gender: Option<String>,
-    albums: Vec<AlbumStat>
+    albums: Vec<ResponseAlbum>
 }
 
 pub async fn artist_info(
@@ -42,12 +52,26 @@ pub async fn artist_info(
         None => (None, None)
     };
 
+    let mut albums_response: Vec<ResponseAlbum> = Vec::new();
+    for album in albums_stat.into_values() {
+        let year = session.navidrome_interface.get_album(&album.id.clone()).await?.year;
+
+        albums_response.push(ResponseAlbum {
+            artist: album.artist,
+            id: album.id,
+            name: album.name,
+            played_hours: album.played_hours,
+            plays: album.plays,
+            year: year
+        });
+    }
+
     let result = Response {
         name: artist.name,
         artist_type: artist_type,
         gender: gender,
-        album_count: albums_stat.len() as u64,
-        albums: albums_stat.into_values().collect()
+        album_count: albums_response.len() as u64,
+        albums: albums_response
     };
 
     return Ok(Json(serde_json::to_value(result).unwrap()));

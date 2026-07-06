@@ -11,6 +11,7 @@ pub struct AlbumStat {
     pub name: String,
     pub artist: String,
     pub id: String,
+    pub artist_id: String,
     pub plays: u64,
     pub played_hours: f64
 }
@@ -40,7 +41,8 @@ impl AlbumStat {
                         song_data.album_id.clone(),
                         AlbumStat {
                             name: song_data.album.clone(),
-                            artist: song_data.artist.clone(),
+                            artist: song_data.album_artist.clone(),
+                            artist_id: song_data.album_artist_id.clone(),
                             id: song_data.album_id.clone(),
                             plays: 1,
                             played_hours: duration_hour

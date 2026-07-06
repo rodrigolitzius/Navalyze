@@ -30,8 +30,11 @@ pub struct NativeSongData {
     pub id: String,
     pub title: String,
     pub artist: String,
+    pub artist_id: String,
     pub album: String,
     pub album_id: String,
+    pub album_artist: String,
+    pub album_artist_id: String,
     pub duration: f64,
     pub artists: Vec<NativeSongArtist>
 }

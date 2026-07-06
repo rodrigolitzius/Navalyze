@@ -37,11 +37,17 @@ pub struct Album {
 }
 
 pub struct SongData {
+    // NOTE: The artist_id and album_artist_id is not always accurate,
+    // since some albums/songs have multiple album artists / artists
+    // Whose artist the id will match to is up to Navidrome
     pub id: String,
     pub title: String,
     pub artist: String,
+    pub artist_id: String,
     pub album: String,
     pub album_id: String,
+    pub album_artist: String,
+    pub album_artist_id: String,
     pub duration: f64,
     pub artists: Vec<SongArtist>
 }
@@ -128,8 +134,11 @@ impl From<NativeSongData> for SongData {
             id: value.id,
             title: value.title,
             artist: value.artist,
+            artist_id: value.artist_id,
             album: value.album,
             album_id: value.album_id,
+            album_artist: value.album_artist,
+            album_artist_id: value.album_artist_id,
             duration: value.duration,
             artists: value.artists.into_iter().map(|a| SongArtist::from(a)).collect()
         };

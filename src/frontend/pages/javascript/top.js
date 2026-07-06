@@ -17,13 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.replace('../index.html');
     });
 
-    // mapa nome-do-artista (normalizado) -> id, usado pra descobrir se o
-    // subtitulo de artista nos cards de album/faixa pode virar link.
-    // Só conseguimos resolver nomes que aparecem em /most-played/artists;
-    // nomes fora dessa lista (feat., grafia diferente, pouco tocados) ficam
-    // como texto normal, sem virar link.
-    let mapaArtistas = {};
-
     function normaliza(nome) {
         return (nome || '').trim().toLowerCase();
     }
@@ -116,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function () {});
     }
 
-    function montaCard(nome, subtitulo, plays) {
+    function montaCard(nome, subtitulo, plays, artistId) {
         const card = document.createElement('div');
         card.className = 'top-card';
 
@@ -133,8 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
             subDiv.className = 'top-card-sub';
             subDiv.textContent = subtitulo;
 
-            // se o nome do artista bate com algum id conhecido, vira link
-            const artistId = mapaArtistas[normaliza(subtitulo)];
+            // Se o id do artista for fornecido, cria um link
             if (artistId) {
                 subDiv.classList.add('artist-link');
                 subDiv.addEventListener('click', function (ev) {
@@ -176,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 dados.forEach(function (item) {
                     const subtitulo = montaSubtitulo ? montaSubtitulo(item) : '';
-                    const card = montaCard(item.name, subtitulo, item.plays);
+                    const card = montaCard(item.name, subtitulo, item.plays, item.artist_id);
                     grid.appendChild(card);
                     aplicaCapa(card, item.id);
                 });
@@ -209,10 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // busca TODOS os artistas (sem limit) de uma vez: usa esse resultado pra
-    // montar o grid de Top Artistas E pra preencher o mapaArtistas usado nos
-    // subtitulos de album/faixa. So depois disso carrega albuns e faixas.
-    fetch(server_url + '/most-played/artists', {
+    fetch(server_url + '/most-played/artists?limit=10', {
         headers: { 'Authorization': token }
     })
         .then(function (r) {
@@ -222,17 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(function (artistas) {
             artistas = artistas || [];
 
-            artistas.forEach(function (artista) {
-                mapaArtistas[normaliza(artista.name)] = artista.id;
-            });
-
             renderizaArtistas(artistas);
             carregaComCapaPropria('/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
             carregaComCapaPropria('/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
         })
         .catch(function (err) {
             document.getElementById('grid-artistas').innerHTML = '<p style="color:#f87171;">Erro: ' + err.message + '</p>';
-            // ainda assim tenta carregar albuns/faixas, so sem os links de artista
             carregaComCapaPropria('/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
             carregaComCapaPropria('/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
         });

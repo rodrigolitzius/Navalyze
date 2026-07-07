@@ -66,6 +66,8 @@ pub async fn artist_info(
         });
     }
 
+    albums_response.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
+
     let result = Response {
         name: artist.name,
         artist_type: artist_type,

@@ -25,11 +25,6 @@ pub struct SubsonicArtist {
     pub music_brainz_id: Option<Uuid>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SubsonicResponseArtistField {
-    pub artist: SubsonicArtist
-}
-
 // ==== ALBUM ====
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

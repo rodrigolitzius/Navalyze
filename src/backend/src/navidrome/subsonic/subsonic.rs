@@ -1,10 +1,14 @@
+use std::str::FromStr;
+
 use rand::{RngExt, distr::Alphanumeric};
 
 use reqwest::{Client, Method};
+use serde::Deserialize;
+use uuid::Uuid;
 
 use crate::{
     navidrome::{
-        subsonic::{SubsonicArtist, SubsonicResponseArtistField, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum},
+        subsonic::{SubsonicArtist, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum},
         interface::{
             error::NavidromeSessionError
         }
@@ -12,6 +16,34 @@ use crate::{
     handlers::LoginRequest,
     reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeserializeSubsonicArtist {
+    id: String,
+    name: String,
+    music_brainz_id: Option<String>
+}
+
+#[derive(Deserialize)]
+struct DeserializeSubsonicResponseArtistField {
+    artist: DeserializeSubsonicArtist
+}
+
+impl From<DeserializeSubsonicArtist> for SubsonicArtist {
+    fn from(value: DeserializeSubsonicArtist) -> Self {
+        let mbz_id = match value.music_brainz_id {
+            Some(s) => Uuid::from_str(&s.as_str()).ok(),
+            None => None
+        };
+
+        return Self {
+            id: value.id,
+            name: value.name,
+            music_brainz_id: mbz_id
+        };
+    }
+}
 
 impl NavidromeSubsonicSession {
     // TODO: Actually test if this fails if the login request has invalid credentials
@@ -67,9 +99,9 @@ impl NavidromeSubsonicSession {
             .await
             .map_reqwest_api_err()?;
 
-        let artist: SubsonicResponse<SubsonicResponseArtistField> = response.into_json().await?;
+        let artist: SubsonicResponse<DeserializeSubsonicResponseArtistField> = response.into_json().await?;
 
-        return Ok(artist.subsonic_response.artist);
+        return Ok(artist.subsonic_response.artist.into());
     }
 
     pub async fn get_album(&self, id: &String) -> Result<SubsonicAlbum, NavidromeSessionError> {

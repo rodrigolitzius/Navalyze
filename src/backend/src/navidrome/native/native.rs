@@ -8,8 +8,9 @@ use serde::{Deserialize, Serialize};
 use crate::{
     handlers::LoginRequest, navidrome::{
         interface::{
-            ArtistRole, error::NavidromeSessionError
-        }, native::{LoginResponse, NativeSongArtist, NativeSongData, NavidromeNativeSession},
+            ArtistRole, error::NavidromeSessionError, scrobble::Scrobble
+        },
+        native::{LoginResponse, NativeSongArtist, NativeSongData, NavidromeNativeSession},
     }, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
 
@@ -88,7 +89,6 @@ impl NavidromeNativeSession {
 
         return Ok(Self {
             url: login_request.url.to_string(),
-            user_id: login_response.id,
             client: client,
             token: login_response.token,
         });
@@ -166,5 +166,19 @@ impl NavidromeNativeSession {
         }
 
         return Ok(result);
+    }
+
+    pub async fn scrobble(&self) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+        let url = format!("{}/api/scrobble/", self.url);
+
+        let response = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let response = response.into_json::<Vec<Scrobble>>().await?;
+
+        return Ok(response);
     }
 }

@@ -117,8 +117,8 @@ impl NavidromeInterface {
         });
     }
 
-    pub fn user_id(&self) -> &String {
-        return &self.native_session.user_id;
+    pub async fn scrobbles(&self) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+        return self.native_session.scrobble().await;
     }
 }
 

@@ -9,14 +9,16 @@ pub async fn recent(
     let mut limit = get_param_default(&query, "limit", 0) as usize;
     let offset = get_param_default(&query, "offset", 0) as usize;
 
-    if limit == 0 {
-        limit = state.scrobbles.len();
-    }
-
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
+    if limit == 0 {
+        limit = session.scrobbles.len()
+    }
+
     let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
-    let scrobbles = Scrobble::filter_range(scrobbles, range);
+    let mut scrobbles = Scrobble::filter_range(scrobbles, range);
+
+    scrobbles.sort_by(|a, b| { b.submission_time.cmp(&a.submission_time)});
 
     let mut result: Vec<serde_json::Value> = Vec::new();
     for scrobble in scrobbles.iter().skip(offset).take(limit) {

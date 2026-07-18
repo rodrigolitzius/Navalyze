@@ -1,9 +1,11 @@
+use serde::Deserialize;
+
 use crate::{api::Range, navidrome::interface::TrackHashmap};
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Scrobble {
     pub media_file_id: String,
-    pub user_id: String,
     pub submission_time: u64
 }
 

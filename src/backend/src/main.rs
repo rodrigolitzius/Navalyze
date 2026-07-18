@@ -9,13 +9,11 @@ mod reqwest;
 
 use axum::{Router, routing::{get, post}};
 use tower_http::cors::{Any, CorsLayer};
-use rusqlite::{Connection, OpenFlags, Row};
 use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
     handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*},
-    navidrome::interface::{scrobble::Scrobble},
     api::{ApiState}
 };
 
@@ -23,9 +21,6 @@ const APP_NAME: &'static str = "Navalyze";
 
 #[derive(Parser, Debug)]
 struct Args {
-    #[arg(short, long)]
-    db_location: String,
-
     #[arg(short, long)]
     mbz_token: Option<Uuid>
 }
@@ -52,45 +47,16 @@ async fn start_backend(state: ApiState) {
     axum::serve(listener, app).await.expect("Failed to serve server");
 }
 
-pub fn build_scrobble(row: &Row) -> Result<Scrobble, rusqlite::Error> {
-    let media_file_id: String = row.get("media_file_id")?;
-    let user_id: String = row.get("user_id")?;
-    let submission_time: i64 = row.get("submission_time")?;
-
-    return Ok(Scrobble {
-        media_file_id, user_id,
-        submission_time: submission_time as u64
-    });
-}
-
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
-
-    // Opening database
-    let navidrome_db = Connection::open_with_flags(
-        args.db_location,
-        OpenFlags::SQLITE_OPEN_READ_ONLY
-    ).expect("Failed to open navidrome's database");
-
-    // Getting scrobbles
-    let mut stmt = navidrome_db.prepare("SELECT * FROM scrobbles ORDER BY submission_time DESC").expect("Couldn't prepare SQL query");
-    let rows = stmt.query_and_then([], |row| build_scrobble(row)).expect("query_and_then failed");
-
-    let mut scrobbles: Vec<Scrobble> = Vec::new();
-
-    for scrobble in rows {
-        if let Ok(v) = scrobble {
-            scrobbles.push(v);
-        }
-    }
 
     let mbz_session = match args.mbz_token {
         Some(v) => Some(mbz::MbzSession::new(v)),
         None => None
     };
 
-    let state = ApiState::new(scrobbles, mbz_session).expect("Failed to initialize API state");
+    let state = ApiState::new(mbz_session).expect("Failed to initialize API state");
 
     start_backend(state).await;
 }

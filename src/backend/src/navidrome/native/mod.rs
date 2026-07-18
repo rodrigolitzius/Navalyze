@@ -6,7 +6,6 @@ use serde::{Deserialize};
 use crate::navidrome::interface::ArtistRole;
 
 pub struct NavidromeNativeSession {
-    pub user_id: String,
     pub url: String,
     pub client: reqwest::Client,
 
@@ -16,8 +15,7 @@ pub struct NavidromeNativeSession {
 
 #[derive(Deserialize)]
 pub struct LoginResponse {
-    pub token: String,
-    pub id: String
+    pub token: String
 }
 
 pub struct NativeSongArtist {

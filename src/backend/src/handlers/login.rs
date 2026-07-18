@@ -14,12 +14,7 @@ pub async fn login(
 
     let navidrome_interface = NavidromeInterface::new(login_request.clone()).await?;
 
-    let mut scrobbles: Vec<Scrobble> = Vec::new();
-    for scrobble in state.scrobbles.iter() {
-        if scrobble.user_id != *navidrome_interface.user_id() {continue;}
-
-        scrobbles.push(scrobble.clone());
-    }
+    let scrobbles: Vec<Scrobble> = navidrome_interface.scrobbles().await?;
 
     let tracks_hashmap = navidrome_interface.build_track_hashmap(&scrobbles).await?;
     let uuid = Uuid::new_v4();

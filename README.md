@@ -28,11 +28,13 @@ It also means any changes in Navidrome (Like changing a file's metadata or manua
 Navalyze, however, is entirely integrated with Navidrome. Any information present in Navalyze will be consistent with Navidrome.
 
 # How to use
+> [!NOTE]
+Navalyze uses the /api/scrobble/ endpoint, meaning only versions after [pr 5761](https://github.com/navidrome/navidrome/pull/5761) are supported.
+
 Deploying Navalyze is a bit cumbersome, as it is still in development, but here's what you have to do:
 
 1. Clone the repo
-1. Copy your your navidrome.db file to a folder of your choosing
-1. Compile the backend at /src/backend/ using `cargo build --release` and run with `cargo run -- -d <path-to-your-copied-navidrome.db> --mbz-token <your-mbz-token>`. You can omit the mbz-token parameter if you don't use MusicBrainz or don't wish to.
+1. Compile the backend at /src/backend/ using `cargo build --release` and run with `cargo run -- --mbz-token <your-listenbrainz-token>`. You can omit the mbz-token parameter if you don't use MusicBrainz or don't wish to.
 1. Go to src/frontend/ and run an http server there. I do this with `python -m http.server`
 1. Now access your http server (if you used python, it should be accesible at http://localhost:8000)
 1. backend-url will be http://localhost:8080 (8080 is the default port)
@@ -41,9 +43,6 @@ Deploying Navalyze is a bit cumbersome, as it is still in development, but here'
 
 > [!NOTE]
 The web interface is in Brazilian Portuguese
-
-> [!NOTE]
-Yes, you need Navidrome's db file for this, but this is because Navidrome does not expose any way for clients to get the scrobbles from the db, so this is the only way for now.
 
 # MusicBrainz integration
 > [!NOTE]

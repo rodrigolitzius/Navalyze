@@ -33,7 +33,6 @@ pub struct LoginRequest {
 
 #[derive(Clone)]
 pub struct ApiState {
-    pub scrobbles: Arc<Vec<Scrobble>>,
     pub sessions: Arc<RwLock<HashMap<Uuid, LoginSession>>>,
     pub storage: Arc<Storage>
 }
@@ -51,9 +50,8 @@ where T: PartialOrd {
 }
 
 impl ApiState {
-    pub fn new(scrobbles: Vec<Scrobble>, mbz: Option<MbzSession>) -> Result<Self, rusqlite::Error> {
+    pub fn new(mbz: Option<MbzSession>) -> Result<Self, rusqlite::Error> {
         let result = Self {
-            scrobbles: Arc::new(scrobbles),
             sessions: Arc::new(RwLock::new(HashMap::new())),
             storage: Arc::new(Storage::new(InternalDB::new("data.db".into())?, mbz))
         };

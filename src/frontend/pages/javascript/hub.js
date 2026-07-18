@@ -12,6 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('logout-btn').addEventListener('click', function() {
         localStorage.removeItem('Token');
         localStorage.removeItem('server_url');
-        window.location.replace('index.html');
+        window.location.replace('../index.html');
     });
 });

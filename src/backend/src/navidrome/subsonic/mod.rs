@@ -31,7 +31,7 @@ pub struct SubsonicArtist {
 pub struct SubsonicAlbum {
     pub id: String,
     pub name: String,
-    pub year: u64,
+    pub year: Option<u64>,
     pub artist: String
 }
 

@@ -33,7 +33,7 @@ pub struct Artist {
 pub struct Album {
     pub name: String,
     pub artist: String,
-    pub year: u64
+    pub year: Option<u64>
 }
 
 pub struct SongData {

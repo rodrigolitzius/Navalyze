@@ -11,7 +11,7 @@ use crate::{
 struct Response {
     name: String,
     artist: String,
-    year: u64,
+    year: Option<u64>,
     tracks: Vec<TrackStat>
 }
 

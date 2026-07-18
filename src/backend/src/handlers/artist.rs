@@ -13,7 +13,7 @@ struct ResponseAlbum {
     id: String,
     plays: u64,
     played_hours: f64,
-    year: u64
+    year: Option<u64>
 }
 
 #[derive(Serialize)]

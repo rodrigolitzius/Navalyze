@@ -8,6 +8,11 @@ impl MbzSession {
             HeaderValue::from_str(format!("Token {}", token).as_str()).expect("Token is invalid")
         );
 
+        default_headers.insert(
+            "User-Agent",
+            HeaderValue::from_str("Navalyze/0 ( https://github.com/rodrigolitzius/Navalyze )").expect("Invalid user agent string")
+        );
+
         let client = ClientBuilder::new()
             .default_headers(default_headers)
             .build().expect("Failed to build MBZ client");

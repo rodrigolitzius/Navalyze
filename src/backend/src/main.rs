@@ -22,10 +22,13 @@ const APP_NAME: &'static str = "Navalyze";
 #[derive(Parser, Debug)]
 struct Args {
     #[arg(short, long)]
-    mbz_token: Option<Uuid>
+    mbz_token: Option<Uuid>,
+
+    #[arg(short, long)]
+    port: u16
 }
 
-async fn start_backend(state: ApiState) {
+async fn start_backend(state: ApiState, listen_port: u16) {
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
@@ -43,7 +46,7 @@ async fn start_backend(state: ApiState) {
         .layer(cors)
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.expect("Failed to bind server");
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", listen_port)).await.expect("Failed to bind server");
     axum::serve(listener, app).await.expect("Failed to serve server");
 }
 
@@ -58,5 +61,5 @@ async fn main() {
 
     let state = ApiState::new(mbz_session).expect("Failed to initialize API state");
 
-    start_backend(state).await;
+    start_backend(state, args.port).await;
 }

@@ -51,5 +51,5 @@ impl From<ReqwestApiError> for MbzError {
 pub struct MbzArtist {
     pub gender: Option<String>,
     #[serde(rename = "type")]
-    pub artist_type: String
+    pub artist_type: Option<String>
 }

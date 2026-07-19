@@ -51,7 +51,7 @@ pub async fn artist_info(
     let albums_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
 
     let (artist_type, gender) = match mbz_artist {
-        Some(v) => (Some(v.artist_type), v.gender),
+        Some(v) => (v.artist_type, v.gender),
         None => (None, None)
     };
 

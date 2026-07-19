@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     handlers::*,
     navidrome::{interface::{
@@ -14,7 +16,7 @@ pub async fn login(
 
     let navidrome_interface = NavidromeInterface::new(login_request.clone()).await?;
 
-    let scrobbles: Vec<Scrobble> = navidrome_interface.scrobbles().await?;
+    let scrobbles: Vec<Scrobble> = navidrome_interface.scrobbles(0).await?;
 
     let tracks_hashmap = navidrome_interface.build_track_hashmap(&scrobbles).await?;
     let uuid = Uuid::new_v4();
@@ -26,11 +28,11 @@ pub async fn login(
         }
     };
 
-    let login_session = LoginSession {
-        navidrome_interface, tracks_hashmap, uuid, scrobbles, db_domain_id
-    };
+    let login_session = Arc::new(RwLock::new(LoginSession::new(
+        db_domain_id, navidrome_interface, scrobbles, tracks_hashmap, uuid
+    )));
 
-    state.sessions.write().await.insert(login_session.uuid, login_session);
+    state.sessions.write().await.insert(uuid, login_session);
 
     return Ok(Json(json!({"id": uuid})));
 }

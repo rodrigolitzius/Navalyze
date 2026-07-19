@@ -168,11 +168,17 @@ impl NavidromeNativeSession {
         return Ok(result);
     }
 
-    pub async fn scrobble(&self) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+    pub async fn scrobble(&self, after_timestamp: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
         let url = format!("{}/api/scrobble/", self.url);
+
+        let mut queries: Vec<(String, String)> = Vec::new();
+        queries.push(("from".into(), after_timestamp.to_string()));
+        queries.push(("_start".into(), 1.to_string()));
+        queries.push(("_end".into(), 9999999.to_string()));
 
         let response = self.client
             .get(&url)
+            .query(&queries)
             .send()
             .await
             .map_reqwest_api_err()?;

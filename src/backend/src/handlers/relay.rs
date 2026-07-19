@@ -18,7 +18,7 @@ pub async fn relay(
 
     headers.remove(header::HOST);
 
-    let response = session.navidrome_interface.subsonic_relay(method, &tail)
+    let response = session.read().await.navidrome_interface.subsonic_relay(method, &tail)
         .query(&client_queries)
         .headers(headers)
         .body(body)

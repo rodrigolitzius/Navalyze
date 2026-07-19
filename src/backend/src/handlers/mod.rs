@@ -8,7 +8,7 @@ pub mod album;
 pub mod tracks;
 
 use std::{str::FromStr, collections::HashMap};
-use tokio::sync::{RwLock, RwLockReadGuard};
+use tokio::sync::RwLock;
 use num_traits::Bounded;
 use serde::{Deserialize};
 use serde_json::json;
@@ -22,7 +22,7 @@ use axum::{
 use reqwest::header;
 
 use crate::{
-    api::{ApiState, LoginSession, Range, error::*},
+    api::{ApiState, LoginSession, Range, Sessions, RwLockLoginSession, error::*},
 };
 
 pub struct Auth{uuid: Uuid}
@@ -94,21 +94,17 @@ where T: FromStr {
     return limit;
 }
 
-async fn get_session_from_uuid<'a>(uuid: &Uuid, sessions: &'a RwLock<HashMap<Uuid, LoginSession>>) -> Result<RwLockReadGuard<'a, LoginSession>, ApiError> {
+async fn get_session_from_uuid(uuid: &Uuid, sessions: &Sessions) -> Result<RwLockLoginSession, ApiError> {
     let session = sessions.read().await;
 
-    let result = RwLockReadGuard::try_map(session, |f| {
-        f.get(uuid)
-    });
-
-    let result = match result {
-        Ok(v) => v,
-        Err(_) => {
+    let result = match session.get(uuid) {
+        Some(v) => v,
+        None => {
             return Err(ApiError::Internal("Could not find token".into()));
         }
     };
 
-    return Ok(result);
+    return Ok(result.clone());
 }
 
 impl<S, T> FromRequestParts<S> for Range<T>

@@ -117,8 +117,8 @@ impl NavidromeInterface {
         });
     }
 
-    pub async fn scrobbles(&self) -> Result<Vec<Scrobble>, NavidromeSessionError> {
-        return self.native_session.scrobble().await;
+    pub async fn scrobbles(&self, after_ts: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+        return self.native_session.scrobble(after_ts).await;
     }
 }
 

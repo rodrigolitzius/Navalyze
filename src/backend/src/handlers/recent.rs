@@ -11,12 +11,15 @@ pub async fn recent(
 
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    if limit == 0 {
-        limit = session.scrobbles.len()
-    }
+    session.write().await.update_scrobbles().await?;
+    let session = session.read().await;
 
-    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    let scrobbles = session.get_scrobbles();
     let mut scrobbles = Scrobble::filter_range(scrobbles, range);
+
+    if limit == 0 {
+        limit = scrobbles.len()
+    }
 
     scrobbles.sort_by(|a, b| { b.submission_time.cmp(&a.submission_time)});
 

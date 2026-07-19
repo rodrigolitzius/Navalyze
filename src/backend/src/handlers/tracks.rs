@@ -12,7 +12,10 @@ pub async fn most_played_tracks(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
-    let scrobbles = Scrobble::as_ref_vec(&session.scrobbles);
+    session.write().await.update_scrobbles().await?;
+    let session = session.read().await;
+
+    let scrobbles = session.get_scrobbles();
     let scrobbles = Scrobble::filter_range(scrobbles, range);
 
     let tracks_stat = TrackStat::group(scrobbles, &session.tracks_hashmap);

@@ -7,6 +7,7 @@ pub mod albums;
 pub mod album;
 pub mod tracks;
 pub mod playlists;
+pub mod playlist;
 
 use std::{str::FromStr, collections::HashMap};
 use tokio::sync::RwLock;

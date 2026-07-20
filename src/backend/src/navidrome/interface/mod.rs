@@ -128,18 +128,25 @@ impl NavidromeInterface {
         return self.native_session.scrobble(after_ts).await;
     }
 
+    pub async fn get_playlist(&self, id: &String) -> Result<Playlist, NavidromeSessionError> {
+        let subsonic_playlist = self.subsonic_session.get_playlist(id).await?;
+
+        return Ok(Playlist {
+            name: subsonic_playlist.name,
+            id: subsonic_playlist.id,
+            song_ids: subsonic_playlist.entry.into_iter().map(|e| e.id).collect()
+        });
+    }
+
     pub async fn playlists(&self) -> Result<Vec<Playlist>, NavidromeSessionError> {
-        let subsonic_playlists = self.subsonic_session.get_playlists().await?;
+        let subsonic_playlists = self.subsonic_session.get_playlist_ids().await?;
 
         let mut result: Vec<Playlist> = Vec::new();
 
-        for subsonic_playlist in subsonic_playlists {
-            let song_ids = self.subsonic_session.get_playlist_song_ids(&subsonic_playlist.id).await?;
-            result.push( Playlist {
-                name: subsonic_playlist.name,
-                id: subsonic_playlist.id.clone(),
-                song_ids: song_ids
-            });
+        for subsonic_playlist_id in subsonic_playlists {
+            let playlist = self.get_playlist(&subsonic_playlist_id).await?;
+
+            result.push(playlist);
         }
 
         return Ok(result);

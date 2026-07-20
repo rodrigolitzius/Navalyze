@@ -46,8 +46,6 @@ pub struct SubsonicResponseAlbumField {
 #[serde(rename_all = "camelCase")]
 pub struct SubsonicPlaylists {
     pub id: String,
-    pub name: String,
-    pub song_count: u64
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -68,7 +66,11 @@ pub struct SubsonicResponsePlaylistField {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubsonicPlaylist {
+    pub id: String,
+    pub name: String,
+    pub song_count: u64,
     #[serde(default)] // This for playlists with no songs
     pub entry: Vec<SubsonicPlaylistEntry>
 }

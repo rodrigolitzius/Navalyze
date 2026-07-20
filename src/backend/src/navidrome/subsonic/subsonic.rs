@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     navidrome::{
-        subsonic::{SubsonicArtist, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum, SubsonicResponsePlaylistsField, SubsonicPlaylists, SubsonicResponsePlaylistField},
+        subsonic::{SubsonicArtist, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum, SubsonicResponsePlaylistsField, SubsonicResponsePlaylistField, SubsonicPlaylist},
         interface::{
             error::NavidromeSessionError
         }
@@ -119,7 +119,7 @@ impl NavidromeSubsonicSession {
         return Ok(artist.subsonic_response.album);
     }
 
-    pub async fn get_playlists(&self) -> Result<Vec<SubsonicPlaylists>, NavidromeSessionError> {
+    pub async fn get_playlist_ids(&self) -> Result<Vec<String>, NavidromeSessionError> {
         let url = format!("{}/rest/getPlaylists", self.url);
 
         let response = self.client
@@ -131,10 +131,10 @@ impl NavidromeSubsonicSession {
 
         let playlists: SubsonicResponse<SubsonicResponsePlaylistsField> = response.into_json().await?;
 
-        return Ok(playlists.subsonic_response.playlists.playlist);
+        return Ok(playlists.subsonic_response.playlists.playlist.into_iter().map(|p| p.id).collect());
     }
 
-    pub async fn get_playlist_song_ids(&self, id: &String) -> Result<Vec<String>, NavidromeSessionError> {
+    pub async fn get_playlist(&self, id: &String) -> Result<SubsonicPlaylist, NavidromeSessionError> {
         let url = format!("{}/rest/getPlaylist?id={}", self.url, id);
 
         let response = self.client
@@ -145,8 +145,7 @@ impl NavidromeSubsonicSession {
             .map_reqwest_api_err()?;
 
         let response: SubsonicResponse<SubsonicResponsePlaylistField> = response.into_json().await?;
-        let song_ids: Vec<String> = response.subsonic_response.playlist.entry.into_iter().map(|e| e.id).collect();
 
-        return Ok(song_ids);
+        return Ok(response.subsonic_response.playlist);
     }
 }

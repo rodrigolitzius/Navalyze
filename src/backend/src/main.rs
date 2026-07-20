@@ -13,7 +13,7 @@ use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
-    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*, playlists::*},
+    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*, playlists::*, playlist::*},
     api::{ApiState}
 };
 
@@ -41,6 +41,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/most-played/albums", get(most_played_albums))
         .route("/most-played/tracks", get(most_played_tracks))
         .route("/most-played/playlists", get(most_played_playlists))
+        .route("/playlist/{*id}", get(playlist_info))
         .route("/artist/{*id}", get(artist_info))
         .route("/album/{*id}", get(album_info))
         .route("/login", post(login))

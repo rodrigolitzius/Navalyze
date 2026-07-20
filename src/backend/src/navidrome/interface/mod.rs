@@ -12,7 +12,8 @@ use crate::{
     handlers::LoginRequest, navidrome::{
         interface::{
             error::NavidromeSessionError, scrobble::Scrobble
-        }, native::{NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::NavidromeSubsonicSession,
+        },
+        native::{NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::NavidromeSubsonicSession
     }
 };
 
@@ -34,6 +35,12 @@ pub struct Album {
     pub name: String,
     pub artist: String,
     pub year: Option<u64>
+}
+
+pub struct Playlist {
+    pub name: String,
+    pub id: String,
+    pub song_ids: Vec<String>
 }
 
 pub struct SongData {
@@ -119,6 +126,23 @@ impl NavidromeInterface {
 
     pub async fn scrobbles(&self, after_ts: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
         return self.native_session.scrobble(after_ts).await;
+    }
+
+    pub async fn playlists(&self) -> Result<Vec<Playlist>, NavidromeSessionError> {
+        let subsonic_playlists = self.subsonic_session.get_playlists().await?;
+
+        let mut result: Vec<Playlist> = Vec::new();
+
+        for subsonic_playlist in subsonic_playlists {
+            let song_ids = self.subsonic_session.get_playlist_song_ids(&subsonic_playlist.id).await?;
+            result.push( Playlist {
+                name: subsonic_playlist.name,
+                id: subsonic_playlist.id.clone(),
+                song_ids: song_ids
+            });
+        }
+
+        return Ok(result);
     }
 }
 

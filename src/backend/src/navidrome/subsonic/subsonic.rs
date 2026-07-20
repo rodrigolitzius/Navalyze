@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     navidrome::{
-        subsonic::{SubsonicArtist, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum},
+        subsonic::{SubsonicArtist, NavidromeSubsonicSession, SubsonicResponse, SubsonicResponseAlbumField, SubsonicAlbum, SubsonicResponsePlaylistsField, SubsonicPlaylists, SubsonicResponsePlaylistField},
         interface::{
             error::NavidromeSessionError
         }
@@ -117,5 +117,36 @@ impl NavidromeSubsonicSession {
         let artist: SubsonicResponse<SubsonicResponseAlbumField> = response.into_json().await?;
 
         return Ok(artist.subsonic_response.album);
+    }
+
+    pub async fn get_playlists(&self) -> Result<Vec<SubsonicPlaylists>, NavidromeSessionError> {
+        let url = format!("{}/rest/getPlaylists", self.url);
+
+        let response = self.client
+            .get(url)
+            .query(&self.default_params)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let playlists: SubsonicResponse<SubsonicResponsePlaylistsField> = response.into_json().await?;
+
+        return Ok(playlists.subsonic_response.playlists.playlist);
+    }
+
+    pub async fn get_playlist_song_ids(&self, id: &String) -> Result<Vec<String>, NavidromeSessionError> {
+        let url = format!("{}/rest/getPlaylist?id={}", self.url, id);
+
+        let response = self.client
+            .get(url)
+            .query(&self.default_params)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let response: SubsonicResponse<SubsonicResponsePlaylistField> = response.into_json().await?;
+        let song_ids: Vec<String> = response.subsonic_response.playlist.entry.into_iter().map(|e| e.id).collect();
+
+        return Ok(song_ids);
     }
 }

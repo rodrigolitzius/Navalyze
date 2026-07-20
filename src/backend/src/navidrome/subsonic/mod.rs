@@ -39,3 +39,42 @@ pub struct SubsonicAlbum {
 pub struct SubsonicResponseAlbumField {
     pub album: SubsonicAlbum
 }
+
+// ==== PLAYLISTS ====
+// This is for deserializing /rest/getPlaylists
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SubsonicPlaylists {
+    pub id: String,
+    pub name: String,
+    pub song_count: u64
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicResponsePlaylistsVec {
+    pub playlist: Vec<SubsonicPlaylists>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicResponsePlaylistsField {
+    pub playlists: SubsonicResponsePlaylistsVec
+}
+
+// ==== PLAYLIST ====
+// // This is for deserializing /rest/getPlaylist
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicResponsePlaylistField {
+    pub playlist: SubsonicPlaylist
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicPlaylist {
+    #[serde(default)] // This for playlists with no songs
+    pub entry: Vec<SubsonicPlaylistEntry>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubsonicPlaylistEntry {
+    // #[serde(rename = "id")]
+    pub id: String
+}

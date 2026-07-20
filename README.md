@@ -9,12 +9,14 @@ This is what Navalyze currently supports
 
 ***Frontend:***
 - **Most played:** artists/albums/tracks
-- **Artist overview:** View your artists's albums
+- **Artist statistics:** View album statistics for any artist
 
 ***Backend***
 - \*all the above*
 - **Range selection**: Filter your scrobbles by starting/ending timestamps
-- **Album information:** View information for any album
+- **Most played:** playlists
+- **Album statistics:** View track statistics for any album
+- **Playlist statistics:** View track statistics for any playlist
 
 # Why Navalyze?
 There are various services with the goal of storing and analyzing your listening history, so what makes Navalyze different?

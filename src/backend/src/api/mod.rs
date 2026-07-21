@@ -44,18 +44,6 @@ pub struct ApiState {
     pub storage: Arc<Storage>
 }
 
-pub struct Range<T> {
-    pub start: T,
-    pub end: T
-}
-
-impl<T> Range<T>
-where T: PartialOrd {
-    pub fn contains(&self, other: &T) -> bool {
-        return (self.start <= *other) && (self.end >= *other);
-    }
-}
-
 impl ApiState {
     pub fn new(mbz: Option<MbzSession>) -> Result<Self, rusqlite::Error> {
         let result = Self {

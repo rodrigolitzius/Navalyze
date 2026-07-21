@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::{
     analysis::{tracks::TrackStat},
     api::{ApiState, error::ApiError},
-    handlers::{Auth, Range, get_session_from_uuid},
+    handlers::{Auth, extract::HandlerParams, get_session_from_uuid},
     navidrome::interface::scrobble::Scrobble
 };
 
@@ -18,8 +18,8 @@ struct Response {
 pub async fn album_info(
     State(state): State<ApiState>,
     Path(id): Path<String>,
-    auth: Auth,
-    range: Range<u64>
+    params: HandlerParams,
+    auth: Auth
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
@@ -27,7 +27,7 @@ pub async fn album_info(
     let session = session.read().await;
 
     let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, range);
+    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
     let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
     let album = session.navidrome_interface.get_album(&id).await?;

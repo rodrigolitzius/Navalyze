@@ -8,10 +8,10 @@ pub mod album;
 pub mod tracks;
 pub mod playlists;
 pub mod playlist;
+pub mod extract;
 
 use std::{str::FromStr, collections::HashMap};
 use tokio::sync::RwLock;
-use num_traits::Bounded;
 use serde::{Deserialize};
 use serde_json::json;
 use uuid::Uuid;
@@ -24,7 +24,7 @@ use axum::{
 use reqwest::header;
 
 use crate::{
-    api::{ApiState, LoginSession, Range, Sessions, RwLockLoginSession, error::*},
+    api::{ApiState, LoginSession, Sessions, RwLockLoginSession, error::*},
 };
 
 pub struct Auth{uuid: Uuid}
@@ -86,16 +86,6 @@ where
     }
 }
 
-pub fn get_param_default<T>(hashmap: &HashMap<String, String>, key: &str, default: T) -> T
-where T: FromStr {
-    let limit = hashmap.get(key);
-    if let None = limit { return default; }
-
-    let limit: T = limit.unwrap().parse().unwrap_or(default);
-
-    return limit;
-}
-
 async fn get_session_from_uuid(uuid: &Uuid, sessions: &Sessions) -> Result<RwLockLoginSession, ApiError> {
     let session = sessions.read().await;
 
@@ -107,30 +97,4 @@ async fn get_session_from_uuid(uuid: &Uuid, sessions: &Sessions) -> Result<RwLoc
     };
 
     return Ok(result.clone());
-}
-
-impl<S, T> FromRequestParts<S> for Range<T>
-where
-    S: Send + Sync,
-    T: Bounded + FromStr
-{
-    type Rejection = ApiError;
-    async fn from_request_parts(
-        parts: &mut axum::http::request::Parts,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
-        let Query(queries) = match Query::<HashMap<String, String>>::from_request_parts(parts, state).await {
-            Ok(v) => v,
-            Err(_) => return Err(ApiError::BadRequest("Invalid queries".into()))
-        };
-
-        let (start, end) = (
-            get_param_default(&queries, "a", T::min_value()),
-            get_param_default(&queries, "b", T::max_value()),
-        );
-
-        let range = Self {start, end};
-
-        return Ok(range);
-    }
 }

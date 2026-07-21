@@ -1,7 +1,11 @@
 use axum::extract::{State, Path, Json};
 use serde::Serialize;
+
 use crate::{
-    analysis::tracks::TrackStat, api::{ApiState, error::ApiError}, handlers::{Auth, Range, get_session_from_uuid}, navidrome::interface::scrobble::Scrobble
+    api::{ApiState, error::ApiError},
+    handlers::{Auth, extract::HandlerParams, get_session_from_uuid},
+    navidrome::interface::scrobble::Scrobble,
+    analysis::tracks::TrackStat
 };
 
 #[derive(Serialize)]
@@ -13,8 +17,8 @@ struct Response {
 pub async fn playlist_info(
     State(state): State<ApiState>,
     Path(id): Path<String>,
+    params: HandlerParams,
     auth: Auth,
-    range: Range<u64>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
@@ -25,7 +29,7 @@ pub async fn playlist_info(
     let track_ids: Vec<&String> = playlist.song_ids.iter().map(|i| i).collect();
 
     let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, range);
+    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
     let scrobbles = Scrobble::filter_track(scrobbles, &session.tracks_hashmap, &track_ids);
 
     let songs_stats = TrackStat::group(scrobbles, &session.tracks_hashmap);

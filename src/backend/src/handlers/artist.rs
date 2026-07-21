@@ -2,6 +2,7 @@ use serde::Serialize;
 
 use crate::{
     handlers::*,
+    handlers::extract::HandlerParams,
     analysis::{albums::AlbumStat},
     navidrome::interface::{scrobble::Scrobble}
 };
@@ -28,8 +29,8 @@ struct Response {
 pub async fn artist_info(
     State(state): State<ApiState>,
     Path(id): Path<String>,
-    auth: Auth,
-    range: Range<u64>
+    params: HandlerParams,
+    auth: Auth
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
 
@@ -37,7 +38,7 @@ pub async fn artist_info(
     let session = session.read().await;
 
     let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, range);
+    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
 
     let artist = session.navidrome_interface.get_artist(&id).await?;
 

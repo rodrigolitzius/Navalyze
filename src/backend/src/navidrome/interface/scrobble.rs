@@ -1,6 +1,9 @@
 use serde::Deserialize;
 
-use crate::{api::Range, navidrome::interface::TrackHashmap};
+use crate::{
+    handlers::extract::Range,
+    navidrome::interface::TrackHashmap
+};
 
 #[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -14,7 +17,7 @@ impl Scrobble {
         return scrobbles.iter().map(|s| s).collect();
     }
 
-    pub fn filter_range(scrobbles: Vec<&Scrobble>, range: Range<u64>) -> Vec<&Scrobble> {
+    pub fn filter_range(scrobbles: Vec<&Scrobble>, range: Range) -> Vec<&Scrobble> {
         let mut refs: Vec<&Scrobble> = Vec::new();
 
         for scrobble in scrobbles {

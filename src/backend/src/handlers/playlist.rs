@@ -1,9 +1,9 @@
-use axum::extract::{State, Path, Json};
+use axum::extract::{Path, Json};
 use serde::Serialize;
 
 use crate::{
-    api::{ApiState, error::ApiError},
-    handlers::{Auth, extract::HandlerParams, get_session_from_uuid},
+    api::error::ApiError,
+    handlers::extract::{HandlerParams, SessionExtractor},
     navidrome::interface::scrobble::Scrobble,
     analysis::tracks::TrackStat
 };
@@ -15,13 +15,10 @@ struct Response {
 }
 
 pub async fn playlist_info(
-    State(state): State<ApiState>,
     Path(id): Path<String>,
     params: HandlerParams,
-    auth: Auth,
+    SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
-
     session.write().await.update_scrobbles().await?;
     let session = session.read().await;
 

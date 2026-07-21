@@ -1,9 +1,15 @@
 use std::str::FromStr;
 use std::collections::HashMap;
 
-use axum::extract::{FromRequestParts, Query};
+use axum::extract::{FromRef, FromRequestParts, Query};
+use uuid::Uuid;
 
-use crate::api::error::ApiError;
+use crate::{
+    api::{ApiState, Sessions, RwLockLoginSession, error::ApiError},
+};
+
+// ==== STRUCTS =====
+pub struct SessionExtractor(pub RwLockLoginSession);
 
 pub struct ResponseFilter {
     limit: usize,
@@ -19,6 +25,39 @@ pub struct Range {
 pub struct HandlerParams {
     pub range: Range,
     pub filter: ResponseFilter
+}
+
+// ==== IMPLS =====
+impl<S> FromRequestParts<S> for SessionExtractor
+where
+    ApiState: axum::extract::FromRef<S>,
+    S: Send + Sync
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let state = ApiState::from_ref(state);
+
+        let auth_header = match parts.headers.get("Authorization") {
+            None => {return Err(ApiError::Unauthorized("Missing Authorization header".into()))},
+            Some(v) => v
+        };
+
+        let header_string = match auth_header.to_str() {
+            Ok(v) => v,
+            Err(_) => {return Err(ApiError::Unauthorized("Invalid Authorization header".into()))}
+        };
+
+        let uuid = match Uuid::from_str(header_string) {
+            Ok(v) => v,
+            Err(_) => {return Err(ApiError::Unauthorized("Authorization header is not and UUID".into()));}
+        };
+
+        return match state.sessions.read().await.contains_key(&uuid) {
+            true => Ok(SessionExtractor(get_session_from_uuid(&uuid, &state.sessions).await?)),
+            false => {return Err(ApiError::Unauthorized("You don't have permission to access this".into()))}
+        }
+    }
 }
 
 impl<S> FromRequestParts<S> for HandlerParams
@@ -54,6 +93,10 @@ impl Range {
 
         return range;
     }
+
+    pub fn contains(&self, other: &u64) -> bool {
+        return (self.start <= *other) && (self.end >= *other);
+    }
 }
 
 impl ResponseFilter {
@@ -69,12 +112,7 @@ impl ResponseFilter {
     }
 }
 
-impl Range {
-    pub fn contains(&self, other: &u64) -> bool {
-        return (self.start <= *other) && (self.end >= *other);
-    }
-}
-
+// ==== FUNCTIONS =====
 fn get_param_default<T>(hashmap: &HashMap<String, String>, key: &str, default: T) -> T
 where T: FromStr {
     let limit = hashmap.get(key);
@@ -83,4 +121,17 @@ where T: FromStr {
     let limit: T = limit.unwrap().parse().unwrap_or(default);
 
     return limit;
+}
+
+async fn get_session_from_uuid(uuid: &Uuid, sessions: &Sessions) -> Result<RwLockLoginSession, ApiError> {
+    let session = sessions.read().await;
+
+    let result = match session.get(uuid) {
+        Some(v) => v,
+        None => {
+            return Err(ApiError::Internal("Could not find token".into()));
+        }
+    };
+
+    return Ok(result.clone());
 }

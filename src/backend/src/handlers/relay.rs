@@ -1,16 +1,16 @@
-use crate::{handlers::*};
+use crate::{
+    handlers::*,
+    handlers::extract::SessionExtractor,
+};
 
 pub async fn relay(
     Query(query): Query<HashMap<String, String>>,
-    State(state): State<ApiState>,
     Path(tail): Path<String>,
+    SessionExtractor(session): SessionExtractor,
     method: Method,
     mut headers: HeaderMap,
-    auth: Auth,
     body: Bytes,
 ) -> Result<(StatusCode, HeaderMap, Bytes), ApiError> {
-    let session = get_session_from_uuid(&auth.uuid, &state.sessions).await?;
-
     let mut client_queries: Vec<(String, String)> = Vec::new();
     for query in query.iter().into_iter() {
         client_queries.push((query.0.clone(), query.1.clone()));

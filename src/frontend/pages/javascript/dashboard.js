@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('Token');
-    const server_url = localStorage.getItem('server_url');
 
-    if (!token || !server_url) {
+    if (!token) {
         window.location.replace('../index.html');
         return;
     }
@@ -13,13 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('logout-btn').addEventListener('click', function () {
         localStorage.removeItem('token');
-        localStorage.removeItem('server_url');
         window.location.replace('../index.html');
     });
 
     const lista = document.getElementById('lista-musicas');
 
-    fetch(server_url + '/recent', {
+    fetch('/api/recent', {
         headers: { 'Authorization': token }
     })
         .then(function (r) { return r.json(); })
@@ -45,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 coverDiv.className = 'album-cover';
                 coverDiv.innerHTML = '🎵';
 
-                fetch(server_url + '/relay/getCoverArt?id=' + musica.id + '&size=400', {
+                fetch('/api/relay/getCoverArt?id=' + musica.id + '&size=400', {
                     headers: { 'Authorization': token }
                 })
                     .then(function (r) {

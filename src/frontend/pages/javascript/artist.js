@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('Token');
-    const server_url = localStorage.getItem('server_url');
 
-    if (!token || !server_url) {
+    if (!token) {
         window.location.replace('../index.html');
         return;
     }
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('logout-btn').addEventListener('click', function () {
         localStorage.removeItem('Token');
-        localStorage.removeItem('server_url');
         window.location.replace('../index.html');
     });
 
@@ -71,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         banner.style.setProperty('--artist-gradient', gradientePorNome(nome));
         inicial.textContent = inicialDoNome(nome);
 
-        fetch(server_url + '/relay/getCoverArt?id=' + artistId + '&size=600', {
+        fetch('/api/relay/getCoverArt?id=' + artistId + '&size=600', {
             headers: { 'Authorization': token }
         })
             .then(function (r) {
@@ -107,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function aplicaCapa(card, coverId) {
         if (!coverId) return;
 
-        fetch(server_url + '/relay/getCoverArt?id=' + coverId + '&size=300', {
+        fetch('/api/relay/getCoverArt?id=' + coverId + '&size=300', {
             headers: { 'Authorization': token }
         })
             .then(function (r) {
@@ -139,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function carregaArtista() {
         document.getElementById('artist-name').textContent = artistNomeFallback || 'Carregando...';
 
-        fetch(server_url + '/artist/' + artistId, {
+        fetch('/api/artist/' + artistId, {
             headers: { 'Authorization': token }
         })
             .then(function (r) {

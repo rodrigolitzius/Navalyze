@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('Token');
-    const server_url = localStorage.getItem('server_url');
 
-    if (!token || !server_url) {
+    if (!token) {
         window.location.replace('../index.html');
         return;
     }
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('logout-btn').addEventListener('click', function () {
         localStorage.removeItem('Token');
-        localStorage.removeItem('server_url');
         window.location.replace('../index.html');
     });
 
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function aplicaFotoArtista(card, artistId) {
         if (!artistId) return;
 
-        fetch(server_url + '/relay/getCoverArt?id=' + artistId + '&size=400', {
+        fetch('/api/relay/getCoverArt?id=' + artistId + '&size=400', {
             headers: { 'Authorization': token }
         })
             .then(function (r) {
@@ -95,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function aplicaCapa(card, coverId) {
         if (!coverId) return;
 
-        fetch(server_url + '/relay/getCoverArt?id=' + coverId + '&size=300', {
+        fetch('/api/relay/getCoverArt?id=' + coverId + '&size=300', {
             headers: { 'Authorization': token }
         })
             .then(function (r) {
@@ -151,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function carregaComCapaPropria(endpoint, elementId, montaSubtitulo) {
         const grid = document.getElementById(elementId);
 
-        fetch(server_url + endpoint + '?limit=10', {
+        fetch(endpoint + '?limit=10', {
             headers: { 'Authorization': token }
         })
             .then(function (r) {
@@ -201,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    fetch(server_url + '/most-played/artists?limit=10', {
+    fetch('/api/most-played/artists?limit=10', {
         headers: { 'Authorization': token }
     })
         .then(function (r) {
@@ -212,12 +210,12 @@ document.addEventListener('DOMContentLoaded', function () {
             artistas = artistas || [];
 
             renderizaArtistas(artistas);
-            carregaComCapaPropria('/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
-            carregaComCapaPropria('/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
+            carregaComCapaPropria('/api/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
+            carregaComCapaPropria('/api/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
         })
         .catch(function (err) {
             document.getElementById('grid-artistas').innerHTML = '<p style="color:#f87171;">Erro: ' + err.message + '</p>';
-            carregaComCapaPropria('/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
-            carregaComCapaPropria('/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
+            carregaComCapaPropria('/api/most-played/albums', 'grid-albuns', function (item) { return item.artist; });
+            carregaComCapaPropria('/api/most-played/tracks', 'grid-faixas', function (item) { return item.artist; });
         });
 });

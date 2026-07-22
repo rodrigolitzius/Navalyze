@@ -5,11 +5,10 @@ form.addEventListener('submit', function(event) {
     event.preventDefault();
 
     const nd_url = document.getElementById('navidrome-url').value;
-    const server_url = document.getElementById('server-url').value;
     const nome = document.getElementById('nome').value;
     const senha = document.getElementById('senha').value;
 
-    if (!nd_url || !server_url || !nome || !senha) {
+    if (!nd_url || !nome || !senha) {
         alert('Preencha todos os campos');
         return;
     }
@@ -18,7 +17,7 @@ form.addEventListener('submit', function(event) {
     btn.textContent = 'Entrando...';
     btn.disabled = true;
 
-    fetch(server_url + '/login', {
+    fetch('/api/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ username: nome, password: senha, url: nd_url })
@@ -32,7 +31,7 @@ form.addEventListener('submit', function(event) {
         return response.json().then(function(json) {
             if (json.id) {
                 localStorage.setItem('Token', json.id);
-                localStorage.setItem('server_url', server_url);
+                localStorage.setItem('Navidrome-url', nd_url);
                 window.location.replace('pages/hub.html');
             } else {
                 alert('Login falhou: token não recebido');

@@ -1,17 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('Token');
-    const server_url = localStorage.getItem('server_url');
+    const nd_url = localStorage.getItem('Navidrome-url');
 
-    if (!token || !server_url) {
+    if (!token) {
         window.location.replace('index.html');
         return;
     }
 
-    document.getElementById('backend-url-display').textContent = server_url;
+    document.getElementById('backend-url-display').textContent = nd_url;
 
     document.getElementById('logout-btn').addEventListener('click', function() {
         localStorage.removeItem('Token');
-        localStorage.removeItem('server_url');
         window.location.replace('../index.html');
     });
 });

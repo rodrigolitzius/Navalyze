@@ -36,11 +36,11 @@ pub struct LoginRequest {
 // Each LoginSession has it's own lock, so that functions
 // can get a reference to a single session rather than all of them
 pub type RwLockLoginSession = Arc<RwLock<LoginSession>>;
-pub type Sessions = Arc<RwLock<HashMap<Uuid, RwLockLoginSession>>>;
+pub type Sessions = RwLock<HashMap<Uuid, RwLockLoginSession>>;
 
 #[derive(Clone)]
 pub struct ApiState {
-    pub sessions: Sessions,
+    pub sessions: Arc<Sessions>,
     pub storage: Arc<Storage>
 }
 

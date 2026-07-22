@@ -33,15 +33,11 @@ Navalyze, however, is entirely integrated with Navidrome. Any information presen
 > [!NOTE]
 Navalyze uses the /api/scrobble/ endpoint, meaning only versions after [pr 5761](https://github.com/navidrome/navidrome/pull/5761) are supported.
 
-Deploying Navalyze is a bit cumbersome, as it is still in development, but here's what you have to do:
-
 1. Clone the repo
-1. Compile the backend at /src/backend/ using `cargo build --release` and run with `cargo run -- --mbz-token <your-listenbrainz-token> -p <port>`. You can omit the mbz-token parameter if you don't use MusicBrainz or don't wish to.
-1. Go to src/frontend/ and run an HTTP server there. I do this with `python -m http.server`
-1. Now access your HTTP server (if you used python, it should be accesible at http://localhost:8000)
-1. backend-url will be `http://localhost:<port>`
-1. Navidrome url is the address that points to Navidrome.
-1. The rest of the fields are your credentials.
+1. `cd Navalyze/src/backend/`
+1. Compile and run the backend using `cargo run --release -- -m <your-listenbrainz-token> -p <port>`. You can omit the -m parameter if you don't use MusicBrainz or don't wish to.
+1. Now access the website at `http://localhost:<port>`
+1. Now fill in the fields with your Navidrome's instance URL, username and password (respectively)
 
 > [!NOTE]
 The web interface is in Brazilian Portuguese

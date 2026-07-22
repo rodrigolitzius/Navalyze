@@ -8,7 +8,7 @@ mod analysis;
 mod reqwest;
 
 use axum::{Router, routing::{get, post}};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 use uuid::Uuid;
 use clap::{Parser};
 
@@ -34,17 +34,20 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .allow_methods(Any)
         .allow_headers(Any);
 
+    let frontend = ServeDir::new("../frontend");
+
     let app = Router::new()
-        .route("/recent", get(recent))
-        .route("/relay/{*tail}", get(relay))
-        .route("/most-played/artists", get(most_played_artists))
-        .route("/most-played/albums", get(most_played_albums))
-        .route("/most-played/tracks", get(most_played_tracks))
-        .route("/most-played/playlists", get(most_played_playlists))
-        .route("/playlist/{*id}", get(playlist_info))
-        .route("/artist/{*id}", get(artist_info))
-        .route("/album/{*id}", get(album_info))
-        .route("/login", post(login))
+        .route("/api/recent", get(recent))
+        .route("/api/relay/{*tail}", get(relay))
+        .route("/api/most-played/artists", get(most_played_artists))
+        .route("/api/most-played/albums", get(most_played_albums))
+        .route("/api/most-played/tracks", get(most_played_tracks))
+        .route("/api/most-played/playlists", get(most_played_playlists))
+        .route("/api/playlist/{*id}", get(playlist_info))
+        .route("/api/artist/{*id}", get(artist_info))
+        .route("/api/album/{*id}", get(album_info))
+        .route("/api/login", post(login))
+        .fallback_service(frontend)
         .layer(cors)
         .with_state(state);
 

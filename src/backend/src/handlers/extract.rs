@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::collections::HashMap;
 
 use axum::extract::{FromRef, FromRequestParts, Query};
+use chrono_tz::Tz;
 use uuid::Uuid;
 
 use crate::{
@@ -25,6 +26,11 @@ pub struct Range {
 pub struct HandlerParams {
     pub range: Range,
     pub filter: ResponseFilter
+}
+
+pub struct TimedParams {
+    pub tz: Tz,
+    pub resolution: u64
 }
 
 // ==== IMPLS =====
@@ -81,6 +87,45 @@ where
         })
     }
 }
+
+impl<S> FromRequestParts<S> for TimedParams
+where
+    S: Send + Sync
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let Query(queries) = match Query::<HashMap<String, String>>::from_request_parts(parts, state).await {
+            Ok(v) => v,
+            Err(_) => return Err(ApiError::BadRequest("Invalid queries".into()))
+        };
+
+        let timezone = queries.get("tz").ok_or_else(|| {
+            ApiError::BadRequest("No timezone specified".into())
+        })?;
+
+        let timezone = timezone.parse().map_err(|_| {
+            ApiError::BadRequest("Failed to parse timezone".into())
+        })?;
+
+        let resolution = queries.get("res").ok_or_else(|| {
+            ApiError::BadRequest("No resolution specified".into())
+        })?;
+
+        let resolution: u64 = resolution.parse().map_err(|_| {
+            ApiError::BadRequest("Invalid resolution string".into())
+        })?;
+
+        return Ok(Self {
+            tz: timezone,
+            resolution: resolution
+        })
+    }
+}
+
 
 impl Range {
     async fn from_query(queries: &HashMap<String, String>) -> Self {

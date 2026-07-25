@@ -1,3 +1,4 @@
+pub mod time;
 pub mod tracks;
 pub mod albums;
 pub mod artists;

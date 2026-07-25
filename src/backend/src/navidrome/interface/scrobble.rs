@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use chrono::{DateTime, TimeZone};
 
 use crate::{
     handlers::extract::Range,
@@ -66,5 +67,10 @@ impl Scrobble {
 
             return track_ids.contains(&&song_data.id);
         }).collect();
+    }
+
+    pub fn date_time<T>(&self, tz: T) -> Option<DateTime<T>>
+    where T: TimeZone {
+        return Some(DateTime::from_timestamp_secs(self.submission_time as i64)?.with_timezone(&tz));
     }
 }

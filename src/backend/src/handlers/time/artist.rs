@@ -5,10 +5,11 @@ use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
     navidrome::interface::{scrobble::Scrobble},
-    analysis::time::frequency
+    analysis::time::artist
 };
 
-pub async fn frequency(
+pub async fn artist_time(
+    Path(id): Path<String>,
     params: HandlerParams,
     timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
@@ -18,6 +19,7 @@ pub async fn frequency(
 
     let scrobbles = session.get_scrobbles();
     let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
     let mut datetimes: Vec<DateTime<Tz>> = Vec::new();
 
@@ -26,7 +28,7 @@ pub async fn frequency(
         datetimes.push(date_time);
     }
 
-    let result = frequency::group(datetimes.iter().map(|d| d).collect(), timed_params.resolution);
+    let result = artist::group(datetimes.iter().map(|d| d).collect(), timed_params.resolution);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

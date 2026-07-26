@@ -13,7 +13,7 @@ use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
-    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*, playlists::*, playlist::*, stats::*, time::frequency::frequency},
+    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*, playlists::*, playlist::*, stats::*, time::frequency::frequency, time::artist::artist_time},
     api::{ApiState}
 };
 
@@ -49,6 +49,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
         .route("/api/time/frequency", get(frequency))
+        .route("/api/time/artist/{*id}", get(artist_time))
         .fallback_service(frontend)
         .layer(cors)
         .with_state(state);

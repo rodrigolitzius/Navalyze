@@ -6,10 +6,18 @@ use chrono_tz::Tz;
 use crate::analysis::time::insert_bin;
 
 pub fn group(
-    datetimes: Vec<&DateTime<Tz>>,
+    data: &Vec<(DateTime<Tz>, f64)>,
     resolution: u64
-) -> HashMap<u64, u64> {
+) -> HashMap<u64, f64> {
     let bin_size = (24*60*60) / resolution;
 
-    return insert_bin(resolution, bin_size, &datetimes.iter().map(|d| d.num_seconds_from_midnight() as u64).collect());
+    let mut values: Vec<(u64, f64)> = Vec::new();
+
+    for (datetime, duration) in data {
+        let datetime = datetime.num_seconds_from_midnight();
+
+        values.push((datetime as u64, *duration));
+    }
+
+    return insert_bin(resolution, bin_size, &values);
 }

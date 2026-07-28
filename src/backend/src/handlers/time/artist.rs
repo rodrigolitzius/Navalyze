@@ -21,14 +21,19 @@ pub async fn artist_time(
     let scrobbles = Scrobble::filter_range(scrobbles, params.range);
     let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
-    let mut datetimes: Vec<DateTime<Tz>> = Vec::new();
+    let mut data: Vec<(DateTime<Tz>, f64)> = Vec::new();
 
     for scrobble in scrobbles {
         let date_time = scrobble.date_time(timed_params.tz).unwrap();
-        datetimes.push(date_time);
+        let duration = match session.tracks_hashmap.get(&scrobble.media_file_id) {
+            Some(v) => v,
+            None => continue
+        }.duration / (60.0*60.0);
+
+        data.push((date_time, duration));
     }
 
-    let result = artist::group(datetimes.iter().map(|d| d).collect(), timed_params.resolution);
+    let result = artist::group(&data, timed_params.resolution);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

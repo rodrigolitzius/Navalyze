@@ -54,8 +54,8 @@ impl NativeSongArtist {
 }
 
 impl NavidromeNativeSession {
-    pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {
-        let client = match Client::builder().tls_danger_accept_invalid_certs(true).build() {
+    pub async fn new(login_request: LoginRequest, allow_invalid_certs: bool) -> Result<Self, NavidromeSessionError> {
+        let client = match Client::builder().tls_danger_accept_invalid_certs(allow_invalid_certs).build() {
             Ok(v) => v,
             Err(e) => {
                 return Err(NavidromeSessionError::Reqwest(e));

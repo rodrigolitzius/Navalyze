@@ -47,7 +47,7 @@ impl From<DeserializeSubsonicArtist> for SubsonicArtist {
 
 impl NavidromeSubsonicSession {
     // TODO: Actually test if this fails if the login request has invalid credentials
-    pub async fn new(login_request: LoginRequest) -> Result<Self, NavidromeSessionError> {
+    pub async fn new(login_request: LoginRequest, allow_invalid_certs: bool) -> Result<Self, NavidromeSessionError> {
         let salt: String = rand::rng()
             .sample_iter(Alphanumeric)
             .take(8)
@@ -66,7 +66,7 @@ impl NavidromeSubsonicSession {
 
         let url = format!("{}/rest/ping", login_request.url);
 
-        let client = match Client::builder().tls_danger_accept_invalid_certs(true).build() {
+        let client = match Client::builder().tls_danger_accept_invalid_certs(allow_invalid_certs).build() {
             Ok(v) => v,
             Err(e) => {
                 return Err(NavidromeSessionError::Reqwest(e));

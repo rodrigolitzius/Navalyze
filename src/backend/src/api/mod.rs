@@ -38,17 +38,23 @@ pub struct LoginRequest {
 pub type RwLockLoginSession = Arc<RwLock<LoginSession>>;
 pub type Sessions = RwLock<HashMap<Uuid, RwLockLoginSession>>;
 
+pub struct Settings {
+    pub allow_invalid_certs: bool
+}
+
 #[derive(Clone)]
 pub struct ApiState {
     pub sessions: Arc<Sessions>,
-    pub storage: Arc<Storage>
+    pub storage: Arc<Storage>,
+    pub settings: Arc<Settings>
 }
 
 impl ApiState {
-    pub fn new(mbz: Option<MbzSession>) -> Result<Self, rusqlite::Error> {
+    pub fn new(mbz: Option<MbzSession>, settings: Settings) -> Result<Self, rusqlite::Error> {
         let result = Self {
             sessions: Arc::new(RwLock::new(HashMap::new())),
-            storage: Arc::new(Storage::new(InternalDB::new("data.db".into())?, mbz))
+            storage: Arc::new(Storage::new(InternalDB::new("data.db".into())?, mbz)),
+            settings: Arc::new(settings)
         };
 
         return Ok(result);

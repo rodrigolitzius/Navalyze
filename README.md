@@ -35,7 +35,7 @@ Navalyze uses the /api/scrobble/ endpoint, meaning only versions after [pr 5761]
 
 1. Clone the repo
 1. `cd Navalyze/src/backend/`
-1. Compile and run the backend using `cargo run --release -- -m <your-listenbrainz-token> -p <port>`. You can omit the -m parameter if you don't use MusicBrainz or don't wish to.
+1. Compile and run the backend using `cargo run --release -- -m <your-listenbrainz-token> -p <port>`. You can omit the -m parameter if you don't use MusicBrainz or don't wish to. If your Navidrome's URL has an invalid SSL certificate, you can add -c to ignore it.
 1. Now access the website at `http://localhost:<port>`
 1. Now fill in the fields with your Navidrome's instance URL, username and password (respectively)
 

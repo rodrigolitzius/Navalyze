@@ -73,10 +73,10 @@ pub struct NavidromeInterface {
 }
 
 impl NavidromeInterface {
-    pub async fn new(request: LoginRequest) -> Result<Self, NavidromeSessionError> {
+    pub async fn new(request: LoginRequest, allow_invalid_certs: bool) -> Result<Self, NavidromeSessionError> {
         return Ok(Self {
-            native_session: NavidromeNativeSession::new(request.clone()).await?,
-            subsonic_session: NavidromeSubsonicSession::new(request.clone()).await?
+            native_session: NavidromeNativeSession::new(request.clone(), allow_invalid_certs).await?,
+            subsonic_session: NavidromeSubsonicSession::new(request.clone(), allow_invalid_certs).await?
         });
     }
 

@@ -14,7 +14,7 @@ pub async fn login(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let login_request: LoginRequest = login_request.into();
 
-    let navidrome_interface = NavidromeInterface::new(login_request.clone()).await?;
+    let navidrome_interface = NavidromeInterface::new(login_request.clone(), state.settings.allow_invalid_certs).await?;
 
     let scrobbles: Vec<Scrobble> = navidrome_interface.scrobbles(0).await?;
 

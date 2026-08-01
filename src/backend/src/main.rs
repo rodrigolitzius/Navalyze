@@ -13,7 +13,7 @@ use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
-    api::{ApiState},
+    api::{ApiState, Settings},
     handlers::{
         other::{login::*, recent::*, relay::*, stats::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*},
@@ -30,7 +30,10 @@ struct Args {
     mbz_token: Option<Uuid>,
 
     #[arg(short, long)]
-    port: u16
+    port: u16,
+
+    #[arg(short = 'c', long)]
+    allow_invalid_certificates: bool
 }
 
 async fn start_backend(state: ApiState, listen_port: u16) {
@@ -74,7 +77,11 @@ async fn main() {
         None => None
     };
 
-    let state = ApiState::new(mbz_session).expect("Failed to initialize API state");
+    let settings = Settings {
+        allow_invalid_certs: args.allow_invalid_certificates
+    };
+
+    let state = ApiState::new(mbz_session, settings).expect("Failed to initialize API state");
 
     start_backend(state, args.port).await;
 }

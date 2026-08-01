@@ -1,15 +1,7 @@
 pub mod time;
-pub mod login;
-pub mod recent;
-pub mod stats;
-pub mod relay;
-pub mod artists;
-pub mod artist;
-pub mod albums;
-pub mod album;
-pub mod tracks;
-pub mod playlists;
-pub mod playlist;
+pub mod other;
+pub mod single;
+pub mod most_played;
 pub mod extract;
 
 use std::collections::HashMap;

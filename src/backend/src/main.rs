@@ -15,9 +15,9 @@ use clap::{Parser};
 use crate::{
     api::{ApiState},
     handlers::{
-        login::*, recent::*, relay::*, stats::*,
-        artists::*, albums::*, tracks::*, playlists::*,
-        artist::*, album::*, playlist::*,
+        other::{login::*, recent::*, relay::*, stats::*},
+        most_played::{artists::*, albums::*, tracks::*, playlists::*},
+        single::{artist::*, album::*, playlist::*},
         time::{frequency::*, artist::*, album::*, track::*},
     }
 };

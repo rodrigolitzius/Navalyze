@@ -1,9 +1,7 @@
-use chrono::DateTime;
-use chrono_tz::Tz;
-
 use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
+    handlers::time::to_datetime_duration_vec,
     navidrome::interface::{scrobble::Scrobble},
     analysis::time::date
 };
@@ -21,17 +19,7 @@ pub async fn album_time(
     let scrobbles = Scrobble::filter_range(scrobbles, params.range);
     let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
-    let mut data: Vec<(DateTime<Tz>, f64)> = Vec::new();
-
-    for scrobble in scrobbles {
-        let date_time = scrobble.date_time(timed_params.tz).unwrap();
-        let duration = match session.tracks_hashmap.get(&scrobble.media_file_id) {
-            Some(v) => v,
-            None => continue
-        }.duration / (60.0*60.0);
-
-        data.push((date_time, duration));
-    }
+    let data = to_datetime_duration_vec(&scrobbles, &session.tracks_hashmap, timed_params.tz);
 
     let result = date::group(&data, timed_params.resolution);
 

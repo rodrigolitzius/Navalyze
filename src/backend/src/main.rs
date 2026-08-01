@@ -18,7 +18,7 @@ use crate::{
         login::*, recent::*, relay::*, stats::*,
         artists::*, albums::*, tracks::*, playlists::*,
         artist::*, album::*, playlist::*,
-        time::{frequency::frequency, artist::artist_time, album::album_time},
+        time::{frequency::*, artist::*, album::*, track::*},
     }
 };
 
@@ -56,6 +56,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/api/time/frequency", get(frequency))
         .route("/api/time/artist/{*id}", get(artist_time))
         .route("/api/time/album/{*id}", get(album_time))
+        .route("/api/time/track/{*id}", get(track_time))
         .fallback_service(frontend)
         .layer(cors)
         .with_state(state);

@@ -1,5 +1,5 @@
 pub mod frequency;
-pub mod artist;
+pub mod date;
 
 use std::collections::HashMap;
 

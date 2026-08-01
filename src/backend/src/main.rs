@@ -13,8 +13,13 @@ use uuid::Uuid;
 use clap::{Parser};
 
 use crate::{
-    handlers::{login::*, recent::*, relay::*, artists::*, albums::*, tracks::*, artist::*, album::*, playlists::*, playlist::*, stats::*, time::frequency::frequency, time::artist::artist_time},
-    api::{ApiState}
+    api::{ApiState},
+    handlers::{
+        login::*, recent::*, relay::*, stats::*,
+        artists::*, albums::*, tracks::*, playlists::*,
+        artist::*, album::*, playlist::*,
+        time::{frequency::frequency, artist::artist_time, album::album_time},
+    }
 };
 
 const APP_NAME: &'static str = "Navalyze";
@@ -50,6 +55,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/api/login", post(login))
         .route("/api/time/frequency", get(frequency))
         .route("/api/time/artist/{*id}", get(artist_time))
+        .route("/api/time/album/{*id}", get(album_time))
         .fallback_service(frontend)
         .layer(cors)
         .with_state(state);

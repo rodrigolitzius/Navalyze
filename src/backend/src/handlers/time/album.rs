@@ -8,7 +8,7 @@ use crate::{
     analysis::time::date
 };
 
-pub async fn artist_time(
+pub async fn album_time(
     Path(id): Path<String>,
     params: HandlerParams,
     timed_params: TimedParams,
@@ -19,7 +19,7 @@ pub async fn artist_time(
 
     let scrobbles = session.get_scrobbles();
     let scrobbles = Scrobble::filter_range(scrobbles, params.range);
-    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
+    let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
 
     let mut data: Vec<(DateTime<Tz>, f64)> = Vec::new();
 

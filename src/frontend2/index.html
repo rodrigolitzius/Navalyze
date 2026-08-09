@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="js/main.js" defer></script>
+</head>
+<body>
+    <div style="display: grid; grid-template-columns: 130px 1fr; gap: 3px;">
+        <header>
+            <div class="menu">
+                <div class="menu-items">
+                    <a target="_self" rel="next">Playlists</a>
+                    <a target="_self" rel="next">Artists</a>
+                    <a target="_self" rel="next">Albums</a>
+                    <a target="_self" rel="next">Tracks</a>
+                </div>
+            </div>
+        </header>
+
+        <main id="main">
+            <div id="artist-banner">
+                <img src="" alt="Top Artist">
+                <p>Loading...</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr));">
+                <!-- TOP ARTISTS-->
+                <div id="top-artists" class="card">
+                    <p class="card-name">Artists</p>
+                    <div class="big-list"></div>
+                </div>
+
+                <!--TOP ALBUMS-->
+                <div id="top-albums" class="card">
+                    <p class="card-name">Albums</p>
+                    <div class="big-list"></div>
+                </div>
+
+                <!--TOP TRACKS-->
+                <div id="top-tracks" class="card">
+                    <p class="card-name">Tracks</p>
+                    <div class="big-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

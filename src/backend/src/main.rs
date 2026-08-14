@@ -17,7 +17,7 @@ use crate::{
     handlers::{
         other::{login::*, recent::*, relay::*, stats::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*},
-        single::{artist::*, album::*, playlist::*},
+        single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*},
     }
 };
@@ -54,6 +54,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/api/playlist/{*id}", get(playlist_info))
         .route("/api/artist/{*id}", get(artist_info))
         .route("/api/album/{*id}", get(album_info))
+        .route("/api/track/{*id}", get(track_info))
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
         .route("/api/time/frequency", get(frequency))

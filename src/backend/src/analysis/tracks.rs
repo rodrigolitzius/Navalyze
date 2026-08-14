@@ -11,6 +11,8 @@ pub struct TrackStat {
     pub name: String,
     pub artist: String,
     pub artist_id: String,
+    pub album: String,
+    pub album_id: String,
     pub id: String,
     pub plays: u64,
     pub played_hours: f64
@@ -43,6 +45,8 @@ impl TrackStat {
                             name: song_data.title.clone(),
                             artist: song_data.artist.clone(),
                             artist_id: song_data.artist_id.clone(),
+                            album: song_data.album.clone(),
+                            album_id: song_data.album_id.clone(),
                             id: song_data.id.clone(),
                             plays: 1,
                             played_hours: duration_hour

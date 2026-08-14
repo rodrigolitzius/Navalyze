@@ -14,6 +14,10 @@ pub async fn recent(
     let scrobbles = session.get_scrobbles();
     let mut scrobbles = Scrobble::filter_range(scrobbles, params.range);
 
+    if !params.ids.is_empty() {
+        scrobbles = Scrobble::filter_track(scrobbles, &session.tracks_hashmap, &params.ids.iter().map(|i| i).collect());
+    }
+
     scrobbles.sort_by(|a, b| { b.submission_time.cmp(&a.submission_time)});
 
     let mut result: Vec<serde_json::Value> = Vec::new();

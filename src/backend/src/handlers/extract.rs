@@ -25,7 +25,8 @@ pub struct Range {
 
 pub struct HandlerParams {
     pub range: Range,
-    pub filter: ResponseFilter
+    pub filter: ResponseFilter,
+    pub ids: Vec<String>
 }
 
 pub struct TimedParams {
@@ -81,9 +82,14 @@ where
             Err(_) => return Err(ApiError::BadRequest("Invalid queries".into()))
         };
 
+        let ids = get_param_default::<String>(&queries, "id", "".to_string());
+        let ids: Vec<&str> = ids.split(",").collect();
+        let ids: Vec<String> = ids.into_iter().map(|i| i.to_string()).filter(|i| !i.is_empty()).collect();
+
         return Ok(Self {
             filter: ResponseFilter::from_query(&queries).await,
-            range: Range::from_query(&queries).await
+            range: Range::from_query(&queries).await,
+            ids: ids
         })
     }
 }

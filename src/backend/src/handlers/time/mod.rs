@@ -2,6 +2,7 @@ pub mod frequency;
 pub mod artist;
 pub mod album;
 pub mod track;
+pub mod playlist;
 
 use chrono::DateTime;
 use chrono_tz::Tz;

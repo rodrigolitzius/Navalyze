@@ -18,7 +18,7 @@ use crate::{
         other::{login::*, recent::*, relay::*, stats::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*},
         single::{artist::*, album::*, playlist::*, track::*},
-        time::{frequency::*, artist::*, album::*, track::*},
+        time::{frequency::*, artist::*, album::*, track::*, playlist::*},
     }
 };
 
@@ -45,22 +45,31 @@ async fn start_backend(state: ApiState, listen_port: u16) {
     let frontend = ServeDir::new("../frontend");
 
     let app = Router::new()
-        .route("/api/recent", get(recent))
+        // Other
         .route("/api/relay/{*tail}", get(relay))
+        .route("/api/recent", get(recent))
+        .route("/api/stats", get(stats))
+        .route("/api/login", post(login))
+
+        // most-played
         .route("/api/most-played/artists", get(most_played_artists))
         .route("/api/most-played/albums", get(most_played_albums))
         .route("/api/most-played/tracks", get(most_played_tracks))
         .route("/api/most-played/playlists", get(most_played_playlists))
+
+        // single
         .route("/api/playlist/{*id}", get(playlist_info))
         .route("/api/artist/{*id}", get(artist_info))
         .route("/api/album/{*id}", get(album_info))
         .route("/api/track/{*id}", get(track_info))
-        .route("/api/stats", get(stats))
-        .route("/api/login", post(login))
+
+        // time
         .route("/api/time/frequency", get(frequency))
         .route("/api/time/artist/{*id}", get(artist_time))
         .route("/api/time/album/{*id}", get(album_time))
         .route("/api/time/track/{*id}", get(track_time))
+        .route("/api/time/playlist/{*id}", get(playlist_time))
+
         .fallback_service(frontend)
         .layer(cors)
         .with_state(state);

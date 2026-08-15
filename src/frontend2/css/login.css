@@ -20,53 +20,12 @@ body {
 }
 
 .login-card {
-    position: relative;
-    width: min(1050px, 100%);
-    min-height: 600px;
-    padding: 55px 70px 45px 57%;
-    display: flex;
-    flex-direction: column;
+    width: min(700px, 90%);
+    padding: 40px;
     justify-content: center;
     background: #303940;
-    border-radius: 0px;
-    overflow: hidden;
+    border-radius: 10px;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-}
-
-.login-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 50%;
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(20, 25, 30, 0.05),
-            rgba(15, 22, 27, 0.65)
-        ),
-        url("https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1000&q=85");
-    background-size: cover;
-    background-position: center;
-    z-index: 0;
-}
-
-.login-card::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 44%;
-    width: 9%;
-    background: linear-gradient(to right, transparent, #303940);
-    z-index: 1;
-    pointer-events: none;
-}
-
-.login-card > * {
-    position: relative;
-    z-index: 2;
 }
 
 .login-brand-mark {
@@ -80,19 +39,10 @@ body {
 }
 
 .login-brand-name {
-    display: block;
     font-size: 38px;
     font-weight: 700;
     letter-spacing: -1px;
     color: #e4eaed;
-}
-
-.login-card h2 {
-    text-align: center;
-    font-size: 27px;
-    line-height: 1.2;
-    margin-bottom: 8px;
-    color: #ffffff;
 }
 
 .login-subtitle {
@@ -144,26 +94,8 @@ body {
     box-shadow: 0 0 0 1px rgba(113, 149, 173, 0.2);
 }
 
-.password-wrapper {
-    position: relative;
-    width: 100%;
-}
-
 .password-wrapper input {
     padding-right: 45px;
-}
-
-.password-wrapper button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 45px;
-    height: 45px;
-    border: none;
-    background: transparent;
-    color: #aeb8bd;
-    cursor: pointer;
-    font-size: 15px;
 }
 
 .password-wrapper button:hover {
@@ -207,79 +139,4 @@ body {
     color: #89959c;
     font-size: 11px;
     line-height: 1.4;
-}
-
-@media (max-width: 800px) {
-    body {
-        padding: 20px;
-    }
-
-    .login-card {
-        min-height: 700px;
-        padding: 330px 40px 45px;
-        width: 100%;
-    }
-
-    .login-card::before {
-        width: 100%;
-        height: 300px;
-        top: 0;
-        right: 0;
-        bottom: auto;
-        background-position: center 35%;
-    }
-
-    .login-card::after {
-        top: 260px;
-        left: 0;
-        width: 100%;
-        height: 80px;
-        background: linear-gradient(to bottom, transparent, #303940);
-    }
-
-    .login-brand-name {
-        font-size: 34px;
-    }
-}
-
-@media (max-width: 500px) {
-    body {
-        padding: 12px;
-    }
-
-    .login-card {
-        min-height: 680px;
-        padding: 250px 25px 35px;
-        border-radius: 0px;
-    }
-
-    .login-card::before {
-        height: 230px;
-    }
-
-    .login-card::after {
-        top: 195px;
-        height: 60px;
-    }
-
-    .login-brand {
-        margin-bottom: 18px;
-    }
-
-    .login-brand-name {
-        font-size: 32px;
-    }
-
-    .login-card h2 {
-        font-size: 24px;
-    }
-
-    .login-subtitle {
-        margin-bottom: 25px;
-        font-size: 13px;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
 }

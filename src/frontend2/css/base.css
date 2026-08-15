@@ -1,0 +1,26 @@
+html {
+    background-color: #8a1515;
+    font-family: sans-serif;
+}
+
+.body {
+    margin: 0px;
+}
+
+/* Menu lateral (usado em todas as páginas) */
+.menu {
+    width: 130px;
+    height: 100%;
+    margin: 0 0 0 0;
+    border-right: 3px solid yellow;
+}
+
+.menu-items {
+    margin: 10px;
+}
+
+.menu > .menu-items > a {
+    display: block;
+    text-decoration: none;
+    margin-block: 5px;
+}

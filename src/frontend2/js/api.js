@@ -32,6 +32,16 @@ class Api {
 
         return fetch(request)
     }
+
+    login(username, password, url) {
+        var request = new Request("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: username, password: password, url: url })
+        })
+
+        return fetch(request)
+    }
 }
 
 export {Api}

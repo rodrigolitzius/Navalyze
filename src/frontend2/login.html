@@ -10,7 +10,12 @@
 </head>
 <body>
     <div class="login-card">
-        <h1>Login</h1>
+        <div class="login-brand">
+            <span class="login-brand-mark">N</span>
+            <span class="login-brand-name">Navalyze</span>
+        </div>
+
+        <p class="login-subtitle">Bem-vindo de volta, faça login na sua conta</p>
 
         <form id="login-form">
             <div class="form-group">
@@ -25,7 +30,10 @@
 
             <div class="form-group">
                 <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="Digite sua senha" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Digite sua senha" required>
+                    <button type="button" id="toggle-password" aria-label="Mostrar senha">&#128065;</button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -35,6 +43,8 @@
 
             <button type="submit" id="login-btn">Entrar</button>
         </form>
+
+        <p class="login-footer">Use as mesmas credenciais do seu Navidrome</p>
     </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 html {
-    background-color: #8a1515;
+    background-color: #3f3737;
     font-family: sans-serif;
 }
 
@@ -7,7 +7,6 @@ html {
     margin: 0px;
 }
 
-/* Menu lateral (usado em todas as páginas) */
 .menu {
     width: 130px;
     height: 100%;

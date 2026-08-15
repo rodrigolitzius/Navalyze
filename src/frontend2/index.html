@@ -1,51 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-    <script type="module" src="js/dashboard.js" defer></script>
+    <script type="module">
+        import {Api} from "./js/api.js"
+
+        let api = new Api
+
+        let is_logged_in = await api.auth_check()
+
+        if (is_logged_in) {
+            window.location.replace("dashboard.html")
+        } else {
+            window.location.replace("login.html")
+        }
+    </script>
+    <title>Index</title>
 </head>
 <body>
-    <div style="display: grid; grid-template-columns: 130px 1fr; gap: 3px;">
-        <header>
-            <div class="menu">
-                <div class="menu-items">
-                    <a target="_self" rel="next">Playlists</a>
-                    <a target="_self" rel="next">Artists</a>
-                    <a target="_self" rel="next">Albums</a>
-                    <a target="_self" rel="next">Tracks</a>
-                </div>
-            </div>
-        </header>
 
-        <main id="main">
-            <div id="artist-banner">
-                <img src="" alt="Top Artist">
-                <p>Loading...</p>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr));">
-                <!-- TOP ARTISTS-->
-                <div id="top-artists" class="card">
-                    <p class="card-name">Artists</p>
-                    <div class="big-list"></div>
-                </div>
-
-                <!--TOP ALBUMS-->
-                <div id="top-albums" class="card">
-                    <p class="card-name">Albums</p>
-                    <div class="big-list"></div>
-                </div>
-
-                <!--TOP TRACKS-->
-                <div id="top-tracks" class="card">
-                    <p class="card-name">Tracks</p>
-                    <div class="big-list"></div>
-                </div>
-            </div>
-        </main>
-    </div>
 </body>
 </html>

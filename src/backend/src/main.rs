@@ -15,7 +15,7 @@ use clap::{Parser};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, relay::*, stats::*},
+        other::{login::*, recent::*, relay::*, stats::*, auth_check::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*, playlist::*},
@@ -42,7 +42,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let frontend = ServeDir::new("../frontend");
+    let frontend = ServeDir::new("../frontend2");
 
     let app = Router::new()
         // Other
@@ -50,6 +50,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .route("/api/recent", get(recent))
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
+        .route("/api/auth-check", get(auth_check))
 
         // most-played
         .route("/api/most-played/artists", get(most_played_artists))

@@ -9,6 +9,15 @@ class Api {
         return request
     }
 
+    async auth_check() {
+        let request;
+
+        try { request = await fetch(this.new_request(`auth-check`)) }
+        catch { return false }
+
+        return request.status == 200
+    }
+
     get_cover_art(id, size) {
         var request = this.new_request(`relay/getCoverArt?id=${id}&size=${size}`)
 

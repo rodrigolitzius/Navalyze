@@ -42,6 +42,12 @@ class Api {
         return fetch(request)
     }
 
+    get_artist(id) {
+        var request = this.new_request(`artist/${id}`)
+
+        return fetch(request)
+    }
+
     login(username, password, url) {
         var request = new Request("/api/login", {
             method: "POST",
@@ -53,4 +59,15 @@ class Api {
     }
 }
 
-export {Api}
+async function get_image_url(api, id, size) {
+    const image_response = await api.get_cover_art(id, size)
+
+    if (!image_response.ok) {
+        throw new Error(`Fetch failed: Status ${image_response.status}`)
+    }
+
+    let image_blob = await image_response.blob();
+    return URL.createObjectURL(image_blob);
+}
+
+export {Api, get_image_url}

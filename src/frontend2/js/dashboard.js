@@ -1,32 +1,23 @@
-import {Api} from "./api.js"
+import {Api, get_image_url} from "./api.js"
 
 const api = new Api()
 
-async function get_image_url(id, size) {
-    const image_response = await api.get_cover_art(id, size)
-
-    if (!image_response.ok) {
-        throw new Error(`Fetch failed: Status ${image_response.status}`)
-    }
-
-    let image_blob = await image_response.blob();
-    return URL.createObjectURL(image_blob);
-}
-
 async function fill_card(entries, card_id) {
-    entries.forEach(async (entry) => {
-        let image_url = await get_image_url(entry.id, 400)
+    for (const entry of entries) {
+        let image_url = await get_image_url(api, entry.id, 400)
 
         let list = document.querySelector(`${card_id}`)
 
         list.insertAdjacentHTML("beforeend",
-            `<div class="label-img">
-                <img src="${image_url}" alt="Artist Cover">
-                <p class="label-title">${entry.name}</p>
-                <p class="label-footer" title="${entry.plays} plays">${entry.played_hours.toFixed(2)}h</p>
+            `<div class="card">
+                <img class="card-img" src="${image_url}" alt="Artist Cover">
+                <a href="artist.html?id=${entry.id}">
+                    <p class="card-name">${entry.name}</p>
+                </a>
+                <p class="card-footer" title="${entry.plays} plays">${entry.played_hours.toFixed(2)}h</p>
             </div>`
         )
-    })
+    }
 }
 
 try {

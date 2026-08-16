@@ -17,3 +17,29 @@ html {
 .body {
     margin: 0px;
 }
+
+.card {
+    padding: 10px;
+    border: 3px solid var(--secondary-color);
+    border-radius: 10px;
+    background-color: var(--content-color);
+
+    .card-img {
+        object-fit: cover;
+        border-radius: 10px;
+        width: 100%;
+    }
+
+    .card-name {
+        color: var(--primary-font-color);
+        margin: 0px;
+        font-size: 1.3em;
+    }
+
+    .card-footer {
+        color: var(--primary-font-color);
+        margin: 0px;
+        font-size: 0.9em;
+        padding-inline: 3px;
+    }
+}

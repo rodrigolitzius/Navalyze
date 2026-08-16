@@ -1,5 +1,6 @@
 #top-artists, #top-albums, #top-tracks {
     display: flex;
+    gap: 10px;
     width: 100%;
     overflow-x: scroll;
     padding: 10px;
@@ -9,39 +10,5 @@
         height: 230px;
         width: 230px;
         flex-shrink: 0;
-    }
-}
-
-.card {
-    padding: 10px;
-    border: 3px solid var(--secondary-color);
-    border-radius: 10px;
-    background-color: var(--content-color);
-
-    margin-block: 20px;
-
-    .card-name {
-        color: var(--primary-font-color);
-        margin: 0px;
-        font-size: 1.3em;
-    }
-}
-
-.label-img {
-    img {
-        object-fit: cover;
-    }
-
-    .label-title {
-        color: var(--primary-font-color);
-        margin: 0px;
-        padding-inline: 3px;
-    }
-
-    .label-footer {
-        color: var(--primary-font-color);
-        margin: 0px;
-        font-size: 0.9em;
-        padding-inline: 3px;
     }
 }

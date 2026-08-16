@@ -1,0 +1,77 @@
+#artist {
+    display: flex;
+    background-color: var(--content-color);
+    padding: 10px;
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+
+    @media (max-width: 700px) {
+        flex-direction: column;
+        padding-bottom: 30px;
+    }
+
+    img {
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        border-radius: 10px;
+        margin: 10px;
+    }
+
+    .content {
+        padding-inline: 10px;
+
+        h1 {
+            color: var(--primary-font-color);
+        }
+
+        .properties {
+            span {
+                background-color: var(--secondary-color);
+                color: var(--primary-font-color);
+                border-radius: 14px;
+                margin-inline: 4px;
+                padding: 8px;
+            }
+        }
+    }
+}
+
+main.card > .card-name{
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+#albums {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    white-space: wrap;
+
+    .card {
+        width: 19%;
+        overflow: hidden;
+        margin: 0px;
+
+        .card-name {
+            white-space: nowrap;
+        }
+    }
+
+    @media (max-width: 1300px) {
+        .card {
+            width: 24%;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .card {
+            width: 32%;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .card {
+            width: 49%;
+        }
+    }
+}

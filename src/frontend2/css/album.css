@@ -1,0 +1,77 @@
+main.card > .card-name{
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.track-list {
+    .track {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .track-title {
+        width: 45%;
+        padding: 10px;
+        color: var(--primary-font-color);
+        font-size: 1.5em;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .track-time {
+        width: 5%;
+        color: var(--primary-font-color);
+        text-align: center;
+    }
+
+    .track-bar {
+        background-color: var(--primary-font-color);
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        width: calc(var(--ratio) * 50%);
+    }
+
+    .left {
+        width: 50%;
+        display: flex;
+
+        .track-title {
+            width: 90%;
+            margin-bottom: 0px;
+        }
+
+        .track-time {
+            width: 10%;
+        }
+    }
+
+    @media (max-width: 1000px) {
+        .track {
+            display: block;
+        }
+
+        .left {
+            width: 100%;
+            display: flex;
+
+            .track-title {
+                width: 90%;
+                margin-bottom: 0px;
+            }
+
+            .track-time {
+                width: 10%;
+            }
+        }
+
+        .track-bar {
+            display: block;
+            margin-top: 0px;
+            width: calc(var(--ratio) * 100%);
+            height: 7px;
+        }
+    }
+}

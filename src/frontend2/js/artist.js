@@ -7,7 +7,7 @@ let artist_id = new URLSearchParams(window.location.search).get("id");
 let artist = await api.get_artist(artist_id)
 artist = await artist.json()
 
-let artist_div = document.getElementById("artist")
+let artist_div = document.getElementById("image-header")
 
 artist_div.insertAdjacentHTML("beforeend",
     `<img src="${await get_image_url(api, artist_id, 300)}">
@@ -38,7 +38,9 @@ for (const album of artist.albums) {
     albums.insertAdjacentHTML("beforeend",
         `<div class="card">
             <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
-            <h1 class="card-name">${album.name}</h1>
+            <a href="album.html?id=${album.id}">
+                <p class="card-name">${album.name}</p>
+            </a>
             <p class="card-footer" title="${album.plays} plays">${album.played_hours.toFixed(2)}h</p>
         </div>`
     )

@@ -34,6 +34,7 @@ html {
         color: var(--primary-font-color);
         margin: 0px;
         font-size: 1.3em;
+        font-weight: bold;
     }
 
     .card-footer {
@@ -41,5 +42,48 @@ html {
         margin: 0px;
         font-size: 0.9em;
         padding-inline: 3px;
+    }
+}
+
+#image-header {
+    display: flex;
+    background-color: var(--content-color);
+    padding: 10px;
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+
+    img {
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.40);
+        border-radius: 10px;
+        object-fit: cover;
+        width: 300px;
+    }
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        padding-bottom: 30px;
+
+        img {
+            width: 100%;
+        }
+    }
+
+    .content {
+        padding-inline: 10px;
+
+        h1 {
+            color: var(--primary-font-color);
+        }
+
+        .properties {
+            span {
+                background-color: var(--secondary-color);
+                color: var(--primary-font-color);
+                border-radius: 14px;
+                margin-inline: 4px;
+                padding: 8px;
+            }
+        }
     }
 }

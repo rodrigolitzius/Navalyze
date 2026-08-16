@@ -48,6 +48,12 @@ class Api {
         return fetch(request)
     }
 
+    get_album(id) {
+        var request = this.new_request(`album/${id}`)
+
+        return fetch(request)
+    }
+
     login(username, password, url) {
         var request = new Request("/api/login", {
             method: "POST",

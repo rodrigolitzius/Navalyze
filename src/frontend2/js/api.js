@@ -42,6 +42,12 @@ class Api {
         return fetch(request)
     }
 
+    get_recently_played(limit, offset) {
+        var request = this.new_request(`recent?limit=${limit}&offset=${offset}`)
+
+        return fetch(request)
+    }
+
     get_artist(id) {
         var request = this.new_request(`artist/${id}`)
 

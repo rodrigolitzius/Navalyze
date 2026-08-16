@@ -32,6 +32,7 @@ pub async fn recent(
             "title": music_info.title,
             "artist": music_info.artist,
             "album": music_info.album,
+            "album_id": music_info.album_id,
         }));
     }
 

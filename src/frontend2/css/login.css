@@ -14,8 +14,6 @@ body {
     align-items: center;
     justify-content: center;
     padding: 40px;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #18232c !important;
     color: #ffffff;
 }
 
@@ -23,7 +21,7 @@ body {
     width: min(700px, 90%);
     padding: 40px;
     justify-content: center;
-    background: #303940;
+    background: var(--content-color);
     border-radius: 10px;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
 }
@@ -42,7 +40,7 @@ body {
     font-size: 38px;
     font-weight: 700;
     letter-spacing: -1px;
-    color: #e4eaed;
+    color: var(--primary-font-color);
 }
 
 .login-subtitle {
@@ -77,7 +75,7 @@ body {
     border: 1px solid transparent;
     border-radius: 5px;
     outline: none;
-    background: #3c464d;
+    background: var(--secondary-color);
     color: #ffffff;
     font-family: inherit;
     font-size: 13px;

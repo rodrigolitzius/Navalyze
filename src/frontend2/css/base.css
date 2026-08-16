@@ -1,25 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #18232c;
+  --content-color: #303940;
+  --secondary-color: #3c464d;
+  --primary-font-color: #e4eaed;
+}
+
 html {
-    background-color: #3f3737;
-    font-family: sans-serif;
+    background-color: var(--bg-color);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .body {
     margin: 0px;
-}
-
-.menu {
-    width: 130px;
-    height: 100%;
-    margin: 0 0 0 0;
-    border-right: 3px solid yellow;
-}
-
-.menu-items {
-    margin: 10px;
-}
-
-.menu > .menu-items > a {
-    display: block;
-    text-decoration: none;
-    margin-block: 5px;
 }

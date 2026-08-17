@@ -1,48 +1,76 @@
-body {
+#nav-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    background-color: var(--content-color);
+    border-radius: 10px;
+    padding: 15px;
+
+    & > button {
+        width: 70px;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        background-color: #dce3e7;
+        cursor: pointer;
+        border: 1px;
+
+        &:hover {
+            background: var(--accent-color);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            transform: none;
+        }
+    }
+
+    & > button:hover {
+        background-color: var(--accent-color);
+    }
 }
 
 main {
-    @media (min-width: 600px) {
-        min-width: 1200px;
-    }
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
 }
 
-.card {
+.song-entry {
+    color: var(--primary-font-color);
     display: flex;
     margin: 10px;
+    background-color: var(--content-color);
+    padding: 10px;
+    border-radius: 10px;
 
-    .card-img {
+    .song-img {
         width: 300px;
         margin-right: 15px;
+        border-radius: 10px;
     }
 
-    .card-name {
-        font-size: 2em;
+    .song-title {
+        font-size: 1.5em;
     }
 
-    .card-contents {
-        /*background-color: red;*/
-        color: var(--primary-font-color);
-
-        .card-item {
-            margin-left: 10px;
-            font-size: 1em;
-            margin-block: 5px;
-        }
+    .song-artist, .song-album, .song-album > * {
+        margin: 0px;
+        padding: 0px;
+        margin-left: 10px;
     }
 
     @media (max-width: 600px) {
-        .card-img {
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.40);
-            object-fit: cover;
-            width: 100px;
-            height: 100px;
-        }
-
-        .card-name {
-            font-size: 1em;
+        .song-img {
+            width: 180px;
+            height: 180px;
         }
     }
 }

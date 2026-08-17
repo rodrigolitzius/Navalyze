@@ -116,7 +116,7 @@ body {
 }
 
 #login-btn:hover {
-    background: #7195ad;
+    background: var(--accent-color);
     color: #ffffff;
     transform: translateY(-1px);
 }

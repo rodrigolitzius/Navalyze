@@ -1,4 +1,4 @@
-main.card > .card-name{
+main.card > .card-name {
     font-size: 2em;
     margin-bottom: 10px;
 }
@@ -30,7 +30,7 @@ main.card > .card-name{
         background-color: var(--primary-font-color);
         margin-top: 10px;
         margin-bottom: 10px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
         width: calc(var(--ratio) * 50%);
     }
 

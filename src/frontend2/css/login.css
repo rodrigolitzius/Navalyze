@@ -22,7 +22,7 @@ body {
     padding: 40px;
     justify-content: center;
     background: var(--content-color);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
 }
 
@@ -73,7 +73,7 @@ body {
     height: 45px;
     padding: 0 14px;
     border: 1px solid transparent;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     outline: none;
     background: var(--secondary-color);
     color: #ffffff;
@@ -104,31 +104,10 @@ body {
     width: 100%;
     height: 46px;
     margin-top: 8px;
-    border: none;
-    border-radius: 8px;
-    background: #dce3e7;
     color: #263139;
     font-family: inherit;
     font-size: 15px;
     font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-#login-btn:hover {
-    background: var(--accent-color);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-#login-btn:active {
-    transform: translateY(0);
-}
-
-#login-btn:disabled {
-    opacity: 0.6;
-    cursor: wait;
-    transform: none;
 }
 
 .login-footer {

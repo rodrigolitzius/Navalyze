@@ -33,8 +33,8 @@ for (const song of recent) {
             <div class="song-contents">
                 <p class="song-title">${song.title}</p>
                 <p class="song-artist">${song.artist}</p>
-                <a class="song-album" href="album.html?id=${song.album_id}">
-                    <p>${song.album}</p>
+                <a href="album.html?id=${song.album_id}">
+                    <p class="song-album">${song.album}</p>
                 </a>
             </div>
         </div>`

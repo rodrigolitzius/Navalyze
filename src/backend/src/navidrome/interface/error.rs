@@ -5,6 +5,7 @@ pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
     Unreachable(reqwest::Error),
     ParseJson(serde_json::Error),
+    NoContentType,
     Status(StatusCode),
     Unauthorized,
 }
@@ -46,6 +47,10 @@ impl From<NavidromeSessionError> for ApiError {
 
             NavidromeSessionError::Status(s) => ApiError::Internal(
                 format!("Navidrome returned an unexpected status code: {}", s.as_str())
+            ),
+
+            NavidromeSessionError::NoContentType => ApiError::Internal(
+                "Navidrome response does not contain a content type: {}".into()
             )
         }
     }

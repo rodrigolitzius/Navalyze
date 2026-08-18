@@ -15,7 +15,7 @@ use clap::{Parser};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, relay::*, stats::*, auth_check::*},
+        other::{login::*, recent::*, relay::*, stats::*, auth_check::*, art::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*, playlist::*},
@@ -47,6 +47,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
     let app = Router::new()
         // Other
         .route("/api/relay/{*tail}", get(relay))
+        .route("/api/art/{*id}", get(art))
         .route("/api/recent", get(recent))
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))

@@ -19,7 +19,7 @@ class Api {
     }
 
     get_cover_art(id, size) {
-        var request = this.new_request(`relay/getCoverArt?id=${id}&size=${size}`)
+        var request = this.new_request(`art/${id}?size=${size}`)
 
         return fetch(request)
     }

@@ -4,8 +4,9 @@ pub mod error;
 
 use std::collections::HashMap;
 
+use axum::{body::Bytes, http::HeaderValue};
 use bitflags::bitflags;
-use reqwest::RequestBuilder;
+use reqwest::{Method, RequestBuilder, header};
 use uuid::Uuid;
 
 use crate::{
@@ -14,7 +15,8 @@ use crate::{
             error::NavidromeSessionError, scrobble::Scrobble
         },
         native::{NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::NavidromeSubsonicSession
-    }
+    },
+    reqwest::ReqwestAPiErrorExt
 };
 
 bitflags! {
@@ -63,6 +65,11 @@ pub struct SongArtist {
     pub id: String,
     pub name: String,
     pub role: ArtistRole
+}
+
+pub struct Image {
+    pub bytes: Bytes,
+    pub content_type: HeaderValue
 }
 
 pub type TrackHashmap = HashMap<String, SongData>;
@@ -150,6 +157,31 @@ impl NavidromeInterface {
         }
 
         return Ok(result);
+    }
+
+    pub async fn get_art(&self, id: &str, size: Option<&String>) -> Result<Image, NavidromeSessionError> {
+        let mut client_queries: Vec<(String, String)> = Vec::new();
+        client_queries.push(("id".to_string(), id.to_string()));
+
+        if let Some(n) = size {
+            client_queries.push(("size".to_string(), n.clone()));
+        }
+
+        let response = self.subsonic_relay(Method::GET, &"getCoverArt".to_string())
+            .query(&client_queries)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let content_type = match response.headers().get(header::CONTENT_TYPE) {
+            Some(v) => v,
+            None => {return Err(NavidromeSessionError::NoContentType)}
+        }.to_owned();
+
+        return Ok(Image {
+            bytes: response.bytes().await.unwrap(),
+            content_type: content_type
+        })
     }
 }
 

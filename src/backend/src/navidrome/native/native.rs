@@ -1,4 +1,5 @@
 use reqwest::Client;
+use uuid::Uuid;
 
 use std::{collections::HashMap};
 
@@ -10,7 +11,7 @@ use crate::{
         interface::{
             ArtistRole, error::NavidromeSessionError, scrobble::Scrobble
         },
-        native::{LoginResponse, NativeSongArtist, NativeSongData, NavidromeNativeSession},
+        native::{LoginResponse, NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession},
     }, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
 
@@ -30,6 +31,15 @@ struct DeserializeSongData {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeserializeAlbum {
+    name: String,
+    id: String,
+    mbz_album_id: Option<Uuid>,
+    participants: DeserializeParticipants
+}
+
+#[derive(Serialize, Deserialize)]
 struct DeserializeParticipants {
     #[serde(rename = "artist")]
     artists: Option<Vec<DeserializeArtist>>,
@@ -44,12 +54,26 @@ struct DeserializeParticipants {
 #[derive(Serialize, Deserialize)]
 struct DeserializeArtist {
     id: String,
-    name: String
+    name: String,
+    mbz_artist_id: Option<Uuid>
+}
+
+impl NativeArtist {
+    fn from_deserialize_artist(artist: DeserializeArtist) -> Self {
+        return Self {
+            mbz_id: artist.mbz_artist_id,
+            id: artist.id,
+            name: artist.name
+        };
+    }
 }
 
 impl NativeSongArtist {
     fn from_deserialize_artist(artist: DeserializeArtist, role: ArtistRole) -> Self {
-        return Self {id: artist.id, name: artist.name, role: role};
+        return Self {
+            artist: NativeArtist::from_deserialize_artist(artist),
+            role: role
+        };
     }
 }
 
@@ -137,14 +161,14 @@ impl NavidromeNativeSession {
 
             let mut artists: HashMap<String, NativeSongArtist> = HashMap::new();
 
-            for artist in all_artists {
-                match artists.get_mut(&artist.id) {
+            for song_artist in all_artists {
+                match artists.get_mut(&song_artist.artist.id) {
                     None => {
-                        artists.insert(artist.id.clone(), NativeSongArtist { id: artist.id, name: artist.name, role: artist.role });
+                        artists.insert(song_artist.artist.id.clone(), NativeSongArtist {artist: song_artist.artist, role: song_artist.role});
                     }
 
                     Some(v) => {
-                        (*v).role |= artist.role
+                        (*v).role |= song_artist.role
                     }
                 }
             }
@@ -164,6 +188,33 @@ impl NavidromeNativeSession {
 
             result.insert(song_data.id.clone(), song_data);
         }
+
+        return Ok(result);
+    }
+
+    pub async fn album(&self, id: &str) -> Result<NativeAlbum, NavidromeSessionError> {
+        let url = format!("{}/api/album/{}", self.url, id);
+
+        let response = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_reqwest_api_err()?;
+
+        let response = response.into_json::<DeserializeAlbum>().await?;
+
+        let mut artists = Vec::new();
+
+        if let Some(album_artists) = response.participants.album_artists {
+            for album_artist in album_artists {
+                artists.push(NativeArtist::from_deserialize_artist(album_artist));
+            }
+        }
+
+        let result = NativeAlbum {
+            name: response.name,
+            artists: artists
+        };
 
         return Ok(result);
     }

@@ -2,6 +2,7 @@ pub mod native;
 
 use reqwest::{self};
 use serde::{Deserialize};
+use uuid::Uuid;
 
 use crate::navidrome::interface::ArtistRole;
 
@@ -18,10 +19,20 @@ pub struct LoginResponse {
     pub token: String
 }
 
+pub struct NativeAlbum {
+    pub name: String,
+    pub artists: Vec<NativeArtist>
+}
+
 pub struct NativeSongArtist {
+    pub artist: NativeArtist,
+    pub role: ArtistRole
+}
+
+pub struct NativeArtist {
+    pub mbz_id: Option<Uuid>,
     pub id: String,
     pub name: String,
-    pub role: ArtistRole
 }
 
 pub struct NativeSongData {

@@ -49,8 +49,8 @@ impl Scrobble {
                 None => return false
             };
 
-            for artist in &song_data.artists {
-                if artist_ids.contains(&&artist.id) {return true};
+            for song_artist in &song_data.artists {
+                if artist_ids.contains(&&song_artist.artist.id) {return true};
             }
 
             return false;

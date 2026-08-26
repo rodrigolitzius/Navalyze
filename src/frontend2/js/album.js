@@ -9,10 +9,27 @@ album = await album.json()
 
 let album_div = document.getElementById("image-header")
 
+let artists_string = ""
+for (const artist of album.artists) {
+    console.log(artist)
+    artists_string = artists_string.concat(
+        `<span>
+            <a href="artist.html?id=${artist.id}">
+                <p>${artist.name}</p>
+            </a>
+        </span>`
+    )
+}
+
+console.log(artists_string)
+
 album_div.insertAdjacentHTML("beforeend",
     `<img src="${await get_image_url(api, album_id, 1000)}">
     <div class="content">
         <h1>${album.name}</h1>
+        <div class="links">
+            ${artists_string}
+        </div>
         <div class="properties"></div>
     </div>`
 )

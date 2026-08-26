@@ -44,8 +44,8 @@ impl Stats {
             tracks.insert(song_data.id.clone(), "");
             albums.insert(song_data.album_id.clone(), "");
 
-            for artist in &song_data.artists {
-                let _ = artists.insert(artist.id.clone(), "");
+            for song_artist in &song_data.artists {
+                let _ = artists.insert(song_artist.artist.id.clone(), "");
             }
         }
 

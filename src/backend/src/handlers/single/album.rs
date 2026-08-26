@@ -8,9 +8,15 @@ use crate::{
 };
 
 #[derive(Serialize)]
+struct ResponseArtist {
+    name: String,
+    id: String,
+}
+
+#[derive(Serialize)]
 struct Response {
     name: String,
-    artist: String,
+    artists: Vec<ResponseArtist>,
     year: Option<u64>,
     tracks: Vec<TrackStat>
 }
@@ -36,7 +42,7 @@ pub async fn album_info(
 
     let response = Response {
         name: album.name,
-        artist: album.artist,
+        artists: album.artists.into_iter().map(|a| ResponseArtist {id: a.id, name: a.name}).collect(),
         year: album.year,
         tracks: tracks
     };

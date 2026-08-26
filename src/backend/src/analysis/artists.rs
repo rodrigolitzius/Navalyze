@@ -30,20 +30,20 @@ impl ArtistStat {
 
             let duration_hour = song_data.duration / (60.0*60.0);
 
-            for artist in song_data.artists.iter() {
-                if !artist.role.intersects(artist_types.clone()) {continue;}
+            for song_artist in song_data.artists.iter() {
+                if !song_artist.role.intersects(artist_types.clone()) {continue;}
 
-                match artist_stat.get_mut(&artist.id) {
+                match artist_stat.get_mut(&song_artist.artist.id) {
                     Some(v) => {
                         (*v).plays += 1;
                         (*v).played_hours += duration_hour
                     },
                     None => {
                         artist_stat.insert(
-                            artist.id.clone(),
+                            song_artist.artist.id.clone(),
                             ArtistStat {
-                                id: artist.id.clone(),
-                                name: artist.name.clone(),
+                                id: song_artist.artist.id.clone(),
+                                name: song_artist.artist.name.clone(),
                                 plays: 1,
                                 played_hours: duration_hour
                             }

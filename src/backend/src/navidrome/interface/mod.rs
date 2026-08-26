@@ -14,7 +14,7 @@ use crate::{
         interface::{
             error::NavidromeSessionError, scrobble::Scrobble
         },
-        native::{NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::NavidromeSubsonicSession
+        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::{NavidromeSubsonicSession, SubsonicAlbum}
     },
     reqwest::ReqwestAPiErrorExt
 };
@@ -30,13 +30,14 @@ bitflags! {
 
 pub struct Artist {
     pub name: String,
+    pub id: String,
     pub mbz_id: Option<Uuid>
 }
 
 pub struct Album {
     pub name: String,
-    pub artist: String,
-    pub year: Option<u64>
+    pub year: Option<u64>,
+    pub artists: Vec<Artist>
 }
 
 pub struct Playlist {
@@ -62,8 +63,7 @@ pub struct SongData {
 }
 
 pub struct SongArtist {
-    pub id: String,
-    pub name: String,
+    pub artist: Artist,
     pub role: ArtistRole
 }
 
@@ -112,23 +112,21 @@ impl NavidromeInterface {
         return request_builder
     }
 
-    pub async fn get_artist(&self, id: &String) -> Result<Artist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: &str) -> Result<Artist, NavidromeSessionError> {
         let artist = self.subsonic_session.get_artist(id).await?;
 
         return Ok(Artist {
             name: artist.name,
+            id: id.to_string(),
             mbz_id: artist.music_brainz_id
         });
     }
 
     pub async fn get_album(&self, id: &String) -> Result<Album, NavidromeSessionError> {
+        let native_album = self.native_session.album(&id).await?;
         let subsonic_album = self.subsonic_session.get_album(&id).await?;
 
-        return Ok(Album {
-            name: subsonic_album.name,
-            artist: subsonic_album.artist,
-            year: subsonic_album.year
-        });
+        return Ok(Album::new(native_album, subsonic_album));
     }
 
     pub async fn scrobbles(&self, after_ts: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
@@ -187,7 +185,34 @@ impl NavidromeInterface {
 
 impl From<NativeSongArtist> for SongArtist {
     fn from(value: NativeSongArtist) -> Self {
-        return Self { id: value.id, name: value.name, role: value.role };
+        return Self {
+            artist: Artist {
+                name: value.artist.name,
+                id: value.artist.id,
+                mbz_id: value.artist.mbz_id
+            },
+            role: value.role
+        };
+    }
+}
+
+impl Album {
+    fn new(native: NativeAlbum, subsonic: SubsonicAlbum) -> Self {
+        return Self {
+            name: native.name,
+            year: subsonic.year,
+            artists: native.artists.into_iter().map(|a| Artist::from(a)).collect()
+        }
+    }
+}
+
+impl From<NativeArtist> for Artist {
+    fn from(value: NativeArtist) -> Self {
+        return Self {
+            id: value.id,
+            name: value.name,
+            mbz_id: value.mbz_id
+        };
     }
 }
 

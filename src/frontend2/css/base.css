@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+a {
+    color: white;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
 :root {
   --bg-color: #18232c;
   --content-color: #303940;
@@ -74,8 +80,26 @@ html {
     .content {
         padding-inline: 10px;
 
+        * {
+            margin-bottom: 20px;
+        }
+
         h1 {
             color: var(--primary-font-color);
+        }
+
+        .links {
+            span {
+                display: inline;
+                margin-inline: 4px;
+                background-color: var(--secondary-color);
+                border-radius: var(--border-radius);
+                padding: 8px;
+
+                p, a {
+                    display: inline;
+                }
+            }
         }
 
         .properties {

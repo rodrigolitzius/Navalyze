@@ -89,7 +89,7 @@ impl NavidromeSubsonicSession {
         return Ok(result)
     }
 
-    pub async fn get_artist(&self, id: &String) -> Result<SubsonicArtist, NavidromeSessionError> {
+    pub async fn get_artist(&self, id: &str) -> Result<SubsonicArtist, NavidromeSessionError> {
         let url = format!("{}/rest/getArtist?id={}", self.url, id);
 
         let response = self.client

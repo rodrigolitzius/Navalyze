@@ -177,11 +177,9 @@ impl NavidromeNativeSession {
                 id: song_data.id,
                 title: song_data.title,
                 artist: song_data.artist,
-                artist_id: song_data.artist_id,
                 album: song_data.album,
                 album_id: song_data.album_id,
                 album_artist: song_data.album_artist,
-                album_artist_id: song_data.album_artist_id,
                 duration: song_data.duration,
                 artists: artists.into_values().collect()
             };

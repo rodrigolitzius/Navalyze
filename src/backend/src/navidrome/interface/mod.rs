@@ -11,10 +11,9 @@ use uuid::Uuid;
 
 use crate::{
     handlers::LoginRequest, navidrome::{
-        interface::{
-            error::NavidromeSessionError, scrobble::Scrobble
-        },
-        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession}, subsonic::{NavidromeSubsonicSession, SubsonicAlbum}
+        interface::{error::NavidromeSessionError, scrobble::Scrobble},
+        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession},
+        subsonic::{NavidromeSubsonicSession, SubsonicAlbum, SubsonicArtist, SubsonicPlaylist}
     },
     reqwest::ReqwestAPiErrorExt
 };
@@ -47,17 +46,12 @@ pub struct Playlist {
 }
 
 pub struct SongData {
-    // NOTE: The artist_id and album_artist_id is not always accurate,
-    // since some albums/songs have multiple album artists / artists
-    // Whose artist the id will match to is up to Navidrome
     pub id: String,
     pub title: String,
     pub artist: String,
-    pub artist_id: String,
     pub album: String,
     pub album_id: String,
     pub album_artist: String,
-    pub album_artist_id: String,
     pub duration: f64,
     pub artists: Vec<SongArtist>
 }
@@ -96,7 +90,7 @@ impl NavidromeInterface {
 
         let mut result: TrackHashmap = HashMap::new();
         for kv in songs {
-            let _ = result.insert(kv.0, SongData::from(kv.1));
+            let _ = result.insert(kv.0, SongData::from_native(kv.1));
         }
 
         return Ok(result);
@@ -115,18 +109,14 @@ impl NavidromeInterface {
     pub async fn get_artist(&self, id: &str) -> Result<Artist, NavidromeSessionError> {
         let artist = self.subsonic_session.get_artist(id).await?;
 
-        return Ok(Artist {
-            name: artist.name,
-            id: id.to_string(),
-            mbz_id: artist.music_brainz_id
-        });
+        return Ok(Artist::from_subsonic(artist));
     }
 
     pub async fn get_album(&self, id: &String) -> Result<Album, NavidromeSessionError> {
         let native_album = self.native_session.album(&id).await?;
         let subsonic_album = self.subsonic_session.get_album(&id).await?;
 
-        return Ok(Album::new(native_album, subsonic_album));
+        return Ok(Album::from_navidrome(native_album, subsonic_album));
     }
 
     pub async fn scrobbles(&self, after_ts: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
@@ -134,13 +124,9 @@ impl NavidromeInterface {
     }
 
     pub async fn get_playlist(&self, id: &String) -> Result<Playlist, NavidromeSessionError> {
-        let subsonic_playlist = self.subsonic_session.get_playlist(id).await?;
+        let playlist = self.subsonic_session.get_playlist(id).await?;
 
-        return Ok(Playlist {
-            name: subsonic_playlist.name,
-            id: subsonic_playlist.id,
-            song_ids: subsonic_playlist.entry.into_iter().map(|e| e.id).collect()
-        });
+        return Ok(Playlist::from_subsonic(playlist));
     }
 
     pub async fn playlists(&self) -> Result<Vec<Playlist>, NavidromeSessionError> {
@@ -183,52 +169,98 @@ impl NavidromeInterface {
     }
 }
 
-impl From<NativeSongArtist> for SongArtist {
-    fn from(value: NativeSongArtist) -> Self {
+trait FromNative {
+    type Native;
+
+    fn from_native(native: Self::Native) -> Self;
+}
+
+trait FromSubsonic {
+    type Subsonic;
+
+    fn from_subsonic(subsonic: Self::Subsonic) -> Self;
+}
+
+trait FromNavidrome {
+    type Subsonic;
+    type Native;
+
+    fn from_navidrome(native: Self::Native, subsonic: Self::Subsonic) -> Self;
+}
+
+impl FromNative for SongArtist {
+    type Native = NativeSongArtist;
+
+    fn from_native(native: Self::Native) -> Self {
         return Self {
-            artist: Artist {
-                name: value.artist.name,
-                id: value.artist.id,
-                mbz_id: value.artist.mbz_id
-            },
-            role: value.role
+            artist: Artist::from_native(native.artist),
+            role: native.role
         };
     }
 }
 
-impl Album {
-    fn new(native: NativeAlbum, subsonic: SubsonicAlbum) -> Self {
+impl FromNative for Artist {
+    type Native = NativeArtist;
+
+    fn from_native(native: Self::Native) -> Self {
+        return Self {
+            name: native.name,
+            id: native.id,
+            mbz_id: native.mbz_id
+        };
+    }
+}
+
+impl FromSubsonic for Artist {
+    type Subsonic = SubsonicArtist;
+
+    fn from_subsonic(subsonic: Self::Subsonic) -> Self {
+        return Self {
+            name: subsonic.name,
+            id: subsonic.id,
+            mbz_id: subsonic.music_brainz_id
+        };
+    }
+}
+
+impl FromNavidrome for Album {
+    type Native = NativeAlbum;
+    type Subsonic = SubsonicAlbum;
+
+    fn from_navidrome(native: Self::Native, subsonic: Self::Subsonic) -> Self {
         return Self {
             name: native.name,
             year: subsonic.year,
-            artists: native.artists.into_iter().map(|a| Artist::from(a)).collect()
+            artists: native.artists.into_iter().map(|a| Artist::from_native(a)).collect()
         }
     }
 }
 
-impl From<NativeArtist> for Artist {
-    fn from(value: NativeArtist) -> Self {
+impl FromSubsonic for Playlist {
+    type Subsonic = SubsonicPlaylist;
+
+    fn from_subsonic(subsonic: Self::Subsonic) -> Self {
         return Self {
-            id: value.id,
-            name: value.name,
-            mbz_id: value.mbz_id
-        };
+            name: subsonic.name,
+            id: subsonic.id,
+            song_ids: subsonic.entry.into_iter().map(|e| e.id).collect()
+        }
     }
 }
 
-impl From<NativeSongData> for SongData {
-    fn from(value: NativeSongData) -> Self {
+impl FromNative for SongData {
+    type Native = NativeSongData;
+
+    fn from_native(native: Self::Native) -> Self {
         return Self {
-            id: value.id,
-            title: value.title,
-            artist: value.artist,
-            artist_id: value.artist_id,
-            album: value.album,
-            album_id: value.album_id,
-            album_artist: value.album_artist,
-            album_artist_id: value.album_artist_id,
-            duration: value.duration,
-            artists: value.artists.into_iter().map(|a| SongArtist::from(a)).collect()
+            id: native.id,
+            title: native.title,
+            artist: native.artist,
+            album: native.album,
+            album_id: native.album_id,
+            album_artist: native.album_artist,
+            duration: native.duration,
+            artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect()
         };
     }
 }

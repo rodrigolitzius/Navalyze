@@ -1,4 +1,5 @@
 import { Api, get_image_url } from "./api.js"
+import { album_link } from "./html.js";
 
 const api = new Api()
 
@@ -13,11 +14,11 @@ artist_div.insertAdjacentHTML("beforeend",
     `<img src="${await get_image_url(api, artist_id, 300)}">
     <div class="content">
         <h1>${artist.name}</h1>
-        <div class="properties"></div>
+        <div class="round-list"></div>
     </div>`
 )
 
-let artist_properties = artist_div.querySelector(".properties")
+let artist_properties = artist_div.querySelector(".round-list")
 
 let properties = [
     `${artist.album_count} albums`,
@@ -29,7 +30,7 @@ for (const property of properties) {
     if (!property) { continue; }
 
     artist_properties.insertAdjacentHTML("beforeend",
-        `<span>${property}</span>`
+        `<span class="round-list-item">${property}</span>`
     )
 }
 
@@ -38,9 +39,7 @@ for (const album of artist.albums) {
     albums.insertAdjacentHTML("beforeend",
         `<div class="card">
             <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
-            <a href="album.html?id=${album.id}">
-                <p class="card-name">${album.name}</p>
-            </a>
+            <a class="card-name" href="${album_link(album.id)}">${album.name}</a>
             <p class="card-footer" title="${album.plays} plays">${album.played_hours.toFixed(2)}h</p>
         </div>`
     )

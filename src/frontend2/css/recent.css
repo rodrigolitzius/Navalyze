@@ -34,17 +34,24 @@ main {
         border-radius: var(--border-radius);
     }
 
+    .song-artist, .song-album, .song-title {
+        padding: 0px;
+        margin: 0px;
+    }
+
     .song-title {
         font-size: 1.8em;
-        margin: 0px 0px 5px 0px;
+        margin-bottom: 5px;
         padding: 0px;
     }
 
-    .song-artist, .song-album {
+    .song-artist {
         font-size: 1.3em;
-        padding: 0px;
-        margin: 0px;
-        margin-left: 10px;
+        margin-bottom: 8px;
+    }
+
+    .song-album {
+        font-size: 1em;
     }
 
     @media (max-width: 600px) {
@@ -57,11 +64,12 @@ main {
             font-size: 1.4em;
         }
 
-        .song-artist, .song-album {
-            font-size: 1em;
-            padding: 0px;
-            margin: 0px;
-            margin-left: 10px;
+        .song-artist {
+            font-size: 1.2em;
+        }
+
+        .song-album {
+            font-size: 0.9em;
         }
     }
 }

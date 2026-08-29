@@ -85,31 +85,43 @@ html {
         }
 
         h1 {
+            margin-top: 0px;
             color: var(--primary-font-color);
         }
+    }
+}
 
-        .links {
-            span {
-                display: inline;
-                margin-inline: 4px;
-                background-color: var(--secondary-color);
-                border-radius: var(--border-radius);
-                padding: 8px;
+.link-list {
+    a {
+        padding-right: 0px;
+        margin: 0px;
+    }
 
-                p, a {
-                    display: inline;
-                }
-            }
-        }
+    p {
+        display: inline;
+        margin: 0px;
+        padding-right: 5px;
+        color: var(--primary-font-color);
+    }
 
-        .properties {
-            span {
-                background-color: var(--secondary-color);
-                color: var(--primary-font-color);
-                border-radius: var(--border-radius);
-                margin-inline: 4px;
-                padding: 8px;
-            }
+    p:last-of-type {
+        display: none;
+    }
+}
+
+.round-list {
+    margin-bottom: 20px;
+
+    .round-list-item {
+        background-color: var(--secondary-color);
+        color: var(--primary-font-color);
+        border-radius: var(--border-radius);
+        margin-inline: 4px;
+        padding: 8px;
+        word-wrap: break-word;
+
+        * {
+            display: inline;
         }
     }
 }

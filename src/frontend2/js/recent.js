@@ -1,4 +1,5 @@
 import { Api, get_image_url } from "./api.js"
+import { build_link_list, artist_link, album_link } from "./html.js";
 
 const api = new Api()
 
@@ -32,11 +33,23 @@ for (const song of recent) {
             <img class="song-img" src=${await get_image_url(api, song.id, 400)}>
             <div class="song-contents">
                 <p class="song-title">${song.title}</p>
-                <p class="song-artist">${song.artist}</p>
-                <a href="album.html?id=${song.album_id}">
-                    <p class="song-album">${song.album}</p>
-                </a>
+                <div class="song-artist link-list"></div>
+                <div class="song-album link-list"></div>
             </div>
         </div>`
+    )
+
+    for (const artist of song.artists) {
+        build_link_list(
+            recent_html.lastElementChild.querySelector(".song-artist"),
+            artist.name,
+            artist_link(artist.id),
+        )
+    }
+
+    build_link_list(
+        recent_html.lastElementChild.querySelector(".song-album"),
+        song.album,
+        album_link(song.album_id),
     )
 }

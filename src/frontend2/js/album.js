@@ -1,4 +1,5 @@
 import { Api, get_image_url } from "./api.js"
+import { build_link_list, artist_link } from "./html.js";
 
 const api = new Api()
 
@@ -9,32 +10,20 @@ album = await album.json()
 
 let album_div = document.getElementById("image-header")
 
-let artists_string = ""
-for (const artist of album.artists) {
-    console.log(artist)
-    artists_string = artists_string.concat(
-        `<span>
-            <a href="artist.html?id=${artist.id}">
-                <p>${artist.name}</p>
-            </a>
-        </span>`
-    )
-}
-
-console.log(artists_string)
-
 album_div.insertAdjacentHTML("beforeend",
     `<img src="${await get_image_url(api, album_id, 1000)}">
     <div class="content">
         <h1>${album.name}</h1>
-        <div class="links">
-            ${artists_string}
-        </div>
-        <div class="properties"></div>
+        <div id="artists" class="link-list"></div>
+        <div id="properties" class="round-list"></div>
     </div>`
 )
 
-let album_content = album_div.querySelector(".properties")
+for (const artist of album.artists) {
+    build_link_list(album_div.querySelector("#artists"), artist.name, artist_link(artist.id))
+}
+
+let album_content = album_div.querySelector("#properties")
 
 let properties = [
     album.year ? `${album.year}` : null,
@@ -44,11 +33,9 @@ for (const property of properties) {
     if (!property) { continue; }
 
     album_content.insertAdjacentHTML("beforeend",
-        `<span>${property}</span>`
+        `<span class="round-list-item">${property}</span>`
     )
 }
-
-console.log(album)
 
 let max = Math.max(...album.tracks.map(item => item.played_hours))
 

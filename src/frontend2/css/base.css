@@ -74,6 +74,7 @@ html {
 
         img {
             width: 100%;
+            margin-bottom: 10px;
         }
     }
 
@@ -86,6 +87,7 @@ html {
 
         h1 {
             margin-top: 0px;
+            margin-bottom: 10px;
             color: var(--primary-font-color);
         }
     }

@@ -1,7 +1,9 @@
 use serde::Serialize;
 
 use crate::{
-    handlers::{extract::{HandlerParams, SessionExtractor}, time::artist, *}, navidrome::interface::{ArtistRole, scrobble::Scrobble}
+    handlers::*,
+    handlers::extract::{HandlerParams, SessionExtractor},
+    navidrome::interface::{scrobble::Scrobble, ArtistRole}
 };
 
 #[derive(Serialize)]
@@ -17,7 +19,8 @@ struct ResponseSong {
     artist: String,
     artists: Vec<ResponseArtist>,
     album: String,
-    album_id: String
+    album_id: String,
+    timestamp: u64
 }
 
 pub async fn recent(
@@ -54,7 +57,8 @@ pub async fn recent(
             artist: music_info.artist.clone(),
             artists: artists,
             album: music_info.album.clone(),
-            album_id: music_info.album_id.clone()
+            album_id: music_info.album_id.clone(),
+            timestamp: scrobble.submission_time
         });
     }
 

@@ -23,18 +23,25 @@ main {
 .song-entry {
     color: var(--primary-font-color);
     display: flex;
+    height: 100%;
     margin: 5px;
     background-color: var(--content-color);
     padding: 10px;
     border-radius: var(--border-radius);
 
+    .song-contents {
+        display: flex;
+        flex-direction: column;
+    }
+
     .song-img {
         width: 300px;
         margin-right: 15px;
+        object-fit: cover;
         border-radius: var(--border-radius);
     }
 
-    .song-artist, .song-album, .song-title {
+    .song-artist, .song-album, .song-title, .song-time {
         padding: 0px;
         margin: 0px;
     }
@@ -54,6 +61,20 @@ main {
         font-size: 1em;
     }
 
+    .song-time {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: flex-end;
+
+        p {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding: 0;
+            color: #c5c5c5;
+        }
+    }
+
     @media (max-width: 600px) {
         .song-img {
             width: 180px;
@@ -70,6 +91,13 @@ main {
 
         .song-album {
             font-size: 0.9em;
+        }
+
+        .song-time {
+            p {
+                margin-bottom: 10px;
+                font-size: 1em;
+            }
         }
     }
 }

@@ -28,6 +28,9 @@ recent = await recent.json()
 
 let recent_html = document.querySelector("main")
 for (const song of recent) {
+    let played_date = new Date(song.timestamp * 1000)
+    let played_date_string = played_date.toLocaleString("pt-br", { timezone: localStorage.getItem("timezone") })
+
     recent_html.insertAdjacentHTML("beforeend",
         `<div class="song-entry">
             <img class="song-img" src=${await get_image_url(api, song.id, 400)}>
@@ -35,6 +38,9 @@ for (const song of recent) {
                 <p class="song-title">${song.title}</p>
                 <div class="song-artist link-list"></div>
                 <div class="song-album link-list"></div>
+                <div class="song-time">
+                    <p>${played_date_string}</p>
+                </div>
             </div>
         </div>`
     )

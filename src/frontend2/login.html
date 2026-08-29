@@ -11,37 +11,36 @@
 <body>
     <div class="login-card">
         <div class="login-brand">
-            <span class="login-brand-mark">N</span>
             <span class="login-brand-name">Navalyze</span>
         </div>
 
-        <p class="login-subtitle">Bem-vindo de volta, faça login na sua conta</p>
+        <p class="login-subtitle">Welcome back! Please log in to your Navidrome instance</p>
 
         <form id="login-form">
             <div class="form-group">
                 <label for="navidrome-url">Navidrome URL</label>
-                <input type="url" id="navidrome-url" placeholder="http://seulocalhost.com" required>
+                <input type="url" id="navidrome-url" placeholder="http://localhost:4533" required>
             </div>
 
             <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" placeholder="Digite seu nome de usuário" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Navidrome username" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" placeholder="Digite sua senha" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Navidrome password" required>
             </div>
 
             <div class="form-group">
-                <label for="timezone">Fuso horário</label>
-                <input type="text" id="timezone" placeholder="America/Sao_Paulo" required>
+                <label for="timezone">Timezone</label>
+                <input type="text" id="timezone" placeholder="IANA timezone" required>
             </div>
 
             <button type="submit" id="login-btn" class="default-button">Entrar</button>
         </form>
 
-        <p class="login-footer">Use as mesmas credenciais do seu Navidrome</p>
+        <p class="login-footer">No external requests other than Navidrome (obviously) and (maybe) ListenBrainz</p>
     </div>
 </body>
 </html>

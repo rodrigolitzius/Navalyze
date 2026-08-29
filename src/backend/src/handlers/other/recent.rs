@@ -1,8 +1,24 @@
+use serde::Serialize;
+
 use crate::{
-    handlers::*,
-    handlers::extract::{HandlerParams, SessionExtractor},
-    navidrome::interface::scrobble::Scrobble
+    handlers::{extract::{HandlerParams, SessionExtractor}, time::artist, *}, navidrome::interface::{ArtistRole, scrobble::Scrobble}
 };
+
+#[derive(Serialize)]
+struct ResponseArtist {
+    name: String,
+    id: String
+}
+
+#[derive(Serialize)]
+struct ResponseSong {
+    id: String,
+    title: String,
+    artist: String,
+    artists: Vec<ResponseArtist>,
+    album: String,
+    album_id: String
+}
 
 pub async fn recent(
     params: HandlerParams,
@@ -20,20 +36,26 @@ pub async fn recent(
 
     scrobbles.sort_by(|a, b| { b.submission_time.cmp(&a.submission_time)});
 
-    let mut result: Vec<serde_json::Value> = Vec::new();
+    let mut result: Vec<ResponseSong> = Vec::new();
     for scrobble in params.filter.select(&scrobbles) {
         let music_info = match session.tracks_hashmap.get(&scrobble.media_file_id) {
             Some(v) => v,
             None => {continue;}
         };
 
-        result.push(json!({
-            "id": music_info.id,
-            "title": music_info.title,
-            "artist": music_info.artist,
-            "album": music_info.album,
-            "album_id": music_info.album_id,
-        }));
+        let artists: Vec<ResponseArtist> = music_info.artists.iter()
+            .filter(|a| a.role.contains(ArtistRole::ARTIST))
+            .map(|a| ResponseArtist {id: a.artist.id.clone(), name: a.artist.name.clone()})
+            .collect();
+
+        result.push(ResponseSong {
+            id: music_info.id.clone(),
+            title: music_info.title.clone(),
+            artist: music_info.artist.clone(),
+            artists: artists,
+            album: music_info.album.clone(),
+            album_id: music_info.album_id.clone()
+        });
     }
 
     return Ok(Json(serde_json::to_value(result).unwrap()));

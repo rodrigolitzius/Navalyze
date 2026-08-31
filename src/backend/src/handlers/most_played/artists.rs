@@ -2,7 +2,7 @@ use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, SessionExtractor},
     analysis::artists::ArtistStat,
-    navidrome::interface::{scrobble::Scrobble, ArtistRole},
+    navidrome::interface::{scrobble::ScrobbleWithSongFilter, ArtistRole},
 };
 
 pub async fn most_played_artists(
@@ -10,18 +10,17 @@ pub async fn most_played_artists(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range);
 
     let artist_types_default = String::from("artist");
     let artist_types = query.get("type").unwrap_or(&artist_types_default);
     let artist_types: Vec<&str> = artist_types.split(",").collect();
     let artist_types = ArtistRole::from(artist_types);
 
-    let artist_stat = ArtistStat::group(scrobbles, &session.tracks_hashmap, &artist_types);
+    let artist_stat = ArtistStat::group(scrobbles, &artist_types);
 
     let mut all_artists: Vec<ArtistStat> = artist_stat.into_values().collect();
 

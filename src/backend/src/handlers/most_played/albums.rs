@@ -2,20 +2,19 @@ use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, SessionExtractor},
     analysis::albums::AlbumStat,
-    navidrome::interface::scrobble::Scrobble
+    navidrome::interface::scrobble::ScrobbleWithSongFilter
 };
 
 pub async fn most_played_albums(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range);
 
-    let album_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
+    let album_stat = AlbumStat::group(scrobbles);
 
     let mut all_albums: Vec<AlbumStat> = album_stat.into_values().collect();
 

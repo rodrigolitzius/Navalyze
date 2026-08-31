@@ -3,7 +3,7 @@ use chrono::{DateTime, TimeZone};
 
 use crate::{
     handlers::extract::Range,
-    navidrome::interface::TrackHashmap
+    navidrome::interface::SongData
 };
 
 #[derive(Clone, Deserialize)]
@@ -13,62 +13,47 @@ pub struct Scrobble {
     pub submission_time: u64
 }
 
-impl Scrobble {
-    pub fn as_ref_vec<'a>(scrobbles: &'a Vec<Scrobble>) -> Vec<&'a Scrobble> {
-        return scrobbles.iter().map(|s| s).collect();
+pub struct ScrobbleWithSong<'a> {
+    pub scrobble: &'a Scrobble,
+    pub track: &'a SongData
+}
+
+pub trait ScrobbleWithSongFilter<'a> {
+    fn filter_range(self, range: Range) -> Self;
+    fn filter_album(self, album_ids: &Vec<&str>) -> Self;
+    fn filter_artist(self, artist_ids: &Vec<&str>) -> Self;
+    fn filter_track(self, track_ids: &Vec<&str>) -> Self;
+}
+
+impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
+    fn filter_range(self, range: Range) -> Self {
+        return self.into_iter().filter(|s| range.contains(&s.scrobble.submission_time)).collect();
     }
 
-    pub fn filter_range(scrobbles: Vec<&Scrobble>, range: Range) -> Vec<&Scrobble> {
-        let mut refs: Vec<&Scrobble> = Vec::new();
-
-        for scrobble in scrobbles {
-            if range.contains(&scrobble.submission_time) {
-                refs.push(&scrobble);
-            }
-        }
-
-        return refs;
+    fn filter_album(self, album_ids: &Vec<&str>) -> Self {
+        return self.into_iter().filter(|s| album_ids.contains(&&s.track.album_id.as_str())).collect();
     }
 
-    pub fn filter_album<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, album_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
-        return scrobbles.into_iter().filter(|s| {
-            let song_data = match tracks_hashmap.get(&s.media_file_id) {
-                Some(v) => v,
-                None => return false
-            };
+    fn filter_artist(self, artist_ids: &Vec<&str>) -> Self {
+        return self.into_iter().filter(|s| {
+            let track_artist_ids: Vec<&str> = s.track.artists.iter().map(|a| a.artist.id.as_str()).collect();
 
-            return album_ids.contains(&&song_data.album_id);
-        }).collect();
-    }
-
-    #[allow(unused)]
-    pub fn filter_artist<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, artist_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
-        return scrobbles.into_iter().filter(|s| {
-            let song_data = match tracks_hashmap.get(&s.media_file_id) {
-                Some(v) => v,
-                None => return false
-            };
-
-            for song_artist in &song_data.artists {
-                if artist_ids.contains(&&song_artist.artist.id) {return true};
+            for artist_id in artist_ids {
+                if track_artist_ids.contains(artist_id) {
+                    return true;
+                }
             }
 
             return false;
         }).collect();
     }
 
-    #[allow(unused)]
-    pub fn filter_track<'a>(scrobbles: Vec<&'a Scrobble>, tracks_hashmap: &TrackHashmap, track_ids: &Vec<&String>) -> Vec<&'a Scrobble> {
-        return scrobbles.into_iter().filter(|s| {
-            let song_data = match tracks_hashmap.get(&s.media_file_id) {
-                Some(v) => v,
-                None => return false
-            };
-
-            return track_ids.contains(&&song_data.id);
-        }).collect();
+    fn filter_track(self, track_ids: &Vec<&str>) -> Self {
+        return self.into_iter().filter(|s| track_ids.contains(&&s.track.id.as_str())).collect();
     }
+}
 
+impl Scrobble {
     pub fn date_time<T>(&self, tz: T) -> Option<DateTime<T>>
     where T: TimeZone {
         return Some(DateTime::from_timestamp_secs(self.submission_time as i64)?.with_timezone(&tz));

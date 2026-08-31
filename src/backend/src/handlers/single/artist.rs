@@ -3,8 +3,8 @@ use serde::Serialize;
 use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, SessionExtractor},
+    navidrome::interface::scrobble::ScrobbleWithSongFilter,
     analysis::{albums::AlbumStat},
-    navidrome::interface::{scrobble::Scrobble}
 };
 
 #[derive(Serialize)]
@@ -32,11 +32,7 @@ pub async fn artist_info(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
-
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let session = &mut session.write().await;
 
     let artist = session.navidrome_interface.get_artist(&id).await?;
 
@@ -44,10 +40,11 @@ pub async fn artist_info(
         Some(v) => state.storage.get_artist(session.db_domain_id, v).await?,
         None => None
     };
+    let scrobbles = session.navidrome_interface.get_library().await?
+        .filter_range(params.range)
+        .filter_artist(&Vec::from([id.as_str()]));
 
-    let scrobbles = Scrobble::filter_artist(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
-
-    let albums_stat = AlbumStat::group(scrobbles, &session.tracks_hashmap);
+    let albums_stat = AlbumStat::group(scrobbles);
 
     let (artist_type, gender) = match mbz_artist {
         Some(v) => (v.artist_type, v.gender),

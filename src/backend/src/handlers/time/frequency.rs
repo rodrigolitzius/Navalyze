@@ -2,7 +2,7 @@ use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
     handlers::time::to_datetime_duration_vec,
-    navidrome::interface::{scrobble::Scrobble},
+    navidrome::interface::scrobble::ScrobbleWithSongFilter,
     analysis::time::frequency
 };
 
@@ -11,13 +11,12 @@ pub async fn frequency(
     timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range);
 
-    let data = to_datetime_duration_vec(&scrobbles, &session.tracks_hashmap, timed_params.tz);
+    let data = to_datetime_duration_vec(scrobbles, timed_params.tz);
 
     let result = frequency::group(&data, timed_params.resolution);
 

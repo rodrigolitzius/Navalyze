@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::{
     handlers::LoginRequest, navidrome::{
-        interface::{error::NavidromeSessionError, scrobble::Scrobble},
+        interface::{error::NavidromeSessionError, scrobble::{Scrobble, ScrobbleWithSong}},
         native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession},
         subsonic::{NavidromeSubsonicSession, SubsonicAlbum, SubsonicArtist, SubsonicPlaylist}
     },
@@ -70,32 +70,25 @@ pub type TrackHashmap = HashMap<String, SongData>;
 
 pub struct NavidromeInterface {
     native_session: NavidromeNativeSession,
-    subsonic_session: NavidromeSubsonicSession
+    subsonic_session: NavidromeSubsonicSession,
+    tracks_hashmap: TrackHashmap,
+    scrobbles: Vec<Scrobble>
 }
 
 impl NavidromeInterface {
     pub async fn new(request: LoginRequest, allow_invalid_certs: bool) -> Result<Self, NavidromeSessionError> {
-        return Ok(Self {
-            native_session: NavidromeNativeSession::new(request.clone(), allow_invalid_certs).await?,
-            subsonic_session: NavidromeSubsonicSession::new(request.clone(), allow_invalid_certs).await?
-        });
+        let native_session = NavidromeNativeSession::new(request.clone(), allow_invalid_certs).await?;
+        let subsonic_session = NavidromeSubsonicSession::new(request.clone(), allow_invalid_certs).await?;
+
+        let scrobbles = native_session.scrobble(0).await?;
+        let tracks_hashmap: HashMap<String, SongData> = native_session.song(Vec::new()).await?.into_iter().map(|s| {
+            (s.0, SongData::from_native(s.1))
+        }).collect();
+
+        return Ok(Self {native_session, subsonic_session, tracks_hashmap, scrobbles});
     }
 
-    pub async fn build_track_hashmap(&self, scrobbles: &Vec<Scrobble>) -> Result<TrackHashmap, NavidromeSessionError> {
-        let songs = self.native_session.song(Vec::new()).await?;
-
-        let media_file_ids: Vec<&String> = scrobbles.iter().map(|s| {&s.media_file_id}).collect();
-
-        let songs: HashMap<String, NativeSongData> = songs.into_iter().filter(|s| media_file_ids.contains(&&s.0)).collect();
-
-        let mut result: TrackHashmap = HashMap::new();
-        for kv in songs {
-            let _ = result.insert(kv.0, SongData::from_native(kv.1));
-        }
-
-        return Ok(result);
-    }
-
+    // ===== API =====
     pub fn subsonic_relay(&self, method: reqwest::Method, endpoint: &String) -> RequestBuilder {
         let url = format!("{}/rest/{}", self.subsonic_session.url, endpoint);
 
@@ -117,10 +110,6 @@ impl NavidromeInterface {
         let subsonic_album = self.subsonic_session.get_album(&id).await?;
 
         return Ok(Album::from_navidrome(native_album, subsonic_album));
-    }
-
-    pub async fn scrobbles(&self, after_ts: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
-        return self.native_session.scrobble(after_ts).await;
     }
 
     pub async fn get_playlist(&self, id: &String) -> Result<Playlist, NavidromeSessionError> {
@@ -166,6 +155,73 @@ impl NavidromeInterface {
             bytes: response.bytes().await.unwrap(),
             content_type: content_type
         })
+    }
+
+    // ===== LIBRARY =====
+    pub async fn get_library<'a>(&'a mut self) -> Result<Vec<ScrobbleWithSong<'a>>, NavidromeSessionError> {
+        self.update_library().await?;
+
+        let mut result = Vec::new();
+
+
+        for scrobble in &self.scrobbles {
+            result.push(ScrobbleWithSong {
+                scrobble: scrobble,
+                track: self.get_song(&scrobble.media_file_id).await?
+            });
+        }
+
+        return Ok(result);
+    }
+
+    async fn update_library(&mut self) -> Result<&Vec<Scrobble>, NavidromeSessionError> {
+        let last_scrobble = self.scrobbles.iter().map(|s| s.submission_time).max().unwrap_or(0);
+
+        let mut new_scrobbles = self.native_session.scrobble(last_scrobble).await?;
+
+        if new_scrobbles.len() > 0 {
+            self.update_hashmap(new_scrobbles.iter().map(|s| s.media_file_id.as_str()).collect()).await?;
+            self.scrobbles.append(&mut new_scrobbles);
+        }
+
+        return Ok(&self.scrobbles);
+    }
+
+    async fn update_hashmap(&mut self, ids: Vec<&str>) -> Result<(), NavidromeSessionError> {
+        for id in ids {
+            if self.tracks_hashmap.contains_key(id) {
+                continue;
+            }
+
+            let mut song = self.native_session.song(Vec::from([
+                ("id".to_string(), id.to_string())
+            ])).await?;
+
+            match song.remove(id) {
+                Some(v) => {
+                    let v = SongData::from_native(v);
+
+                    self.tracks_hashmap.insert(id.to_string(), v);
+
+                    continue;
+                },
+
+                None => {
+                    return Err(NavidromeSessionError::SongNotFound);
+                }
+            }
+        }
+
+        return Ok(());
+    }
+
+    async fn get_song(&self, id: &str) -> Result<&SongData, NavidromeSessionError> {
+        return match self.tracks_hashmap.get(id) {
+            Some(v) => Ok(v),
+            None => {
+                Err(NavidromeSessionError::SongNotFound)
+            }
+        }
     }
 }
 

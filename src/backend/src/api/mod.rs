@@ -6,11 +6,8 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::{
-    mbz::MbzSession, navidrome::interface::{
-        NavidromeInterface, TrackHashmap,
-        scrobble::Scrobble,
-        error::NavidromeSessionError
-    },
+    navidrome::interface::NavidromeInterface,
+    mbz::MbzSession,
     sqlite::InternalDB,
     storage::Storage,
 };
@@ -19,9 +16,7 @@ pub struct LoginSession {
     pub navidrome_interface: NavidromeInterface,
     #[allow(unused)]
     pub uuid: uuid::Uuid,
-    pub tracks_hashmap: TrackHashmap,
-    pub db_domain_id: i64,
-    scrobbles: Vec<Scrobble>
+    pub db_domain_id: i64
 }
 
 #[derive(Deserialize)]
@@ -65,26 +60,8 @@ impl LoginSession {
     pub fn new(
         db_domain_id: i64,
         navidrome_interface: NavidromeInterface,
-        scrobbles: Vec<Scrobble>,
-        tracks_hashmap: TrackHashmap,
         uuid: Uuid
     ) -> Self {
-        return Self {db_domain_id, navidrome_interface, scrobbles, tracks_hashmap, uuid};
-    }
-
-    pub async fn update_scrobbles(&mut self) -> Result<(), NavidromeSessionError> {
-        let last_scrobble = self.scrobbles.iter().map(|s| s.submission_time).max().unwrap_or(0);
-
-        let mut new_scrobbles = self.navidrome_interface.scrobbles(last_scrobble).await?;
-
-        if new_scrobbles.len() > 0 {
-            self.scrobbles.append(&mut new_scrobbles);
-        }
-
-        return Ok(());
-    }
-
-    pub fn get_scrobbles(&self) -> Vec<&Scrobble> {
-        return Scrobble::as_ref_vec(&self.scrobbles);
+        return Self {db_domain_id, navidrome_interface, uuid};
     }
 }

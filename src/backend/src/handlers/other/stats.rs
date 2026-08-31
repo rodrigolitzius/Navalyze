@@ -2,20 +2,19 @@ use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, SessionExtractor},
     analysis::stats::Stats,
-    navidrome::interface::scrobble::Scrobble
+    navidrome::interface::scrobble::ScrobbleWithSongFilter
 };
 
 pub async fn stats(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range);
 
-    let stats = Stats::group(scrobbles, &session.tracks_hashmap);
+    let stats = Stats::group(scrobbles);
 
     return Ok(Json(serde_json::to_value(stats).unwrap()))
 }

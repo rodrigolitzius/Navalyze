@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Serialize;
 
 use crate::{
-    navidrome::interface::{scrobble::Scrobble, TrackHashmap, Playlist}
+    navidrome::interface::{scrobble::ScrobbleWithSong, Playlist}
 };
 
 #[derive(Serialize, Clone)]
@@ -16,22 +16,16 @@ pub struct PlaylistStat {
 
 impl PlaylistStat {
     pub fn group(
-        scrobbles: Vec<&Scrobble>,
-        playlists: &Vec<Playlist>,
-        track_hashmap: &TrackHashmap
+        scrobbles_with_songs: Vec<ScrobbleWithSong>,
+        playlists: &Vec<Playlist>
     ) -> HashMap<String, PlaylistStat> {
         let mut playlist_stat: HashMap<String, PlaylistStat> = HashMap::new();
 
-        for scrobble in scrobbles {
-            let song_data = match track_hashmap.get(&scrobble.media_file_id) {
-                Some(v) => v,
-                None => continue
-            };
-
-            let duration_hour = song_data.duration / (60.0*60.0);
+        for scrobble in scrobbles_with_songs {
+            let duration_hour = scrobble.track.duration / (60.0*60.0);
 
             for playlist in playlists {
-                if !playlist.song_ids.contains(&song_data.id) {continue;}
+                if !playlist.song_ids.contains(&scrobble.track.id) {continue;}
 
                 match playlist_stat.get_mut(&playlist.id) {
                     Some(v) => {

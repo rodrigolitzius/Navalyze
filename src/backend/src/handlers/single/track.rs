@@ -1,7 +1,11 @@
 use axum::extract::{Path, Json};
 use serde_json::json;
+
 use crate::{
-    analysis::tracks::TrackStat, api::error::ApiError, handlers::{extract::{HandlerParams, SessionExtractor}}, navidrome::interface::scrobble::Scrobble
+    api::error::ApiError,
+    handlers::{extract::{HandlerParams, SessionExtractor}},
+    navidrome::interface::scrobble::{ScrobbleWithSongFilter},
+    analysis::tracks::TrackStat
 };
 
 pub async fn track_info(
@@ -9,17 +13,16 @@ pub async fn track_info(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
-    let scrobbles = Scrobble::filter_track(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range)
+        .filter_track(&Vec::from([id.as_str()]));
 
-    let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.submission_time).collect();
+    let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.scrobble.submission_time).collect();
     let timestamps = params.filter.select(&timestamps);
 
-    let songs_stats = TrackStat::group(scrobbles, &session.tracks_hashmap);
+    let songs_stats = TrackStat::group(scrobbles);
 
     let mut tracks: Vec<TrackStat> = songs_stats.into_values().collect();
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});

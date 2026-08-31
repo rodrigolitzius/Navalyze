@@ -3,7 +3,7 @@ use serde::Serialize;
 use crate::{
     handlers::*,
     handlers::extract::{HandlerParams, SessionExtractor},
-    navidrome::interface::{scrobble::Scrobble, ArtistRole}
+    navidrome::interface::{scrobble::ScrobbleWithSongFilter, ArtistRole}
 };
 
 #[derive(Serialize)]
@@ -27,38 +27,34 @@ pub async fn recent(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let mut scrobbles = Scrobble::filter_range(scrobbles, params.range);
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(params.range);
 
     if !params.ids.is_empty() {
-        scrobbles = Scrobble::filter_track(scrobbles, &session.tracks_hashmap, &params.ids.iter().map(|i| i).collect());
+        scrobbles = scrobbles.filter_track(
+            &params.ids.iter().map(|i| i.as_str()).collect()
+        );
     }
 
-    scrobbles.sort_by(|a, b| { b.submission_time.cmp(&a.submission_time)});
+    scrobbles.sort_by(|a, b| { b.scrobble.submission_time.cmp(&a.scrobble.submission_time)});
 
     let mut result: Vec<ResponseSong> = Vec::new();
     for scrobble in params.filter.select(&scrobbles) {
-        let music_info = match session.tracks_hashmap.get(&scrobble.media_file_id) {
-            Some(v) => v,
-            None => {continue;}
-        };
-
-        let artists: Vec<ResponseArtist> = music_info.artists.iter()
+        let artists: Vec<ResponseArtist> = scrobble.track.artists.iter()
             .filter(|a| a.role.contains(ArtistRole::ARTIST))
             .map(|a| ResponseArtist {id: a.artist.id.clone(), name: a.artist.name.clone()})
             .collect();
 
         result.push(ResponseSong {
-            id: music_info.id.clone(),
-            title: music_info.title.clone(),
-            artist: music_info.artist.clone(),
+            id: scrobble.track.id.clone(),
+            title: scrobble.track.title.clone(),
+            artist: scrobble.track.artist.clone(),
             artists: artists,
-            album: music_info.album.clone(),
-            album_id: music_info.album_id.clone(),
-            timestamp: scrobble.submission_time
+            album: scrobble.track.album.clone(),
+            album_id: scrobble.track.album_id.clone(),
+            timestamp: scrobble.scrobble.submission_time
         });
     }
 

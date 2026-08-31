@@ -4,7 +4,7 @@ use crate::{
     analysis::{tracks::TrackStat},
     api::error::ApiError,
     handlers::extract::{HandlerParams, SessionExtractor},
-    navidrome::interface::scrobble::Scrobble
+    navidrome::interface::scrobble::{ScrobbleWithSongFilter}
 };
 
 #[derive(Serialize)]
@@ -26,16 +26,15 @@ pub async fn album_info(
     params: HandlerParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    session.write().await.update_scrobbles().await?;
-    let session = session.read().await;
+    let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = session.get_scrobbles();
-    let scrobbles = Scrobble::filter_range(scrobbles, params.range);
-    let scrobbles = Scrobble::filter_album(scrobbles, &session.tracks_hashmap, &Vec::from([&id]));
+    let album = navidrome.get_album(&id).await?;
 
-    let album = session.navidrome_interface.get_album(&id).await?;
+    let scrobbles = navidrome.get_library().await?
+        .filter_range(params.range)
+        .filter_album(&Vec::from([id.as_str()]));
 
-    let songs_stats = TrackStat::group(scrobbles, &session.tracks_hashmap);
+    let songs_stats = TrackStat::group(scrobbles);
 
     let mut tracks: Vec<TrackStat> = songs_stats.into_values().collect();
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});

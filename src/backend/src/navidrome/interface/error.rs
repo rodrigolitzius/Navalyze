@@ -8,6 +8,7 @@ pub enum NavidromeSessionError {
     NoContentType,
     Status(StatusCode),
     Unauthorized,
+    SongNotFound
 }
 
 impl From<ReqwestApiError> for NavidromeSessionError {
@@ -50,7 +51,11 @@ impl From<NavidromeSessionError> for ApiError {
             ),
 
             NavidromeSessionError::NoContentType => ApiError::Internal(
-                "Navidrome response does not contain a content type: {}".into()
+                "Navidrome response does not contain a content type.".into()
+            ),
+
+            NavidromeSessionError::SongNotFound => ApiError::Internal(
+                "Tried to get data for an invalid song. The server probably in an out-of-date state.".into()
             )
         }
     }

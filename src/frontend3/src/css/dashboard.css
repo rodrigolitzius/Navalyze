@@ -1,0 +1,14 @@
+#top-artists, #top-albums, #top-tracks {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    overflow-x: scroll;
+    padding: 10px;
+
+    img {
+        object-fit: cover;
+        height: 230px;
+        width: 230px;
+        flex-shrink: 0;
+    }
+}

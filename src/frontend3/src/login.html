@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/login.css">
+    <script type="module" src="js/login.js" defer></script>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-brand">
+            <span class="login-brand-name">Navalyze</span>
+        </div>
+
+        <p class="login-subtitle">Welcome back! Please log in to your Navidrome instance</p>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="navidrome-url">Navidrome URL</label>
+                <input type="url" id="navidrome-url" placeholder="http://localhost:4533" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Navidrome username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Navidrome password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="timezone">Timezone</label>
+                <input type="text" id="timezone" placeholder="IANA timezone" required>
+            </div>
+
+            <button type="submit" id="login-btn" class="default-button">Entrar</button>
+        </form>
+
+        <p class="login-footer">No external requests other than Navidrome (obviously) and (maybe) ListenBrainz</p>
+    </div>
+</body>
+</html>

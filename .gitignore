@@ -1,3 +1,6 @@
 /src/backend/target/
 /src/backend/data.db*
 *navidrome.db*
+
+node_modules
+dist

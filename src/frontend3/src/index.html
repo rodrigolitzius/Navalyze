@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module">
+        import {Api} from "./js/api.js"
+
+        let api = new Api
+
+        let is_logged_in = await api.auth_check()
+
+        if (is_logged_in) {
+            window.location.replace("dashboard.html")
+        } else {
+            window.location.replace("login.html")
+        }
+    </script>
+    <title>Index</title>
+</head>
+<body>
+
+</body>
+</html>

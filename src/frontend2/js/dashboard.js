@@ -1,33 +1,16 @@
 import { Api, get_image_url } from "./api.js"
-import { artist_link, album_link } from "./html.js"
+import { track_link } from "./html.js"
+import { relative_time } from "./util.js"
 
 const api = new Api()
 
-function format_number(n) {
-    return n.toLocaleString("pt-BR")
-}
-
 function format_hours(hours) {
-    return `${hours.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} h`
-}
-
-function relative_time(timestamp_seconds) {
-    const diff_seconds = Math.max(0, (Date.now() / 1000) - timestamp_seconds)
-
-    const minutes = Math.floor(diff_seconds / 60)
-    if (minutes < 1) return "agora"
-    if (minutes < 60) return `há ${minutes} min`
-
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `há ${hours} h`
-
-    const days = Math.floor(hours / 24)
-    return `há ${days} d`
+    return `${hours.toFixed(1)}h`
 }
 
 async function safe_image_url(entry_id) {
     try {
-        return await get_image_url(api, entry_id, 200)
+        return await get_image_url(api, entry_id, 400)
     } catch {
         return null
     }
@@ -39,22 +22,19 @@ function thumb_html(image_url) {
         : `<div class="ranked-thumb"></div>`
 }
 
-async function fill_featured_item(entry, featured_id, href, badge, sub_field) {
+async function fill_featured_item(entry, featured_id, href) {
     const featured = document.querySelector(featured_id)
     featured.innerHTML = ""
 
     if (!entry) return
 
     const image_url = await safe_image_url(entry.id)
-    const sub_text = sub_field && entry[sub_field] ? `<p class="list-featured-sub">${entry[sub_field]}</p>` : ""
 
     const inner = `
         ${image_url ? `<img src="${image_url}" alt="">` : `<div class="ranked-thumb-empty"></div>`}
-        <span class="list-featured-badge">${badge}</span>
         <div class="list-featured-info">
             <div class="list-featured-text">
                 <p class="list-featured-name">${entry.name}</p>
-                ${sub_text}
             </div>
             <span class="list-featured-stat">${format_hours(entry.played_hours)}</span>
         </div>
@@ -67,17 +47,17 @@ async function fill_featured_item(entry, featured_id, href, badge, sub_field) {
     )
 }
 
-async function fill_ranked_list(entries, list_id, featured_id, href, badge, sub_field) {
+async function fill_ranked_list(entries, list_id, featured_id, href) {
     const list = document.querySelector(list_id)
     list.innerHTML = ""
 
     if (!entries || entries.length === 0) {
-        list.insertAdjacentHTML("beforeend", `<li class="list-empty">Sem dados ainda.</li>`)
-        await fill_featured_item(null, featured_id, href, badge, sub_field)
+        list.insertAdjacentHTML("beforeend", `<li class="list-empty">No data</li>`)
+        await fill_featured_item(null, featured_id, href)
         return
     }
 
-    await fill_featured_item(entries[0], featured_id, href, badge, sub_field)
+    await fill_featured_item(entries[0], featured_id, href)
 
     const rest = entries.slice(1, 5)
 
@@ -108,16 +88,16 @@ async function fill_recent_strip(songs) {
     strip.innerHTML = ""
 
     if (!songs || songs.length === 0) {
-        strip.insertAdjacentHTML("beforeend", `<p class="list-empty">Nada tocado recentemente.</p>`)
+        strip.insertAdjacentHTML("beforeend", `<p class="list-empty">Nothing to see here.</p>`)
         return
     }
 
-    for (const song of songs.slice(0, 10)) {
+    for (const song of songs) {
         const image_url = await safe_image_url(song.id)
         const artist_names = (song.artists || []).map(a => a.name).join(", ")
 
         strip.insertAdjacentHTML("beforeend",
-            `<a class="recent-card" href="${album_link(song.album_id)}">
+            `<a class="recent-card" href="${track_link(song.id)}">
                 ${image_url ? `<img src="${image_url}" alt="">` : `<img alt="">`}
                 <p class="recent-title">${song.title}</p>
                 <p class="recent-sub">${artist_names}</p>
@@ -132,14 +112,13 @@ async function load_stats() {
         const response = await api.get_stats()
         const stats = await response.json()
 
-        document.getElementById("stat-plays").textContent = format_number(stats.plays)
+        document.getElementById("stat-plays").textContent = stats.plays
         document.getElementById("stat-hours").textContent = format_hours(stats.played_hours)
-        document.getElementById("stat-days").textContent = `≈ ${Math.round(stats.played_hours / 24)} dias ouvindo música`
-        document.getElementById("stat-artists").textContent = format_number(stats.artists)
-        document.getElementById("stat-albums").textContent = format_number(stats.albums)
-        document.getElementById("stat-tracks").textContent = format_number(stats.tracks)
+        document.getElementById("stat-artists").textContent = stats.artists
+        document.getElementById("stat-albums").textContent = stats.albums
+        document.getElementById("stat-tracks").textContent = stats.tracks
     } catch (error) {
-        console.error("Falha ao carregar /api/stats", error)
+        console.error("Failure loading /api/stats", error)
     }
 }
 
@@ -147,43 +126,35 @@ async function load_top_lists() {
     try {
         const response = await api.get_most_played_artists(30)
         const artists = await response.json()
-        await fill_ranked_list(artists, "#top-artists", "#top-artists-featured", "artist.html", "Top artista", null)
+        await fill_ranked_list(artists, "#top-artists", "#top-artists-featured", "artist.html")
     } catch (error) {
-        console.error("Falha ao carregar artistas mais ouvidos", error)
+        console.error("Failure to load artists", error)
     }
 
     try {
         const response = await api.get_most_played_albums(30)
         const albums = await response.json()
-        await fill_ranked_list(albums, "#top-albums", "#top-albums-featured", "album.html", "Top álbum", "artist")
+        await fill_ranked_list(albums, "#top-albums", "#top-albums-featured", "album.html")
     } catch (error) {
-        console.error("Falha ao carregar álbuns mais ouvidos", error)
+        console.error("Failure to load albums", error)
     }
 
     try {
         const response = await api.get_most_played_tracks(30)
         const tracks = await response.json()
-        await fill_ranked_list(tracks, "#top-tracks", "#top-tracks-featured", null, "Top faixa", "artist")
+        await fill_ranked_list(tracks, "#top-tracks", "#top-tracks-featured", "track.html")
     } catch (error) {
-        console.error("Falha ao carregar faixas mais ouvidas", error)
-    }
-
-    try {
-        const response = await api.get_most_played_playlists(30)
-        const playlists = await response.json()
-        await fill_ranked_list(playlists, "#top-playlists", "#top-playlists-featured", null, "Top playlist", null)
-    } catch (error) {
-        console.error("Falha ao carregar playlists mais ouvidas", error)
+        console.error("Failure to load tracks", error)
     }
 }
 
 async function load_recent() {
     try {
-        const response = await api.get_recently_played(10, 0)
+        const response = await api.get_recently_played(20, 0)
         const songs = await response.json()
         await fill_recent_strip(songs)
     } catch (error) {
-        console.error("Falha ao carregar recentemente tocadas", error)
+        console.error("Failure to load recently played", error)
     }
 }
 

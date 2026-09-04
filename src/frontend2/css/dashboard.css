@@ -3,42 +3,29 @@
     min-height: 100vh;
 }
 #sidebar {
-    width: 230px;
     flex-shrink: 0;
     background-color: var(--content-color);
-    border-right: 1px solid var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
     padding: 20px 14px;
     position: sticky;
     top: 0;
     height: 100vh;
 }
-#brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 10px 24px 10px;
-    color: var(--primary-font-color);
-    font-size: 1.2em;
-    font-weight: bold;
-}
-#brand svg {
-    width: 26px;
-    height: 26px;
-    flex-shrink: 0;
-}
 #nav-links {
     display: flex;
     flex-direction: column;
+    width: fit-content;
     gap: 4px;
 }
 .nav-link {
     display: flex;
     align-items: center;
+    width: fit-content;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 10px 10px;
     border-radius: var(--border-radius);
     color: var(--muted-font-color);
-    font-size: 0.95em;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -59,13 +46,9 @@
     cursor: default;
     opacity: 0.55;
 }
-.nav-link.disabled:hover {
-    background-color: transparent;
-    color: var(--muted-font-color);
-}
 #main {
     flex: 1;
-    padding: 24px 32px 48px 32px;
+    padding: 24px 24px 48px 24px;
     min-width: 0;
 }
 #top-bar {
@@ -122,7 +105,6 @@
     border: 1px solid var(--secondary-color);
     border-radius: var(--border-radius);
     padding: 26px 28px 22px 28px;
-    margin-bottom: 20px;
 }
 #hero h2 {
     color: var(--primary-font-color);
@@ -149,6 +131,7 @@
     width: 30px;
     height: 30px;
     background-color: var(--accent-color);
+    border-radius: var(--border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,15 +192,16 @@
 }
 #top-lists {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 20px;
 }
 .list-card {
     background-color: var(--content-color);
     border: 1px solid var(--secondary-color);
     border-radius: var(--border-radius);
     padding: 16px 16px 6px 16px;
+    min-height: 0;
+    min-width: 0;
 }
 .list-card-header {
     display: flex;
@@ -255,6 +239,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: var(--border-radius);
     background-color: var(--secondary-color);
 }
 .list-featured-badge {
@@ -381,13 +366,12 @@
 }
 .recent-card {
     flex-shrink: 0;
-    width: 150px;
+    object-fit: cover;
     text-decoration: none;
     color: var(--primary-font-color);
 }
 .recent-card img {
-    width: 150px;
-    height: 150px;
+    width: 250px;
     object-fit: cover;
     border-radius: var(--border-radius);
     background-color: var(--secondary-color);
@@ -406,7 +390,14 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
     margin-top: 2px;
+}
+
+.recent-title, .recent-sub, .recent-time {
+    margin: 0;
+    padding: 0;
 }
 @media (max-width: 1200px) {
     #stat-cards { grid-template-columns: repeat(3, 1fr); }

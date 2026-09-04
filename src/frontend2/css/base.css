@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+section {
+    margin-bottom: 20px;
+}
+
 a {
     color: white;
     color: var(--accent-color);
@@ -16,12 +20,13 @@ a {
   --muted-font-color: #9a9ca0;
   --accent-color: #7965b5;
   --accent-color-2: #a693e8;
-  --border-radius: 0px;
+  --border-radius: 8px;
 }
 
 html {
     background-color: var(--bg-color);
     font-family: Arial, Helvetica, sans-serif;
+    color: var(--primary-font-color)
 }
 
 .body {

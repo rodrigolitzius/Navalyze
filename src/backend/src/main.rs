@@ -42,7 +42,7 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let frontend = ServeDir::new("../frontend2");
+    let frontend = ServeDir::new("../frontend/dist");
 
     let app = Router::new()
         // Other

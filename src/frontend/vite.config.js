@@ -22,6 +22,12 @@ export default defineConfig({
                 album: resolve(import.meta.dirname, "src/album.html"),
                 recent: resolve(import.meta.dirname, "src/recent.html")
             }
+        },
+    },
+
+    server: {
+        proxy: {
+            "/api": "http://localhost:8080"
         }
     },
 })

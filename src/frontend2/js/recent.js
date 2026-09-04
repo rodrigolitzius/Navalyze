@@ -29,7 +29,7 @@ recent = await recent.json()
 let recent_html = document.querySelector("main")
 for (const song of recent) {
     let played_date = new Date(song.timestamp * 1000)
-    let played_date_string = played_date.toLocaleString("pt-br", { timezone: localStorage.getItem("timezone") })
+    let played_date_string = played_date.toLocaleString("pt-br", { timeZone: localStorage.getItem("timezone") || undefined })
 
     recent_html.insertAdjacentHTML("beforeend",
         `<div class="song-entry">

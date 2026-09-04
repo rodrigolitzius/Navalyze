@@ -42,6 +42,18 @@ class Api {
         return fetch(request)
     }
 
+    get_most_played_playlists(limit) {
+        var request = this.new_request(`most-played/playlists?limit=${limit}`)
+
+        return fetch(request)
+    }
+
+    get_stats() {
+        var request = this.new_request(`stats`)
+
+        return fetch(request)
+    }
+
     get_recently_played(limit, offset) {
         var request = this.new_request(`recent?limit=${limit}&offset=${offset}`)
 

@@ -1,30 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Navalyze — Visão geral</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <script type="module" src="js/dashboard.js" defer></script>
 </head>
 <body>
-    <main id="main">
-        <!-- TOP ARTISTS-->
-        <div class="card">
-            <p class="card-name">Artists</p>
-            <div id="top-artists"></div>
-        </div>
+    <div id="layout">
+        <aside id="sidebar">
+            <div id="brand">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="10" width="3" height="6" rx="1.5" fill="var(--accent-color-2)"/>
+                    <rect x="8" y="6" width="3" height="14" rx="1.5" fill="var(--accent-color)"/>
+                    <rect x="13" y="2" width="3" height="18" rx="1.5" fill="var(--accent-color-2)"/>
+                    <rect x="18" y="8" width="3" height="10" rx="1.5" fill="var(--accent-color)"/>
+                </svg>
+                <span>Navalyze</span>
+            </div>
 
-        <div class="card">
-            <p class="card-name">Albums</p>
-            <div id="top-albums"></div>
-        </div>
+            <nav id="nav-links">
+                <a href="dashboard.html" class="nav-link active">
+                    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+                    <span>Início</span>
+                </a>
+                <a href="recent.html" class="nav-link">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                    <span>Recentemente tocadas</span>
+                </a>
+                <span class="nav-link disabled" title="Em breve">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M4.5 20c1-3.8 4-5.8 7.5-5.8s6.5 2 7.5 5.8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                    <span>Artistas</span>
+                </span>
+                <span class="nav-link disabled" title="Em breve">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg>
+                    <span>Álbuns</span>
+                </span>
+                <span class="nav-link disabled" title="Em breve">
+                    <svg viewBox="0 0 24 24"><path d="M9 18V6.4l10-2v10.6M9 18a2.6 2.6 0 1 1-5.2 0A2.6 2.6 0 0 1 9 18Zm10-3a2.6 2.6 0 1 1-5.2 0 2.6 2.6 0 0 1 5.2 0Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+                    <span>Faixas</span>
+                </span>
+                <span class="nav-link disabled" title="Em breve">
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h10M17 15v6l4-3-4-3Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+                    <span>Playlists</span>
+                </span>
+            </nav>
+        </aside>
 
-        <div class="card">
-            <p class="card-name">Tracks</p>
-            <div id="top-tracks"></div>
-        </div>
-    </main>
+        <main id="main">
+            <header id="top-bar">
+                <h1>Visão geral</h1>
+
+                <div id="top-bar-controls">
+                    <label class="selector-button" id="timezone-control" for="timezone-select">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3.7 12h16.6M12 3.7c2.4 2.3 3.7 5.3 3.7 8.3s-1.3 6-3.7 8.3c-2.4-2.3-3.7-5.3-3.7-8.3S9.6 6 12 3.7Z" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+                        <select id="timezone-select" aria-label="Fuso horário"></select>
+                    </label>
+                </div>
+            </header>
+
+            <section id="hero">
+                <h2>Seu histórico musical</h2>
+                <p>Explore sua jornada sonora em detalhes.<br>Todos os seus hábitos de escuta, reunidos em um só lugar.</p>
+
+                <div id="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+                        </div>
+                        <div class="stat-body">
+                            <p class="stat-label">Reproduções</p>
+                            <p class="stat-value" id="stat-plays">—</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="stat-body">
+                            <p class="stat-label">Horas ouvidas</p>
+                            <p class="stat-value" id="stat-hours">—</p>
+                        </div>
+                        <p class="stat-sub" id="stat-days"></p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M4.5 20c1-3.8 4-5.8 7.5-5.8s6.5 2 7.5 5.8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                        </div>
+                        <div class="stat-body">
+                            <p class="stat-label">Artistas</p>
+                            <p class="stat-value" id="stat-artists">—</p>
+                        </div>
+                        <p class="stat-sub">Artistas diferentes</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg>
+                        </div>
+                        <div class="stat-body">
+                            <p class="stat-label">Álbuns</p>
+                            <p class="stat-value" id="stat-albums">—</p>
+                        </div>
+                        <p class="stat-sub">Álbuns diferentes</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9 18V6.4l10-2v10.6M9 18a2.6 2.6 0 1 1-5.2 0A2.6 2.6 0 0 1 9 18Zm10-3a2.6 2.6 0 1 1-5.2 0 2.6 2.6 0 0 1 5.2 0Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="stat-body">
+                            <p class="stat-label">Faixas</p>
+                            <p class="stat-value" id="stat-tracks">—</p>
+                        </div>
+                        <p class="stat-sub">Faixas diferentes</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="graphs">
+                <div class="graph-card">
+                    <div class="graph-card-header">
+                        <div>
+                            <h3>Atividade ao longo do tempo</h3>
+                            <p>Horas ouvidas por período</p>
+                        </div>
+                    </div>
+                    <div class="graph-placeholder" id="graph-activity">
+                        <span>Gráfico em breve</span>
+                    </div>
+                </div>
+                <div class="graph-card">
+                    <div class="graph-card-header">
+                        <div>
+                            <h3>Quando você mais ouve</h3>
+                            <p>Média de reproduções por hora do dia</p>
+                        </div>
+                    </div>
+                    <div class="graph-placeholder" id="graph-hour">
+                        <span>Gráfico em breve</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="top-lists">
+                <div class="list-card">
+                    <div class="list-card-header">
+                        <h3>Artistas mais ouvidos</h3>
+                    </div>
+                    <div class="list-featured" id="top-artists-featured"></div>
+                    <ol class="ranked-list" id="top-artists"></ol>
+                </div>
+                <div class="list-card">
+                    <div class="list-card-header">
+                        <h3>Álbuns mais ouvidos</h3>
+                    </div>
+                    <div class="list-featured" id="top-albums-featured"></div>
+                    <ol class="ranked-list" id="top-albums"></ol>
+                </div>
+                <div class="list-card">
+                    <div class="list-card-header">
+                        <h3>Faixas mais ouvidas</h3>
+                    </div>
+                    <div class="list-featured" id="top-tracks-featured"></div>
+                    <ol class="ranked-list" id="top-tracks"></ol>
+                </div>
+                <div class="list-card">
+                    <div class="list-card-header">
+                        <h3>Playlists mais ouvidas</h3>
+                    </div>
+                    <div class="list-featured" id="top-playlists-featured"></div>
+                    <ol class="ranked-list" id="top-playlists"></ol>
+                </div>
+            </section>
+
+            <section id="recent-section">
+                <div class="list-card-header">
+                    <h3>Recentemente tocadas</h3>
+                    <a href="recent.html">Ver tudo &gt;</a>
+                </div>
+                <div id="recent-strip"></div>
+            </section>
+        </main>
+    </div>
 </body>
 </html>

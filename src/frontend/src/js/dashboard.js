@@ -1,6 +1,7 @@
 import { Api, get_image_url } from "./api.js"
 import { track_link } from "./html.js"
 import { relative_time } from "./util.js"
+import { Chart } from "chart.js/auto"
 
 const api = new Api()
 
@@ -158,6 +159,38 @@ async function load_recent() {
     }
 }
 
+async function load_graphs() {
+    try {
+        let frequency_graph = document.getElementById("graph-hour")
+
+        let graph_data = await api.frequency(48)
+        graph_data = await graph_data.json()
+
+        let data = new Array
+        for (const [key, value] of Object.entries(graph_data)) {
+            data.push({
+                x: ((key / (24 * 60 * 60)) * 24).toString(),
+                y: value
+            })
+        }
+
+        new Chart(frequency_graph, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: "Hours",
+                    data: data
+                }]
+            },
+            options: {
+                maintainAspectRatio: false
+            }
+        });
+    } catch (error) {
+        console.error("Failed to load graph", error)
+    }
+}
+
 function setup_timezone_select() {
     const select = document.getElementById("timezone-select")
 
@@ -193,3 +226,4 @@ setup_timezone_select()
 load_stats()
 load_top_lists()
 load_recent()
+load_graphs()

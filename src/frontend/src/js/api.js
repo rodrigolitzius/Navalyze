@@ -1,12 +1,30 @@
 class Api {
-    new_request(endpoint) {
+    new_request(endpoint, params) {
         const token = localStorage.getItem("token")
 
-        var request = new Request("/api/" + endpoint, {
-            headers: { "Authorization": token }
+        const start_ts = localStorage.getItem("start_ts") ?? 0
+        const end_ts = localStorage.getItem("end_ts") ?? 9999999999
+        const timezone = localStorage.getItem("timezone") ?? "aa"
+
+        const default_params = new URLSearchParams({
+            ...params,
+            "a": start_ts,
+            "b": end_ts,
+            "tz": timezone
+        })
+
+        var request = new Request(`/api/${endpoint}?${default_params}`, {
+            headers: { "Authorization": token },
+
         })
 
         return request
+    }
+
+    async frequency(resolution) {
+        var request = this.new_request(`time/frequency`, {res: resolution})
+
+        return fetch(request)
     }
 
     async auth_check() {
@@ -19,25 +37,25 @@ class Api {
     }
 
     get_cover_art(id, size) {
-        var request = this.new_request(`art/${id}?size=${size}`)
+        var request = this.new_request(`art/${id}`, {size: size})
 
         return fetch(request)
     }
 
     get_most_played_artists(limit) {
-        var request = this.new_request(`most-played/artists?limit=${limit}`)
+        var request = this.new_request(`most-played/artists`, {limit: limit})
 
         return fetch(request)
     }
 
     get_most_played_albums(limit) {
-        var request = this.new_request(`most-played/albums?limit=${limit}`)
+        var request = this.new_request(`most-played/albums`, {limit: limit})
 
         return fetch(request)
     }
 
     get_most_played_tracks(limit) {
-        var request = this.new_request(`most-played/tracks?limit=${limit}`)
+        var request = this.new_request(`most-played/tracks`, {limit: limit})
 
         return fetch(request)
     }
@@ -55,7 +73,7 @@ class Api {
     }
 
     get_recently_played(limit, offset) {
-        var request = this.new_request(`recent?limit=${limit}&offset=${offset}`)
+        var request = this.new_request(`recent`, {limit: limit, offset: offset})
 
         return fetch(request)
     }

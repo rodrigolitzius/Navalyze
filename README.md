@@ -47,10 +47,8 @@ Firstly, you'll need to install these for the frontend and backend
 - backend
     - Rust (nightly)
 
-Clone the repo
-
 ## Building/running
-Clone the repo: `git clone github.com/rodrigolitzius/Navalyze`
+Clone the repo: `git clone https://github.com/rodrigolitzius/Navalyze`
 
 Go into the project folder: `cd Navalyze`
 

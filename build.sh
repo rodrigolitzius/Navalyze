@@ -1,6 +1,6 @@
 # ==== Building the backend ====
 cd src/backend/
-cargo build --release
+cargo +nightly build --release
 
 cd ../
 

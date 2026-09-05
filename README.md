@@ -39,14 +39,30 @@ Navalyze, however, is entirely integrated with Navidrome. Any information presen
 > [!NOTE]
 Navalyze uses the /api/scrobble/ endpoint, meaning only versions after [pr 5761](https://github.com/navidrome/navidrome/pull/5761) are supported.
 
-1. Clone the repo
-1. `cd Navalyze/src/backend/`
-1. Compile and run the backend using `cargo run --release -- -m <your-listenbrainz-token> -p <port>`. You can omit the -m parameter if you don't use MusicBrainz or don't wish to. If your Navidrome's URL has an invalid SSL certificate, you can add -c to ignore it.
-1. Now access the website at `http://localhost:<port>`
-1. Now fill in the fields with your Navidrome's instance URL, username and password (respectively)
+No releases are currently available, so you'll have to build it yourself
+## Dependencies
+Firstly, you'll need to install these for the frontend and backend
+- frontend
+    - npm (used to install Vite and Chart.JS)
+- backend
+    - Rust (nightly)
 
-> [!NOTE]
-The web interface is in Brazilian Portuguese
+Clone the repo
+
+## Building/running
+Clone the repo: `git clone github.com/rodrigolitzius/Navalyze`
+
+Go into the project folder: `cd Navalyze`
+
+To build, simply run `./build.sh`. 
+
+to run, do `./run.sh -m <your-listenbrainz-token> -p <port>`
+
+The backend may not work properly if listenbrainz isn't available, so only use the `-m` if you know listenbrainz is running and you want to use it.
+
+If your Navidrome's URL has an invalid SSL certificate, you can add `-c` to ignore it.
+
+Now you should be able to access the website at `http://localhost:<port>`
 
 # MusicBrainz integration
 > [!NOTE]

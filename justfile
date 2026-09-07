@@ -25,6 +25,7 @@ backend-rel: build-dir
 
 frontend-rel: build-dir npm-dep
     cd ./src/frontend/ && npx vite build
+    rm -rf ./build/dist
     cp -r ./src/frontend/dist ./build/dist
 
 npm-dep:

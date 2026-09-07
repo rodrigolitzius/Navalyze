@@ -26,7 +26,7 @@ document.getElementById("previous-page").addEventListener("click", function () {
 let recent = await api.get_recently_played(30, 30*page)
 recent = await recent.json()
 
-let recent_html = document.querySelector("main")
+let recent_html = document.querySelector("#played-list")
 for (const song of recent) {
     let played_date = new Date(song.timestamp * 1000)
     let played_date_string = played_date.toLocaleString("pt-br", { timeZone: localStorage.getItem("timezone") || undefined })

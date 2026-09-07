@@ -7,33 +7,11 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <script type="module" src="js/dashboard.js" defer></script>
+    <script type="module" src="js/load-sidebar.js" defer></script>
 </head>
 <body>
     <div id="layout">
-        <aside id="sidebar">
-            <nav id="nav-links">
-                <a href="dashboard.html" class="nav-link active" title="Dashboard">
-                    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
-                </a>
-                <a href="recent.html" class="nav-link" title="Recently Played">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
-                </a>
-                <span class="nav-link disabled" title="Soon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M4.5 20c1-3.8 4-5.8 7.5-5.8s6.5 2 7.5 5.8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
-                </span>
-                <span class="nav-link disabled" title="Soon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3" stroke="currentColor" stroke-width="1.7" fill="none"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg>
-                </span>
-                <span class="nav-link disabled" title="Soon">
-                    <svg viewBox="0 0 24 24"><path d="M9 18V6.4l10-2v10.6M9 18a2.6 2.6 0 1 1-5.2 0A2.6 2.6 0 0 1 9 18Zm10-3a2.6 2.6 0 1 1-5.2 0 2.6 2.6 0 0 1 5.2 0Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
-                </span>
-                <span class="nav-link disabled" title="Soon">
-                    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h10M17 15v6l4-3-4-3Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>
-                </span>
-            </nav>
-        </aside>
-
-        <main id="main">
+        <main>
             <header id="top-bar">
                 <h1>Dashboard</h1>
                 <div id="top-bar-controls">
@@ -44,8 +22,8 @@
                 </div>
             </header>
 
-            <section id="hero">
-                <h2>Your statistics</h2>
+            <section class="card">
+                <h2 class="card-name">Your statistics</h2>
 
                 <div id="stat-cards">
                     <div class="stat-card">
@@ -97,44 +75,36 @@
             </section>
 
             <section id="top-lists">
-                <div class="list-card">
-                    <div class="list-card-header">
-                        <h3>Top Artists</h3>
-                    </div>
+                <div class="card top-list-card">
+                    <h3 class="card-name">Top Artists</h3>
                     <div class="list-featured" id="top-artists-featured"></div>
                     <ol class="ranked-list" id="top-artists"></ol>
                 </div>
-                <div class="list-card">
-                    <div class="list-card-header">
-                        <h3>Top Albums</h3>
-                    </div>
+                <div class="card top-list-card">
+                    <h3 class="card-name">Top Albums</h3>
                     <div class="list-featured" id="top-albums-featured"></div>
                     <ol class="ranked-list" id="top-albums"></ol>
                 </div>
-                <div class="list-card">
-                    <div class="list-card-header">
-                        <h3>Top Tracks</h3>
-                    </div>
+                <div class="card top-list-card">
+                    <h3 class="card-name">Top Tracks</h3>
                     <div class="list-featured" id="top-tracks-featured"></div>
                     <ol class="ranked-list" id="top-tracks"></ol>
                 </div>
             </section>
 
-            <section id="recent-section">
-                <div class="list-card-header">
-                    <h3>Recently played</h3>
-                    <a href="recent.html">See more &gt;</a>
+            <section class="card">
+                <div class="card-expandable">
+                    <h3 class="card-name">Recently played</h3>
+                    <a class="card-expand" href="recent.html">See more &gt;</a>
                 </div>
                 <div id="recent-strip"></div>
             </section>
 
             <section id="graphs">
-                <div class="graph-card">
-                    <div class="graph-card-header">
-                        <div>
-                            <h3>Daily frequency</h3>
-                            <p>Your activity during a day</p>
-                        </div>
+                <div class="graph-card card">
+                    <div>
+                        <h3 class="card-name">Daily frequency</h3>
+                        <p class="card-desc">Your activity during a day</p>
                     </div>
                     <canvas id="graph-hour"><canvas/>
                 </div>

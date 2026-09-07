@@ -7,13 +7,17 @@
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/recent.css">
 	<script type="module" src="js/recent.js" defer></script>
+	<script type="module" src="js/load-sidebar.js" defer></script>
 </head>
 <body>
-    <main>
-        <div id="nav-buttons">
-            <button id="previous-page" class="default-button">Previous</button>
-            <button id="next-page" class="default-button">Next</button>
-        </div>
-    </main>
+    <div id="layout">
+        <main>
+            <section id="nav-buttons">
+                <button id="previous-page" class="default-button">Previous</button>
+                <button id="next-page" class="default-button">Next</button>
+            </section>
+            <section id="played-list"></section>
+        </main>
+    </div>
 </body>
 </html>

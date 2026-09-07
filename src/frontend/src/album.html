@@ -7,14 +7,17 @@
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/album.css">
 	<script type="module" src="js/album.js" defer></script>
+	<script type="module" src="js/load-sidebar.js" defer></script>
 </head>
 <body>
-    <div id="image-header">
-
+    <div id="layout">
+        <main>
+            <section id="image-header" class="card"></section>
+            <section class="card">
+                <h1 class="card-name">Tracks</h1>
+                <div class="track-list" id="track-list"></div>
+            </section>
+        </main>
     </div>
-    <main class="card">
-        <h1 class="card-name">Tracks</h1>
-        <div class="track-list" id="track-list"></div>
-    </main>
 </body>
 </html>

@@ -1,56 +1,3 @@
-#layout {
-    display: flex;
-    min-height: 100vh;
-}
-#sidebar {
-    flex-shrink: 0;
-    background-color: var(--content-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: var(--border-radius);
-    padding: 20px 14px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-}
-#nav-links {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    gap: 4px;
-}
-.nav-link {
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    gap: 12px;
-    padding: 10px 10px;
-    border-radius: var(--border-radius);
-    color: var(--muted-font-color);
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-.nav-link svg {
-    width: 19px;
-    height: 19px;
-    flex-shrink: 0;
-}
-.nav-link:hover {
-    background-color: var(--secondary-color);
-    color: var(--primary-font-color);
-}
-.nav-link.active {
-    background-color: var(--accent-color);
-    color: #ffffff;
-}
-.nav-link.disabled {
-    cursor: default;
-    opacity: 0.55;
-}
-#main {
-    flex: 1;
-    padding: 24px 24px 48px 24px;
-    min-width: 0;
-}
 #top-bar {
     display: flex;
     align-items: center;
@@ -158,29 +105,6 @@
     font-size: 0.78em;
     margin: 8px 0 0 0;
 }
-#graphs {
-    margin-bottom: 20px;
-}
-.graph-card {
-    background-color: var(--content-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: var(--border-radius);
-    padding: 18px 20px;
-    height: 400px;
-}
-.graph-card canvas {
-    padding-bottom: 25px;
-}
-.graph-card-header h3 {
-    color: var(--primary-font-color);
-    font-size: 1.05em;
-    margin: 0 0 3px 0;
-}
-.graph-card-header p {
-    color: var(--muted-font-color);
-    font-size: 0.82em;
-    margin: 0;
-}
 .graph-placeholder {
     margin-top: 16px;
     height: 220px;
@@ -204,30 +128,9 @@
     min-height: 0;
     min-width: 0;
 }
-.list-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-.list-card-header h3 {
-    color: var(--primary-font-color);
-    font-size: 1em;
-    margin: 0;
-}
-.list-card-header a {
-    font-size: 0.8em;
-    color: var(--muted-font-color);
-}
-.list-card-header a:hover {
-    color: var(--accent-color-2);
-}
-.list-featured {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    margin-bottom: 10px;
-    background-color: var(--secondary-color);
-    overflow: hidden;
+.top-list-card {
+    min-width: 0;
+    min-height: 0;
 }
 .list-featured-link {
     display: block;
@@ -363,7 +266,6 @@
     display: flex;
     gap: 14px;
     overflow-x: auto;
-    padding-top: 8px;
 }
 .recent-card {
     flex-shrink: 0;

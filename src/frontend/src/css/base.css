@@ -35,7 +35,7 @@ html {
 
 .card {
     padding: 10px;
-    border: 3px solid var(--secondary-color);
+    border: 1px solid var(--secondary-color);
     border-radius: var(--border-radius);
     background-color: var(--content-color);
 
@@ -45,11 +45,31 @@ html {
         width: 100%;
     }
 
+    .card-expandable {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .card-expand {
+        font-size: 1em;
+        margin: 0px;
+        color: var(--muted-font-color);
+    }
+
     .card-name {
         color: var(--primary-font-color);
         margin: 0px;
         font-size: 1.3em;
         font-weight: bold;
+        padding-bottom: 5px;
+    }
+
+    .card-desc {
+        color: var(--muted-font-color);
+        font-size: 0.82em;
+        margin: 0;
     }
 
     .card-footer {
@@ -57,6 +77,14 @@ html {
         margin: 0px;
         font-size: 0.9em;
         padding-inline: 3px;
+    }
+}
+
+.graph-card {
+    height: 400px;
+
+    canvas {
+        padding-bottom: 40px;
     }
 }
 
@@ -115,6 +143,63 @@ html {
 
     p:last-of-type {
         display: none;
+    }
+}
+
+main {
+    flex: 1;
+    margin-inline: 12px;
+    min-width: 0;
+}
+
+#layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+#sidebar {
+    flex-shrink: 0;
+    background-color: var(--content-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
+    padding: 6px 6px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        gap: 4px;
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            width: fit-content;
+            gap: 12px;
+            padding: 10px 10px;
+            border-radius: var(--border-radius);
+            color: var(--muted-font-color);
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+
+            svg {
+                width: 19px;
+                height: 19px;
+                flex-shrink: 0;
+            }
+
+            &:hover {
+                background-color: var(--secondary-color);
+                color: var(--primary-font-color);
+            }
+
+            &:disabled {
+                cursor: default;
+                opacity: 0.55;
+            }
+        }
     }
 }
 

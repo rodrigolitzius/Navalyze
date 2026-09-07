@@ -20,7 +20,8 @@ export default defineConfig({
                 dashboard: resolve(import.meta.dirname, "src/dashboard.html"),
                 artist: resolve(import.meta.dirname, "src/artist.html"),
                 album: resolve(import.meta.dirname, "src/album.html"),
-                recent: resolve(import.meta.dirname, "src/recent.html")
+                recent: resolve(import.meta.dirname, "src/recent.html"),
+                sidebar: resolve(import.meta.dirname, "src/sidebar.html"),
             }
         },
     },

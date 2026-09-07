@@ -7,10 +7,10 @@ mod storage;
 mod analysis;
 mod reqwest;
 
+use std::{fs::File, io::Read};
+
 use axum::{Router, routing::{get, post}};
 use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
-use uuid::Uuid;
-use clap::{Parser};
 
 use crate::{
     api::{ApiState, Settings},
@@ -24,25 +24,13 @@ use crate::{
 
 const APP_NAME: &'static str = "Navalyze";
 
-#[derive(Parser, Debug)]
-struct Args {
-    #[arg(short, long)]
-    mbz_token: Option<Uuid>,
-
-    #[arg(short, long)]
-    port: u16,
-
-    #[arg(short = 'c', long)]
-    allow_invalid_certificates: bool
-}
-
-async fn start_backend(state: ApiState, listen_port: u16) {
+async fn start_backend(state: ApiState, binding_address: String) {
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let frontend = ServeDir::new("../frontend/dist");
+    let frontend = ServeDir::new("./dist");
 
     let app = Router::new()
         // Other
@@ -76,24 +64,29 @@ async fn start_backend(state: ApiState, listen_port: u16) {
         .layer(cors)
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", listen_port)).await.expect("Failed to bind server");
+    let listener = tokio::net::TcpListener::bind(binding_address.clone()).await.expect("Failed to bind server");
+    println!("Server listening on {}", binding_address);
+
     axum::serve(listener, app).await.expect("Failed to serve server");
+
 }
 
 #[tokio::main]
 async fn main() {
-    let args = Args::parse();
+    let mut toml_str = String::new();
+    File::open("./settings.toml")
+        .expect("Could not open settings.toml")
+        .read_to_string(&mut toml_str)
+        .expect("Failed to read settings.toml");
 
-    let mbz_session = match args.mbz_token {
+    let settings = Settings::load(toml_str.as_str()).expect("Invalid toml file");
+
+    let mbz_session = match settings.lbz_token {
         Some(v) => Some(mbz::MbzSession::new(v)),
         None => None
     };
 
-    let settings = Settings {
-        allow_invalid_certs: args.allow_invalid_certificates
-    };
+    let state = ApiState::new(mbz_session, settings.clone()).expect("Failed to initialize API state");
 
-    let state = ApiState::new(mbz_session, settings).expect("Failed to initialize API state");
-
-    start_backend(state, args.port).await;
+    start_backend(state, settings.bind.clone()).await;
 }

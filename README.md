@@ -39,28 +39,27 @@ Navalyze, however, is entirely integrated with Navidrome. Any information presen
 > [!NOTE]
 Navalyze uses the /api/scrobble/ endpoint, meaning only versions after [pr 5761](https://github.com/navidrome/navidrome/pull/5761) are supported.
 
-No releases are currently available, so you'll have to build it yourself
-## Dependencies
-Firstly, you'll need to install these for the frontend and backend
-- frontend
-    - npm (used to install Vite and Chart.JS)
-- backend
-    - Rust (nightly)
+No binary releases are currently available, so you'll have to build it yourself
+## Building
+1. Firstly, you'll need to install these:
+    - frontend: [npm](https://www.npmjs.com/) (used to install Vite and Chart.JS)
+    - backend: [Rust](https://rust-lang.org/) (nightly version, because of [Polonius](https://blog.rust-lang.org/2026/08/04/enabling-polonius-alpha-on-nightly/))
+    - building: [Just](https://just.systems/) (A simple way to combine backend and frontend builds)
 
-## Building/running
-Clone the repo: `git clone https://github.com/rodrigolitzius/Navalyze`
+1. Clone the repo: `git clone https://github.com/rodrigolitzius/Navalyze`
 
-Go into the project folder: `cd Navalyze`
+1. Go into the project folder: `cd Navalyze`
 
-To build, simply run `./build.sh`. 
+1. Run `just build` to build.
 
-to run, do `./run.sh -m <your-listenbrainz-token> -p <port>`
+## Running
+Before running, you first need to set up your configs for Navalyze. This can be done with a `settings.toml` file or the command line.
 
-The backend may not work properly if listenbrainz isn't available, so only use the `-m` if you know listenbrainz is running and you want to use it.
+The recommended way is to use `settings.toml`. move the [default settings file](./settings.toml) to the `build` folder, then edit the settings to your needs.
 
-If your Navidrome's URL has an invalid SSL certificate, you can add `-c` to ignore it.
+If you prefer the command line, run `just run "--help"` to see the available options.
 
-Now you should be able to access the website at `http://localhost:<port>`
+Finally, to run, just do `just run ""`, or `just run "<options>"` to override your `settings.toml` options.
 
 # MusicBrainz integration
 > [!NOTE]

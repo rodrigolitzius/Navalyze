@@ -15,6 +15,25 @@ pub enum ApiError {
     DatabaseError(String)
 }
 
+#[derive(Debug)]
+#[allow(unused)]
+pub enum SettingsError {
+    ParseToml(toml::de::Error),
+    InvalidUuid(uuid::Error)
+}
+
+impl From<toml::de::Error> for SettingsError {
+    fn from(value: toml::de::Error) -> Self {
+        return Self::ParseToml(value);
+    }
+}
+
+impl From<uuid::Error> for SettingsError {
+    fn from(value: uuid::Error) -> Self {
+        return Self::InvalidUuid(value);
+    }
+}
+
 impl From<StorageError> for ApiError {
     fn from(value: StorageError) -> Self {
         return match value {

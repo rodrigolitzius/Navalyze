@@ -1,0 +1,8 @@
+# Address the server will listen on
+bind = "[::]:8080"
+
+# Whether to allow connections to Navidrome instances without a valid SSL certificate
+allow_invalid_certs = false
+
+# Your ListenBrainz token. Used to fetch additional info about your library
+# lbz_token = ""

@@ -21,16 +21,14 @@ a {
   --accent-color: #7965b5;
   --accent-color-2: #a693e8;
   --border-radius: 8px;
+
+  --sidebar-margin: 8px;
 }
 
 html {
     background-color: var(--bg-color);
     font-family: Arial, Helvetica, sans-serif;
     color: var(--primary-font-color)
-}
-
-.body {
-    margin: 0px;
 }
 
 .card {
@@ -148,7 +146,6 @@ html {
 
 main {
     flex: 1;
-    margin-inline: 12px;
     min-width: 0;
 }
 
@@ -164,41 +161,42 @@ main {
     border-radius: var(--border-radius);
     padding: 6px 6px;
     position: sticky;
-    top: 0;
+    margin-right: var(--sidebar-margin);
+    top: var(--sidebar-margin);
     height: 100vh;
+}
 
-    .nav-links {
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 4px;
+
+    .nav-link {
         display: flex;
-        flex-direction: column;
+        align-items: center;
         width: fit-content;
-        gap: 4px;
+        gap: 12px;
+        padding: 10px 10px;
+        border-radius: var(--border-radius);
+        color: var(--muted-font-color);
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
 
-        .nav-link {
-            display: flex;
-            align-items: center;
-            width: fit-content;
-            gap: 12px;
-            padding: 10px 10px;
-            border-radius: var(--border-radius);
-            color: var(--muted-font-color);
-            cursor: pointer;
-            transition: background 0.15s ease, color 0.15s ease;
+        svg {
+            width: 19px;
+            height: 19px;
+            flex-shrink: 0;
+        }
 
-            svg {
-                width: 19px;
-                height: 19px;
-                flex-shrink: 0;
-            }
+        &:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-font-color);
+        }
 
-            &:hover {
-                background-color: var(--secondary-color);
-                color: var(--primary-font-color);
-            }
-
-            &:disabled {
-                cursor: default;
-                opacity: 0.55;
-            }
+        &:disabled {
+            cursor: default;
+            opacity: 0.55;
         }
     }
 }
@@ -239,4 +237,20 @@ main {
     opacity: 0.6;
     cursor: wait;
     transform: none;
+}
+
+@media (max-width: 800px) {
+    #layout {
+        flex-direction: column;
+    }
+    #sidebar {
+        width: 100%;
+        height: fit-content;
+        z-index: 10;
+        margin-bottom: var(--sidebar-margin);
+    }
+    .nav-links {
+        flex-direction: row;
+        width: 100%;
+    }
 }

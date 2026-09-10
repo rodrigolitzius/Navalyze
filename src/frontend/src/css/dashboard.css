@@ -310,7 +310,6 @@
     .graph-card {height: 300px;}
 }
 @media (max-width: 600px) {
-    #sidebar { display: none; }
     #main { padding: 18px; }
     #stat-cards { grid-template-columns: repeat(2, 1fr); }
     #top-lists { grid-template-columns: 1fr; }

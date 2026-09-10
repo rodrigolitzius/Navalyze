@@ -9,9 +9,9 @@ function format_hours(hours) {
     return `${hours.toFixed(1)}h`
 }
 
-async function safe_image_url(entry_id) {
+async function safe_image_url(entry_id, size) {
     try {
-        return await get_image_url(api, entry_id, 400)
+        return await get_image_url(api, entry_id, size)
     } catch {
         return null
     }
@@ -29,7 +29,7 @@ async function fill_featured_item(entry, featured_id, href) {
 
     if (!entry) return
 
-    const image_url = await safe_image_url(entry.id)
+    const image_url = await safe_image_url(entry.id, 800)
 
     const inner = `
         ${image_url ? `<img src="${image_url}" alt="">` : `<div class="ranked-thumb-empty"></div>`}
@@ -64,7 +64,7 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
 
     for (let i = 0; i < rest.length; i++) {
         const entry = rest[i]
-        const image_url = await safe_image_url(entry.id)
+        const image_url = await safe_image_url(entry.id, 200)
         const stat_text = format_hours(entry.played_hours)
 
         const inner = `
@@ -94,7 +94,7 @@ async function fill_recent_strip(songs) {
     }
 
     for (const song of songs) {
-        const image_url = await safe_image_url(song.id)
+        const image_url = await safe_image_url(song.id, 400)
         const artist_names = (song.artists || []).map(a => a.name).join(", ")
 
         strip.insertAdjacentHTML("beforeend",

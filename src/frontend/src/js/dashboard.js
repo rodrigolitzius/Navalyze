@@ -1,13 +1,9 @@
 import { Api, get_image_url } from "./api.js"
 import { track_link } from "./html.js"
-import { relative_time } from "./util.js"
+import { relative_time, format_hours } from "./util.js"
 import { Chart } from "chart.js/auto"
 
 const api = new Api()
-
-function format_hours(hours) {
-    return `${hours.toFixed(1)}h`
-}
 
 async function safe_image_url(entry_id, size) {
     try {

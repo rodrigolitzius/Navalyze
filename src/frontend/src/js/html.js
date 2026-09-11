@@ -1,3 +1,5 @@
+import { get_image_url } from "./api"
+
 function artist_link(id) {
     return `artist.html?id=${id}`
 }

@@ -20,7 +20,7 @@
     width: 100%;
 }
 
-.song-entry {
+.track-entry {
     color: var(--primary-font-color);
     display: flex;
     height: 100%;
@@ -30,39 +30,39 @@
     border-radius: var(--border-radius);
     margin-bottom: 5px;
 
-    .song-contents {
+    .track-contents {
         display: flex;
         flex-direction: column;
     }
 
-    .song-img {
+    .track-img {
         width: 300px;
         margin-right: 15px;
         object-fit: cover;
         border-radius: var(--border-radius);
     }
 
-    .song-artist, .song-album, .song-title, .song-time {
+    .track-artist, .track-album, .track-title, .track-time {
         padding: 0px;
         margin: 0px;
     }
 
-    .song-title {
+    .track-title {
         font-size: 1.8em;
         margin-bottom: 5px;
         padding: 0px;
     }
 
-    .song-artist {
+    .track-artist {
         font-size: 1.3em;
         margin-bottom: 8px;
     }
 
-    .song-album {
+    .track-album {
         font-size: 1em;
     }
 
-    .song-time {
+    .track-time {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -77,24 +77,24 @@
     }
 
     @media (max-width: 600px) {
-        .song-img {
+        .track-img {
             width: 180px;
             height: 180px;
         }
 
-        .song-title {
+        .track-title {
             font-size: 1.4em;
         }
 
-        .song-artist {
+        .track-artist {
             font-size: 1.2em;
         }
 
-        .song-album {
+        .track-album {
             font-size: 0.9em;
         }
 
-        .song-time {
+        .track-time {
             p {
                 margin-bottom: 10px;
                 font-size: 1em;

@@ -12,4 +12,8 @@ function relative_time(timestamp_seconds) {
     return `${days} days ago`
 }
 
-export {relative_time}
+function format_hours(hours) {
+    return `${hours.toFixed(1)}h`
+}
+
+export {relative_time, format_hours}

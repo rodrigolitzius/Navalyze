@@ -1,0 +1,109 @@
+#nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--content-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 5px;
+    padding: 10px;
+
+    .default-button {
+        width: 80px;
+        padding: 10px;
+        text-align: center;
+    }
+}
+
+#tracks-list {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+.track-entry {
+    color: var(--primary-font-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin: 0px;
+    background-color: var(--content-color);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 5px;
+    gap: 15px;
+
+    .track-img {
+        width: 300px;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: var(--border-radius);
+        flex-shrink: 0;
+    }
+
+    .track-contents {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .track-artist, .track-album, .track-title, .track-stat {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .track-title {
+        font-size: 1.8em;
+        margin-bottom: 5px;
+        padding: 0px;
+    }
+
+    .track-artist {
+        font-size: 1.3em;
+        margin-bottom: 8px;
+    }
+
+    .track-album {
+        font-size: 1em;
+    }
+
+    .track-stat {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: flex-end;
+
+        p {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding: 0;
+            color: #c5c5c5;
+        }
+    }
+
+    @media (max-width: 600px) {
+       
+        .track-img {
+            width: 130px;
+        }
+
+        .track-title {
+            font-size: 1.4em;
+        }
+
+        .track-artist {
+            font-size: 1.2em;
+        }
+
+        .track-album {
+            font-size: 0.9em;
+        }
+
+        .track-stat {
+            p {
+                margin-bottom: 10px;
+                font-size: 1em;
+            }
+        }
+    }
+}

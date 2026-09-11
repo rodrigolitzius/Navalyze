@@ -1,0 +1,77 @@
+#image-header.track-header {
+    position: relative;
+    overflow: hidden;
+}
+
+#image-header.track-header .track-header-bg {
+    position: absolute;
+    inset: -20px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(35px) brightness(0.5) saturate(1.15);
+    transform: scale(1.15);
+    z-index: 0;
+}
+
+#image-header.track-header .track-header-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5));
+}
+
+#image-header.track-header img,
+#image-header.track-header .content {
+    position: relative;
+    z-index: 2;
+}
+
+#image-header.track-header .track-title {
+    text-decoration: none;
+    color: inherit;
+}
+
+#image-header.track-header .track-title:hover h1 {
+    text-decoration: underline;
+}
+
+#image-header.track-header .track-artist {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--accent-color-2);
+    text-decoration: none;
+}
+
+#track-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+
+    .track-stat-card {
+        background-color: var(--bg-color);
+        border: 1px solid var(--secondary-color);
+        border-radius: var(--border-radius);
+        padding: 16px;
+    }
+
+    .track-stat-label {
+        color: var(--muted-font-color);
+        font-size: 0.85em;
+        margin: 0 0 6px 0;
+    }
+
+    .track-stat-value {
+        color: var(--primary-font-color);
+        font-size: 1.4em;
+        font-weight: bold;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    @media (max-width: 700px) {
+        grid-template-columns: 1fr 1fr;
+    }
+}

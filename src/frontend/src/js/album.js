@@ -1,5 +1,5 @@
 import { Api, get_image_url } from "./api.js"
-import { build_link_list, artist_link } from "./html.js";
+import { build_link_list, artist_link, track_link } from "./html.js";
 
 const api = new Api()
 
@@ -45,7 +45,7 @@ for (const track of album.tracks) {
     track_list.insertAdjacentHTML("beforeend",
         `<div class="track">
             <div class="left">
-                <span class="track-title">${track.name}</span>
+                <a class="track-title" href="${track_link(track.id)}">${track.name}</a>
                 <p class="track-time" title="${track.plays} plays">${track.played_hours.toFixed(2)}h</p>
             </div>
             <span class="track-bar"</span>

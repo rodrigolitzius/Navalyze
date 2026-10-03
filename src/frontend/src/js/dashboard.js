@@ -33,7 +33,7 @@ async function fill_featured_item(entry, featured_id, href) {
             <div class="list-featured-text">
                 <p class="list-featured-name">${entry.name}</p>
             </div>
-            <span class="list-featured-stat">${format_hours(entry.played_hours)}</span>
+            <span class="list-featured-stat" title="${entry.plays} plays">${format_hours(entry.played_hours)}</span>
         </div>
     `
 
@@ -61,7 +61,6 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
     for (let i = 0; i < rest.length; i++) {
         const entry = rest[i]
         const image_url = await safe_image_url(entry.id, 200)
-        const stat_text = format_hours(entry.played_hours)
 
         const inner = `
             <span class="ranked-rank">${i + 2}</span>
@@ -69,7 +68,7 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
             <div class="ranked-info">
                 <p class="ranked-name">${entry.name}</p>
             </div>
-            <span class="ranked-stat">${stat_text}</span>
+            <span class="ranked-stat" title="${entry.plays} plays">${format_hours(entry.played_hours)}</span>
         `
 
         list.insertAdjacentHTML("beforeend",

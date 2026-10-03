@@ -115,7 +115,11 @@ html {
         padding-inline: 10px;
 
         * {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+
+        .round-list {
+            margin-top: 20px;
         }
 
         h1 {

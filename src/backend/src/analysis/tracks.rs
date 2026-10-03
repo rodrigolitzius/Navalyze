@@ -7,9 +7,15 @@ use crate::{
 };
 
 #[derive(Serialize, Clone)]
+pub struct TrackStatArtists {
+    pub name: String,
+    pub id: String,
+}
+
+#[derive(Serialize, Clone)]
 pub struct TrackStat {
     pub name: String,
-    pub artist: String,
+    pub artists: Vec<TrackStatArtists>,
     pub album: String,
     pub album_id: String,
     pub id: String,
@@ -36,7 +42,9 @@ impl TrackStat {
                         scrobble.track.id.clone(),
                         TrackStat {
                             name: scrobble.track.title.clone(),
-                            artist: scrobble.track.artist.clone(),
+                            artists: scrobble.track.artists.iter().map(|a|
+                                TrackStatArtists {id: a.artist.id.clone(), name: a.artist.name.clone()}
+                            ).collect(),
                             album: scrobble.track.album.clone(),
                             album_id: scrobble.track.album_id.clone(),
                             id: scrobble.track.id.clone(),

@@ -1,5 +1,5 @@
 import { Api, get_image_url } from "./api.js"
-import { album_link, artist_link } from "./html.js"
+import { build_link_list, artist_link, album_link } from "./html.js"
 
 const api = new Api()
 
@@ -24,26 +24,28 @@ if (Array.isArray(track)) {
         image_url = null
     }
 
-    let artist_id = null
-    try {
-        let album_response = await api.get_album(track.album_id)
-        let album = await album_response.json()
-        artist_id = album.artists?.[0]?.id ?? null
-    } catch {
-        artist_id = null
-    }
-
     header.insertAdjacentHTML("beforeend",
-        `${image_url ? `<div class="track-header-bg" style="background-image:url('${image_url}')"></div>` : ""}
-        <div class="track-header-scrim"></div>
-        ${image_url ? `<img src="${image_url}">` : ""}
+        `<img src="${image_url}">
         <div class="content">
-            <a class="track-title" href="${album_link(track.album_id)}"><h1>${track.name}</h1></a>
-            ${artist_id
-                ? `<a class="track-artist" href="${artist_link(artist_id)}">${track.artist}</a>`
-                : `<p class="track-artist">${track.artist}</p>`}
+            <h1 class="track-title">${track.name}</h1>
+            <div id="artists" class="link-list"></div>
+            <div id="album" class="link-list"></div>
         </div>`
     )
+
+    build_link_list(
+        header.querySelector("#album"),
+        track.album,
+        album_link(track.album_id),
+    )
+
+    for (const artist of track.artists) {
+        build_link_list(
+            header.querySelector("#artists"),
+            artist.name,
+            artist_link(artist.id),
+        )
+    }
 
     let last_played = track.timestamps && track.timestamps.length
         ? new Date(Math.max(...track.timestamps) * 1000).toLocaleDateString("pt-BR")

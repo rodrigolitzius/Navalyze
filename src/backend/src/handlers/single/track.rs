@@ -33,7 +33,7 @@ pub async fn track_info(
 
     let response = json!({
         "name": tracks[0].name,
-        "artist": tracks[0].artist,
+        "artists": tracks[0].artists,
         "album": tracks[0].album,
         "album_id": tracks[0].album_id,
         "plays": tracks[0].plays,

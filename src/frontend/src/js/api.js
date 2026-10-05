@@ -42,8 +42,8 @@ class Api {
         return fetch(request)
     }
 
-    get_most_played_artists(limit) {
-        var request = this.new_request(`most-played/artists`, {limit: limit})
+    get_most_played_artists(limit, offset) {
+        var request = this.new_request(`most-played/artists`, {limit: limit, offset: offset})
 
         return fetch(request)
     }

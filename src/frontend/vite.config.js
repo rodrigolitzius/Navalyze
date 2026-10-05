@@ -19,6 +19,7 @@ export default defineConfig({
                 login: resolve(import.meta.dirname, "src/login.html"),
                 dashboard: resolve(import.meta.dirname, "src/dashboard.html"),
                 artist: resolve(import.meta.dirname, "src/artist.html"),
+                artists: resolve(import.meta.dirname, "src/artists.html"),
                 album: resolve(import.meta.dirname, "src/album.html"),
                 albums: resolve(import.meta.dirname, "src/albums.html"),
                 track: resolve(import.meta.dirname, "src/track.html"),

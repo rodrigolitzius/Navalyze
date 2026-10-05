@@ -48,8 +48,8 @@ class Api {
         return fetch(request)
     }
 
-    get_most_played_albums(limit) {
-        var request = this.new_request(`most-played/albums`, {limit: limit})
+    get_most_played_albums(limit, offset) {
+        var request = this.new_request(`most-played/albums`, {limit: limit, offset: offset})
 
         return fetch(request)
     }

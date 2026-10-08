@@ -14,6 +14,20 @@ page.insertAdjacentHTML("afterbegin", popover_filter)
 let last_focused_input = null;
 
 document.querySelectorAll("input#start-ts, input#end-ts").forEach(function (element) {
+    let timezone = localStorage.getItem("timezone")
+    let start_ts = localStorage.getItem("start_ts")
+    let end_ts = localStorage.getItem("end_ts")
+
+    if (element.id == "start-ts" && start_ts != null) {
+        let date = Temporal.Instant.fromEpochMilliseconds(start_ts * 1000).toZonedDateTimeISO(timezone)
+        element.value = date.toString().slice(0, 16)
+    }
+
+    if (element.id == "end-ts" && end_ts != null) {
+        let date = Temporal.Instant.fromEpochMilliseconds(end_ts * 1000).toZonedDateTimeISO(timezone)
+        element.value = date.toString().slice(0, 16)
+    }
+
     element.addEventListener("focus", function() {
         last_focused_input = element
     })

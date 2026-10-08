@@ -1,0 +1,11 @@
+services:
+  navalyze:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - navalyze-data:/data
+    restart: unless-stopped
+
+volumes:
+  navalyze-data:

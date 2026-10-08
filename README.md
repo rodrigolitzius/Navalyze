@@ -61,6 +61,17 @@ If you prefer the command line, run `just run "--help"` to see the available opt
 
 Finally, to run, just do `just run ""`, or `just run "<options>"` to override your `settings.toml` options.
 
+## Docker
+If you don't want to install the build tools, you can build and run Navalyze with Docker instead:
+
+```
+docker compose up -d --build
+```
+
+Then open `http://localhost:8080`.
+
+The container keeps `settings.toml` and `data.db` in the `/data` volume. A default `settings.toml` is created there on first start, so edit that file (or pass options like `-l <token>` as the container command) to change the settings. The container always listens on `0.0.0.0:8080` unless you pass `-b`, so change the published port in `docker-compose.yml` instead of `bind`.
+
 # MusicBrainz integration
 > [!NOTE]
 MusicBrainz integration is very WIP

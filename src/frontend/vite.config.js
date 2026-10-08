@@ -26,6 +26,7 @@ export default defineConfig({
                 tracks: resolve(import.meta.dirname, "src/tracks.html"),
                 recent: resolve(import.meta.dirname, "src/recent.html"),
                 sidebar: resolve(import.meta.dirname, "src/sidebar.html"),
+                filter_popover: resolve(import.meta.dirname, "src/filter-popover.html"),
             }
         },
     },

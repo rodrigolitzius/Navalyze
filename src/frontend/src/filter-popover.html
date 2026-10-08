@@ -1,0 +1,53 @@
+<div id="global-filter" class="card" popover>
+    <h1 class="card-name">Filter</h1>
+    <p class="card-desc">Filter your scrobbles based on date and time</p>
+    <form>
+        <div class="ts-row space-between">
+            <span>
+                <label for="start-ts">Starting datetime</label>
+                <input type="datetime-local" id="start-ts">
+            </span>
+
+            <span>
+                <label for="end-ts">Ending datetime</label>
+                <input type="datetime-local" id="end-ts">
+            </span>
+        </div>
+
+        <br>
+
+        <div>
+            <button type="button" id="ts-set-time" class="ts-set-now">Now</button>
+            <button type="button" id="ts-set-time" class="ts-set-last-week">Last week</button>
+            <button type="button" id="ts-set-time" class="ts-set-last-month">Last month</button>
+            <button type="button" id="ts-set-time" class="ts-set-last-year">Last year</button>
+        </div>
+
+        <br>
+
+        <div>
+            <button type="button" id="ts-set-time" class="ts-set-january">January</button>
+            <button type="button" id="ts-set-time" class="ts-set-february">February</button>
+            <button type="button" id="ts-set-time" class="ts-set-march">March</button>
+            <button type="button" id="ts-set-time" class="ts-set-april">April</button>
+            <button type="button" id="ts-set-time" class="ts-set-may">May</button>
+            <button type="button" id="ts-set-time" class="ts-set-june">June</button>
+            <button type="button" id="ts-set-time" class="ts-set-july">July</button>
+        </div>
+
+        <div>
+            <button type="button" id="ts-set-time" class="ts-set-august">August</button>
+            <button type="button" id="ts-set-time" class="ts-set-september">September</button>
+            <button type="button" id="ts-set-time" class="ts-set-october">October</button>
+            <button type="button" id="ts-set-time" class="ts-set-november">November</button>
+            <button type="button" id="ts-set-time" class="ts-set-december">December</button>
+        </div>
+
+        <br>
+
+        <div class="space-between">
+            <button class="default-button" type="button" id="submit-filter">Submit</button>
+            <button class="default-button" type="button" id="clear-filter">Clear</button>
+        </div>
+    </form>
+</div>

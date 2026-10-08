@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::collections::HashMap;
 
 use axum::extract::{FromRef, FromRequestParts, Query};
+use chrono::Weekday;
 use chrono_tz::Tz;
 use uuid::Uuid;
 
@@ -31,6 +32,10 @@ pub struct HandlerParams {
 
 pub struct TimedParams {
     pub tz: Tz,
+    pub weekdays: Vec<Weekday>,
+}
+
+pub struct GraphParams {
     pub resolution: u64
 }
 
@@ -117,6 +122,37 @@ where
             ApiError::BadRequest("Failed to parse timezone".into())
         })?;
 
+        let weekdays = get_param_default::<String>(&queries, "weekdays", "0,1,2,3,4,5,6".to_string());
+        let weekdays = weekdays
+            .split(",")
+            .collect::<Vec<&str>>()
+            .into_iter().map(|w| { w.parse::<u8>() })
+            .collect::<Result<Vec<u8>, <u8 as FromStr>::Err>>().map_err(|_| {ApiError::BadRequest("Invalid string".into())})?
+            .into_iter().map(|w| { Weekday::try_from(w) })
+            .collect::<Result<Vec<Weekday>, <Weekday as TryFrom<u8>>::Error>>().map_err(|e| {ApiError::BadRequest(format!("Could not convert value to a weekday: {}", e.to_string()).into())})?;
+
+        return Ok(Self {
+            tz: timezone,
+            weekdays: weekdays,
+        })
+    }
+}
+
+impl<S> FromRequestParts<S> for GraphParams
+where
+    S: Send + Sync
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let Query(queries) = match Query::<HashMap<String, String>>::from_request_parts(parts, state).await {
+            Ok(v) => v,
+            Err(_) => return Err(ApiError::BadRequest("Invalid queries".into()))
+        };
+
         let resolution = queries.get("res").ok_or_else(|| {
             ApiError::BadRequest("No resolution specified".into())
         })?;
@@ -126,12 +162,10 @@ where
         })?;
 
         return Ok(Self {
-            tz: timezone,
-            resolution: resolution
+            resolution,
         })
     }
 }
-
 
 impl Range {
     async fn from_query(queries: &HashMap<String, String>) -> Self {

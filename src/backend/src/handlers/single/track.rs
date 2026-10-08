@@ -3,7 +3,7 @@ use serde_json::json;
 
 use crate::{
     api::error::ApiError,
-    handlers::{extract::{HandlerParams, SessionExtractor}},
+    handlers::{extract::{HandlerParams, TimedParams, SessionExtractor}},
     navidrome::interface::scrobble::{ScrobbleWithSongFilter},
     analysis::tracks::TrackStat
 };
@@ -11,12 +11,14 @@ use crate::{
 pub async fn track_info(
     Path(id): Path<String>,
     params: HandlerParams,
+    timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
     let scrobbles = navidrome.get_library().await?
         .filter_range(params.range)
+        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
         .filter_track(&Vec::from([id.as_str()]));
 
     let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.scrobble.submission_time).collect();

@@ -4,13 +4,15 @@ class Api {
 
         const start_ts = localStorage.getItem("start_ts") ?? 0
         const end_ts = localStorage.getItem("end_ts") ?? 9999999999
-        const timezone = localStorage.getItem("timezone") ?? "aa"
+        const timezone = localStorage.getItem("timezone") ?? ""
+        const weekdays = localStorage.getItem("weekdays") ?? "0,1,2,3,4,5,6"
 
         const default_params = new URLSearchParams({
             ...params,
             "a": start_ts,
             "b": end_ts,
-            "tz": timezone
+            "tz": timezone,
+            "weekdays": weekdays
         })
 
         var request = new Request(`/api/${endpoint}?${default_params}`, {

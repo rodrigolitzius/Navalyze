@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::{
     handlers::*,
-    handlers::extract::{HandlerParams, SessionExtractor},
+    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
     navidrome::interface::scrobble::ScrobbleWithSongFilter,
     analysis::{albums::AlbumStat},
 };
@@ -30,6 +30,7 @@ pub async fn artist_info(
     State(state): State<ApiState>,
     Path(id): Path<String>,
     params: HandlerParams,
+    timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = &mut session.write().await;
@@ -42,6 +43,7 @@ pub async fn artist_info(
     };
     let scrobbles = session.navidrome_interface.get_library().await?
         .filter_range(params.range)
+        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
         .filter_artist(&Vec::from([id.as_str()]));
 
     let albums_stat = AlbumStat::group(scrobbles);

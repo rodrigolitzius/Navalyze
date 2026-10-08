@@ -1,6 +1,6 @@
 use crate::{
     handlers::*,
-    handlers::extract::{HandlerParams, SessionExtractor},
+    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
     analysis::artists::ArtistStat,
     navidrome::interface::{scrobble::ScrobbleWithSongFilter, ArtistRole},
 };
@@ -8,11 +8,13 @@ use crate::{
 pub async fn most_played_artists(
     Query(query): Query<HashMap<String, String>>,
     params: HandlerParams,
+    timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
     let scrobbles = navidrome.get_library().await?
+        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
         .filter_range(params.range);
 
     let artist_types_default = String::from("artist");

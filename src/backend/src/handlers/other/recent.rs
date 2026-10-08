@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::{
     handlers::*,
-    handlers::extract::{HandlerParams, SessionExtractor},
+    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
     navidrome::interface::{scrobble::ScrobbleWithSongFilter, ArtistRole}
 };
 
@@ -25,11 +25,13 @@ struct ResponseSong {
 
 pub async fn recent(
     params: HandlerParams,
+    timed_params: TimedParams,
     SessionExtractor(session): SessionExtractor
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
     let mut scrobbles = navidrome.get_library().await?
+        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
         .filter_range(params.range);
 
     if !params.ids.is_empty() {

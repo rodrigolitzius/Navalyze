@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use chrono::{DateTime, TimeZone};
+use chrono::{DateTime, Datelike, TimeZone, Weekday};
 
 use crate::{
     handlers::extract::Range,
@@ -20,6 +20,7 @@ pub struct ScrobbleWithSong<'a> {
 
 pub trait ScrobbleWithSongFilter<'a> {
     fn filter_range(self, range: Range) -> Self;
+    fn filter_weekdays<T: TimeZone>(self, weekdays: &Vec<Weekday>, timezone: T) -> Self;
     fn filter_album(self, album_ids: &Vec<&str>) -> Self;
     fn filter_artist(self, artist_ids: &Vec<&str>) -> Self;
     fn filter_track(self, track_ids: &Vec<&str>) -> Self;
@@ -28,6 +29,12 @@ pub trait ScrobbleWithSongFilter<'a> {
 impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
     fn filter_range(self, range: Range) -> Self {
         return self.into_iter().filter(|s| range.contains(&s.scrobble.submission_time)).collect();
+    }
+
+    fn filter_weekdays<T: TimeZone>(self, weekdays: &Vec<Weekday>, timezone: T) -> Self {
+        self.into_iter().filter(|s|
+            weekdays.contains(&s.scrobble.date_time(timezone.clone()).unwrap().weekday())
+        ).collect()
     }
 
     fn filter_album(self, album_ids: &Vec<&str>) -> Self {

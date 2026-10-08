@@ -11,7 +11,7 @@ artist = await artist.json()
 let artist_div = document.getElementById("image-header")
 
 artist_div.insertAdjacentHTML("beforeend",
-    `<img src="${await get_image_url(api, artist_id, 300)}">
+    `<img src="${await get_image_url(api, artist_id, 700)}">
     <div class="content">
         <h1>${artist.name}</h1>
         <div class="round-list"></div>

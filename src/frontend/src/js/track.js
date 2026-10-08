@@ -19,7 +19,7 @@ if (Array.isArray(track)) {
 } else {
     let image_url = null
     try {
-        image_url = await get_image_url(api, track_id, 600)
+        image_url = await get_image_url(api, track_id, 700)
     } catch {
         image_url = null
     }

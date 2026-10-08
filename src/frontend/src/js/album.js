@@ -11,7 +11,7 @@ album = await album.json()
 let album_div = document.getElementById("image-header")
 
 album_div.insertAdjacentHTML("beforeend",
-    `<img src="${await get_image_url(api, album_id, 1000)}">
+    `<img src="${await get_image_url(api, album_id, 700)}">
     <div class="content">
         <h1>${album.name}</h1>
         <div id="artists" class="link-list"></div>

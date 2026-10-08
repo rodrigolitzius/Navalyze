@@ -12,6 +12,82 @@ page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
 
 let last_focused_input = null;
+let weekdays = [true, true, true, true, true, true, true]
+
+document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(function (element) {
+    let weekdays_ls = localStorage.getItem("weekdays")
+
+    if (weekdays_ls != null) {
+        weekdays_ls.split(",").forEach((day, i) => {
+            weekdays[i] = (day == "1")
+        })
+        console.log(weekdays)
+    }
+
+    let class_name = element.className
+
+    if (class_name == "mon") {
+        element.checked = weekdays[0]
+    }
+
+    if (class_name == "tue") {
+        element.checked = weekdays[1]
+    }
+
+    if (class_name == "wed") {
+        element.checked = weekdays[2]
+    }
+
+    if (class_name == "thu") {
+        element.checked = weekdays[3]
+    }
+
+    if (class_name == "fri") {
+        element.checked = weekdays[4]
+    }
+
+    if (class_name == "sat") {
+        element.checked = weekdays[5]
+    }
+
+    if (class_name == "sun") {
+        element.checked = weekdays[6]
+    }
+
+    element.addEventListener("change", function (event) {
+        let checked = event.target.checked
+
+        if (class_name == "mon") {
+            weekdays[0] = checked
+        }
+
+        if (class_name == "tue") {
+            weekdays[1] = checked
+        }
+
+        if (class_name == "wed") {
+            weekdays[2] = checked
+        }
+
+        if (class_name == "thu") {
+            weekdays[3] = checked
+        }
+
+        if (class_name == "fri") {
+            weekdays[4] = checked
+        }
+
+        if (class_name == "sat") {
+            weekdays[5] = checked
+        }
+
+        if (class_name == "sun") {
+            weekdays[6] = checked
+        }
+
+        console.log(weekdays)
+    })
+})
 
 document.querySelectorAll("input#start-ts, input#end-ts").forEach(function (element) {
     let timezone = localStorage.getItem("timezone")
@@ -122,14 +198,29 @@ document.querySelectorAll("button#ts-set-time").forEach(function (button) {
 document.getElementById("submit-filter").addEventListener("click", function () {
     let timezone = localStorage.getItem("timezone")
 
-    let start = document.getElementById("start-ts").value.slice(0, 16)
-    let end = document.getElementById("end-ts").value.slice(0, 16)
+    let start_string = document.getElementById("start-ts").value
+    let end_string = document.getElementById("end-ts").value
 
-    let start_ts = Math.floor(Temporal.PlainDateTime.from(start).toZonedDateTime(timezone).epochMilliseconds / 1000)
-    let end_ts = Math.floor(Temporal.PlainDateTime.from(end).toZonedDateTime(timezone).epochMilliseconds / 1000)
+    if (start_string != "") {
+        let start_ts = Math.floor(Temporal.PlainDateTime.from(start_string.slice(0, 16)).toZonedDateTime(timezone).epochMilliseconds / 1000)
+        localStorage.setItem("start_ts", start_ts)
+    }
 
-    localStorage.setItem("start_ts", start_ts)
-    localStorage.setItem("end_ts", end_ts)
+    if (end_string != "") {
+        let end_ts = Math.floor(Temporal.PlainDateTime.from(end_string.slice(0, 16)).toZonedDateTime(timezone).epochMilliseconds / 1000)
+        localStorage.setItem("end_ts", end_ts)
+    }
+
+    let weekdays_arr = new Array
+    weekdays.forEach((bool, i) => {
+        if (bool) {
+            weekdays_arr.push("1")
+        } else {
+            weekdays_arr.push("0")
+        }
+    })
+
+    localStorage.setItem("weekdays", weekdays_arr)
 
     window.location.reload()
 })
@@ -137,6 +228,7 @@ document.getElementById("submit-filter").addEventListener("click", function () {
 document.getElementById("clear-filter").addEventListener("click", function () {
     localStorage.removeItem("start_ts")
     localStorage.removeItem("end_ts")
+    localStorage.removeItem("weekdays")
 
     window.location.reload()
 })

@@ -5,14 +5,22 @@ class Api {
         const start_ts = localStorage.getItem("start_ts") ?? 0
         const end_ts = localStorage.getItem("end_ts") ?? 9999999999
         const timezone = localStorage.getItem("timezone") ?? ""
-        const weekdays = localStorage.getItem("weekdays") ?? "0,1,2,3,4,5,6"
+        const weekdays = localStorage.getItem("weekdays") ?? "1,1,1,1,1,1,1"
+
+        let weekdays_string = new Array
+        weekdays.split(",").forEach((day, i) => {
+            if (day == "1") {
+                weekdays_string.push(`${i}`)
+            }
+        })
+        weekdays_string = weekdays_string.join(",")
 
         const default_params = new URLSearchParams({
             ...params,
             "a": start_ts,
             "b": end_ts,
             "tz": timezone,
-            "weekdays": weekdays
+            "weekdays": weekdays_string
         })
 
         var request = new Request(`/api/${endpoint}?${default_params}`, {

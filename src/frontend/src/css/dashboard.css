@@ -270,13 +270,14 @@
     overflow-x: auto;
 }
 .recent-card {
+    width: 250px;
     flex-shrink: 0;
     object-fit: cover;
     text-decoration: none;
     color: var(--primary-font-color);
 }
 .recent-card img {
-    width: 250px;
+    width: 100%;
     object-fit: cover;
     border-radius: var(--border-radius);
     background-color: var(--secondary-color);

@@ -53,13 +53,13 @@ class Api {
     }
 
     get_most_played_artists(limit, offset) {
-        var request = this.new_request(`most-played/artists`, {limit: limit, offset: offset})
+        var request = this.new_request(`most-played/artists`, {limit: limit, offset: offset ?? 0})
 
         return fetch(request)
     }
 
     get_most_played_albums(limit, offset) {
-        var request = this.new_request(`most-played/albums`, {limit: limit, offset: offset})
+        var request = this.new_request(`most-played/albums`, {limit: limit, offset: offset ?? 0})
 
         return fetch(request)
     }
@@ -70,8 +70,8 @@ class Api {
         return fetch(request)
     }
 
-    get_most_played_playlists(limit) {
-        var request = this.new_request(`most-played/playlists`, {limit: limit})
+    get_most_played_playlists(limit, offset) {
+        var request = this.new_request(`most-played/playlists`, {limit: limit, offset: offset ?? 0})
 
         return fetch(request)
     }
@@ -84,6 +84,12 @@ class Api {
 
     get_recently_played(limit, offset) {
         var request = this.new_request(`recent`, {limit: limit, offset: offset})
+
+        return fetch(request)
+    }
+
+    get_playlist(id) {
+        var request = this.new_request(`playlist/${id}`)
 
         return fetch(request)
     }

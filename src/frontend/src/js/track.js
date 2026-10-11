@@ -1,5 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { build_link_list, artist_link, album_link } from "./html.js"
+import { format_hours } from "./util.js";
 
 const api = new Api()
 
@@ -55,7 +56,7 @@ if (Array.isArray(track)) {
 
     let stat_items = [
         { label: "Reproduções", value: `${track.plays}` },
-        { label: "Tempo ouvido", value: format_duration(track.played_hours) },
+        { label: "Tempo ouvido", value: format_hours(track.played_hours) },
         { label: "Última vez", value: last_played ?? "—" }
     ]
 
@@ -67,12 +68,4 @@ if (Array.isArray(track)) {
             </div>`
         )
     }
-}
-
-function format_duration(hours) {
-    if (hours < 1) {
-        return `${Math.round(hours * 60)} min`
-    }
-
-    return `${hours.toFixed(1)}h`
 }

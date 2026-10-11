@@ -1,5 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { album_link } from "./html.js";
+import { format_hours } from "./util.js";
 
 const api = new Api()
 
@@ -41,7 +42,7 @@ for (const album of artist.albums) {
             <div>
                 <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
                 <p class="card-name">${album.name}</p>
-                <p class="card-footer" title="${album.plays} plays">${album.played_hours.toFixed(2)}h</p>
+                <p class="card-footer" title="${album.plays} plays">${format_hours(album.played_hours)}</p>
             </div>
         </a>`
     )

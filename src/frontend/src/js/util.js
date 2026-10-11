@@ -13,6 +13,14 @@ function relative_time(timestamp_seconds) {
 }
 
 function format_hours(hours) {
+    if (hours < (1.0 / 60.0)) {
+        return `${Math.round(hours / 60)}s`
+    }
+
+    if (hours < 1) {
+        return `${Math.round(hours * 60)}m`
+    }
+
     return `${hours.toFixed(1)}h`
 }
 

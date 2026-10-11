@@ -1,4 +1,5 @@
 import { Api, get_image_url } from "./api.js"
+import { format_hours } from "./util.js";
 
 let api = new Api()
 
@@ -31,7 +32,7 @@ for (const playlist of playlists) {
             <div class="card album-entry">
                 <img class="card-img" src="${await get_image_url(api, playlist.id, 400)}">
                 <p class="card-name">${playlist.name}</p>
-                <p class="card-footer" title="${playlist.plays}">${playlist.played_hours.toFixed(2)}h</p>
+                <p class="card-footer" title="${playlist.plays}">${format_hours(playlist.played_hours)}</p>
             </div>
         </a>`
     )

@@ -1,5 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { format_hours } from "./util.js";
 
 let api = new Api()
 
@@ -17,7 +18,7 @@ for (const album of albums) {
             <div class="card album-entry">
                 <img class="card-img" src="${await get_image_url(api, album.id, 400)}">
                 <p class="card-name">${album.name}</p>
-                <p class="card-footer" title="${album.plays}">${album.played_hours.toFixed(2)}h</p>
+                <p class="card-footer" title="${album.plays}">${format_hours(album.played_hours)}</p>
             </div>
         </a>`
     )

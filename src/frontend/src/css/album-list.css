@@ -1,14 +1,18 @@
 #albums-list {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 10px;
 
-    .album-entry {
+    .artist-entry {
         height: 100%;
     }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1600px) {
+    #albums-list { grid-template-columns: 1fr 1fr 1fr 1fr }
+}
+
+@media (max-width: 1000px) {
     #albums-list { grid-template-columns: 1fr 1fr 1fr }
 }
 

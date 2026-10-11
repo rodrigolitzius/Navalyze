@@ -14,7 +14,7 @@ let header = document.getElementById("image-header")
 if (Array.isArray(track)) {
     header.insertAdjacentHTML("beforeend",
         `<div class="content">
-            <h1>Nenhum dado encontrado</h1>
+            <h1>Nothing found</h1>
         </div>`
     )
 } else {
@@ -55,9 +55,9 @@ if (Array.isArray(track)) {
     let stats = document.getElementById("track-stats")
 
     let stat_items = [
-        { label: "Reproduções", value: `${track.plays}` },
-        { label: "Tempo ouvido", value: format_hours(track.played_hours) },
-        { label: "Última vez", value: last_played ?? "—" }
+        { label: "Plays", value: `${track.plays}` },
+        { label: "Time played", value: format_hours(track.played_hours) },
+        { label: "Last played", value: last_played ?? "—" }
     ]
 
     for (const stat of stat_items) {

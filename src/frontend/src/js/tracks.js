@@ -31,7 +31,7 @@ for (let i = 0; i < tracks.length; i++) {
                     <div class="track-artist link-list"></div>
                     <div class="track-album link-list"></div>
                     <div class="track-time">
-                        <p>${format_hours(track.played_hours)} · ${track.plays} reproduções</p>
+                        <p>${format_hours(track.played_hours)} · ${track.plays} plays</p>
                     </div>
                 </div>
             </div>

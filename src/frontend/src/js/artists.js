@@ -1,24 +1,10 @@
 import { Api, get_image_url } from "./api.js"
+import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
 
 let api = new Api()
 
-const PAGE_SIZE = 20
-
-let page = new URLSearchParams(window.location.search).get("page");
-page = page ? parseInt(page, 10) : 0
-if (Number.isNaN(page) || page < 0) page = 0
-
-document.getElementById("next-page").addEventListener("click", function() {
-    window.location.replace(`artists.html?page=${page+1}`)
-});
-
-document.getElementById("previous-page").addEventListener("click", function () {
-    let next = page-1
-    if (page <= 0) {
-        next = 0
-    }
-    window.location.replace(`artists.html?page=${next}`)
-});
+load_nav_buttons(document.querySelector("#nav-buttons"), "artists.html")
+let page = get_page()
 
 let artists = await api.get_most_played_artists(PAGE_SIZE, PAGE_SIZE*page)
 artists = await artists.json()

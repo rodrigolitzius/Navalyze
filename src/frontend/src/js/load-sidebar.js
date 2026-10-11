@@ -21,7 +21,6 @@ document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(fu
         weekdays_ls.split(",").forEach((day, i) => {
             weekdays[i] = (day == "1")
         })
-        console.log(weekdays)
     }
 
     let class_name = element.className
@@ -84,8 +83,6 @@ document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(fu
         if (class_name == "sun") {
             weekdays[6] = checked
         }
-
-        console.log(weekdays)
     })
 })
 
@@ -190,8 +187,6 @@ document.querySelectorAll("button#ts-set-time").forEach(function (button) {
         if (new_time != null) {
             last_focused_input.value = new_time.toString().slice(0, 16)
         }
-
-        console.log(plain.toString())
     })
 })
 

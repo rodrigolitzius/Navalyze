@@ -1,7 +1,6 @@
 const PAGE_SIZE = 20
 
 function load_nav_buttons(parent_element, page_url) {
-    console.log(parent_element)
     let page = get_page()
 
     parent_element.querySelector("#next-page").addEventListener("click", function() {

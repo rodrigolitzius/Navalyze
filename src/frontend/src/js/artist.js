@@ -37,10 +37,12 @@ for (const property of properties) {
 let albums = document.getElementById("albums")
 for (const album of artist.albums) {
     albums.insertAdjacentHTML("beforeend",
-        `<div class="card">
-            <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
-            <a class="card-name" href="${album_link(album.id)}">${album.name}</a>
-            <p class="card-footer" title="${album.plays} plays">${album.played_hours.toFixed(2)}h</p>
-        </div>`
+        `<a href="${album_link(album.id)}" class="card">
+            <div>
+                <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
+                <p class="card-name">${album.name}</p>
+                <p class="card-footer" title="${album.plays} plays">${album.played_hours.toFixed(2)}h</p>
+            </div>
+        </a>`
     )
 }

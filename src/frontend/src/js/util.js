@@ -14,7 +14,7 @@ function relative_time(timestamp_seconds) {
 
 function format_hours(hours) {
     if (hours < (1.0 / 60.0)) {
-        return `${Math.round(hours / 60)}s`
+        return `${Math.round(hours * 60 * 60)}s`
     }
 
     if (hours < 1) {

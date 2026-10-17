@@ -1,6 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { build_link_list, artist_link, track_link } from "./html.js";
-import { format_hours } from "./util.js";
+import { format_hours, build_time_graph } from "./util.js";
 
 const api = new Api()
 
@@ -33,6 +33,11 @@ for (const property of properties) {
         `<span class="round-list-item">${property}</span>`
     )
 }
+
+let playlist_activity = await api.get_playlist_graph(playlist_id, 50)
+playlist_activity = await playlist_activity.json()
+
+build_time_graph(document.getElementById("graph-playlist"), playlist_activity)
 
 let max = Math.max(...playlist.tracks.map(item => item.played_hours))
 

@@ -37,6 +37,30 @@ class Api {
         return fetch(request)
     }
 
+    async get_playlist_graph(id, resolution) {
+        var request = this.new_request(`time/playlist/${id}`, {res: resolution})
+
+        return fetch(request)
+    }
+
+    async get_artist_graph(id, resolution) {
+        var request = this.new_request(`time/artist/${id}`, {res: resolution})
+
+        return fetch(request)
+    }
+
+    async get_album_graph(id, resolution) {
+        var request = this.new_request(`time/album/${id}`, {res: resolution})
+
+        return fetch(request)
+    }
+
+    async get_track_graph(id, resolution) {
+        var request = this.new_request(`time/track/${id}`, {res: resolution})
+
+        return fetch(request)
+    }
+
     async auth_check() {
         let request;
 

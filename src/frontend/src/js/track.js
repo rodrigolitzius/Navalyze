@@ -1,6 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { build_link_list, artist_link, album_link } from "./html.js"
-import { format_hours } from "./util.js";
+import { format_hours, build_time_graph } from "./util.js";
 
 const api = new Api()
 
@@ -69,3 +69,8 @@ if (Array.isArray(track)) {
         )
     }
 }
+
+let track_activity = await api.get_track_graph(track_id, 50)
+track_activity = await track_activity.json()
+
+build_time_graph(document.getElementById("graph-track"), track_activity)

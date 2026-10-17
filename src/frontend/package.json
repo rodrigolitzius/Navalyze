@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "chart.js": "^4.5.1",
+    "chartjs-adapter-temporal": "^1.2.3",
     "temporal-polyfill": "^1.0.5"
   }
 }

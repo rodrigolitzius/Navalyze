@@ -1,6 +1,7 @@
+import { Temporal } from "temporal-polyfill";
 import { Api, get_image_url } from "./api.js"
 import { album_link } from "./html.js";
-import { format_hours } from "./util.js";
+import { format_hours, build_time_graph } from "./util.js";
 
 const api = new Api()
 
@@ -47,3 +48,8 @@ for (const album of artist.albums) {
         </a>`
     )
 }
+
+let artist_activity = await api.get_artist_graph(artist_id, 50)
+artist_activity = await artist_activity.json()
+
+build_time_graph(document.getElementById("graph-artist"), artist_activity)

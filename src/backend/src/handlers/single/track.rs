@@ -1,28 +1,24 @@
-use axum::extract::{Path, Json};
-use serde_json::json;
-
-use crate::{
-    api::error::ApiError,
-    handlers::{extract::{HandlerParams, TimedParams, SessionExtractor}},
-    navidrome::interface::scrobble::{ScrobbleWithSongFilter},
-    analysis::tracks::TrackStat
-};
+use crate::handlers::single::prelude::*;
 
 pub async fn track_info(
+    SessionExtractor(session): SessionExtractor,
     Path(id): Path<String>,
-    params: HandlerParams,
-    timed_params: TimedParams,
-    SessionExtractor(session): SessionExtractor
+    RangeWithDefault(range): RangeWithDefault,
+    ResponseFilterWithDefault(response_filter): ResponseFilterWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = navidrome.get_library().await?
-        .filter_range(params.range)
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(range)
         .filter_track(&Vec::from([id.as_str()]));
 
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
+
     let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.scrobble.submission_time).collect();
-    let timestamps = params.filter.select(&timestamps);
+    let timestamps = response_filter.select(&timestamps);
 
     let songs_stats = TrackStat::group(scrobbles);
 

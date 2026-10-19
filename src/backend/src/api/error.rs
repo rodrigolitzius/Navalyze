@@ -12,6 +12,7 @@ pub enum ApiError {
     Internal(String),
     Unauthorized(String),
     BadRequest(String),
+    MissingParameter(String),
     DatabaseError(String)
 }
 
@@ -67,6 +68,7 @@ impl IntoResponse for ApiError {
             ApiError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg),
             ApiError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
             ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
+            ApiError::MissingParameter(msg) => (StatusCode::BAD_REQUEST, msg),
             ApiError::DatabaseError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg)
         };
 

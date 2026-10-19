@@ -1,28 +1,26 @@
-use crate::{
-    handlers::*,
-    handlers::extract::{HandlerParams, TimedParams, GraphParams, SessionExtractor},
-    handlers::time::to_datetime_duration_vec,
-    navidrome::interface::scrobble::ScrobbleWithSongFilter,
-    analysis::time::date
-};
+use crate::handlers::time::prelude::*;
 
 pub async fn album_time(
+    SessionExtractor(session): SessionExtractor,
     Path(id): Path<String>,
-    params: HandlerParams,
-    timed_params: TimedParams,
-    graph_params: GraphParams,
-    SessionExtractor(session): SessionExtractor
+    Timezone(timezone): Timezone,
+    Resolution(resolution): Resolution,
+    RangeWithDefault(range): RangeWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = navidrome.get_library().await?
-        .filter_range(params.range)
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(range)
         .filter_album(&Vec::from([id.as_str()]));
 
-    let data = to_datetime_duration_vec(scrobbles, timed_params.tz);
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
 
-    let result = date::group(&data, graph_params.resolution);
+    let data = to_datetime_duration_vec(scrobbles, timezone);
+
+    let result = date::group(&data, resolution);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

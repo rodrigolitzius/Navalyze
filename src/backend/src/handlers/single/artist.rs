@@ -1,11 +1,6 @@
+use crate::handlers::single::prelude::*;
+use crate::analysis::albums::AlbumStat;
 use serde::Serialize;
-
-use crate::{
-    handlers::*,
-    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
-    navidrome::interface::scrobble::ScrobbleWithSongFilter,
-    analysis::{albums::AlbumStat},
-};
 
 #[derive(Serialize)]
 struct ResponseAlbum {
@@ -27,11 +22,11 @@ struct Response {
 }
 
 pub async fn artist_info(
+    SessionExtractor(session): SessionExtractor,
     State(state): State<ApiState>,
     Path(id): Path<String>,
-    params: HandlerParams,
-    timed_params: TimedParams,
-    SessionExtractor(session): SessionExtractor
+    RangeWithDefault(range): RangeWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let session = &mut session.write().await;
 
@@ -41,10 +36,13 @@ pub async fn artist_info(
         Some(v) => state.storage.get_artist(session.db_domain_id, v).await?,
         None => None
     };
-    let scrobbles = session.navidrome_interface.get_library().await?
-        .filter_range(params.range)
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
+    let mut scrobbles = session.navidrome_interface.get_library().await?
+        .filter_range(range)
         .filter_artist(&Vec::from([id.as_str()]));
+
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
 
     let albums_stat = AlbumStat::group(scrobbles);
 

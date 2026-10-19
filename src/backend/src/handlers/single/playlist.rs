@@ -1,12 +1,5 @@
-use axum::extract::{Path, Json};
 use serde::Serialize;
-
-use crate::{
-    api::error::ApiError,
-    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
-    navidrome::interface::scrobble::{ScrobbleWithSongFilter},
-    analysis::tracks::TrackStat
-};
+use crate::handlers::single::prelude::*;
 
 #[derive(Serialize)]
 struct Response {
@@ -15,19 +8,22 @@ struct Response {
 }
 
 pub async fn playlist_info(
+    SessionExtractor(session): SessionExtractor,
     Path(id): Path<String>,
-    params: HandlerParams,
-    timed_params: TimedParams,
-    SessionExtractor(session): SessionExtractor
+    RangeWithDefault(range): RangeWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
     let playlist = navidrome.get_playlist(&id).await?;
 
-    let scrobbles = navidrome.get_library().await?
-        .filter_range(params.range)
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(range)
         .filter_track(&playlist.song_ids.iter().map(|s| s.as_str()).collect());
+
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
 
     let songs_stats = TrackStat::group(scrobbles);
 

@@ -1,26 +1,25 @@
-use crate::{
-    handlers::*,
-    handlers::extract::{HandlerParams, TimedParams, GraphParams, SessionExtractor},
-    handlers::time::to_datetime_duration_vec,
-    navidrome::interface::scrobble::ScrobbleWithSongFilter,
-    analysis::time::frequency
-};
+use crate::handlers::time::prelude::*;
+use crate::analysis::time::frequency;
 
 pub async fn frequency(
-    params: HandlerParams,
-    timed_params: TimedParams,
-    graph_params: GraphParams,
-    SessionExtractor(session): SessionExtractor
+    SessionExtractor(session): SessionExtractor,
+    Timezone(timezone): Timezone,
+    Resolution(resolution): Resolution,
+    RangeWithDefault(range): RangeWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = navidrome.get_library().await?
-        .filter_range(params.range)
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz);
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(range);
 
-    let data = to_datetime_duration_vec(scrobbles, timed_params.tz);
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
 
-    let result = frequency::group(&data, graph_params.resolution);
+    let data = to_datetime_duration_vec(scrobbles, timezone);
+
+    let result = frequency::group(&data, resolution);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

@@ -1,33 +1,28 @@
-use crate::{
-    handlers::*,
-    handlers::extract::{HandlerParams, TimedParams, SessionExtractor},
-    analysis::artists::ArtistStat,
-    navidrome::interface::{scrobble::ScrobbleWithSongFilter, ArtistRole},
-};
+use crate::handlers::most_played::prelude::*;
+use crate::analysis::artists::ArtistStat;
 
 pub async fn most_played_artists(
-    Query(query): Query<HashMap<String, String>>,
-    params: HandlerParams,
-    timed_params: TimedParams,
-    SessionExtractor(session): SessionExtractor
+    SessionExtractor(session): SessionExtractor,
+    RangeWithDefault(range): RangeWithDefault,
+    ResponseFilterWithDefault(response_filter): ResponseFilterWithDefault,
+    ArtistRolesWithDefault(artist_roles): ArtistRolesWithDefault,
+    weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &mut session.write().await.navidrome_interface;
 
-    let scrobbles = navidrome.get_library().await?
-        .filter_weekdays(&timed_params.weekdays, timed_params.tz)
-        .filter_range(params.range);
+    let mut scrobbles = navidrome.get_library().await?
+        .filter_range(range);
 
-    let artist_types_default = String::from("artist");
-    let artist_types = query.get("type").unwrap_or(&artist_types_default);
-    let artist_types: Vec<&str> = artist_types.split(",").collect();
-    let artist_types = ArtistRole::from(artist_types);
+    if let Some(days) = weekdays {
+        scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
+    }
 
-    let artist_stat = ArtistStat::group(scrobbles, &artist_types);
+    let artist_stat = ArtistStat::group(scrobbles, &artist_roles);
 
     let mut all_artists: Vec<ArtistStat> = artist_stat.into_values().collect();
 
     all_artists.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
-    let select = params.filter.select(&all_artists);
+    let select = response_filter.select(&all_artists);
 
     return Ok(Json(serde_json::to_value(select).unwrap()));
 }

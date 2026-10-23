@@ -41,7 +41,7 @@ pub async fn recent(
     scrobbles.sort_by(|a, b| { b.scrobble.submission_time.cmp(&a.scrobble.submission_time)});
 
     let mut result: Vec<ResponseSong> = Vec::new();
-    for scrobble in response_filter.select(&scrobbles) {
+    for scrobble in response_filter.select(scrobbles) {
         let artists: Vec<ResponseArtist> = scrobble.track.artists.iter()
             .filter(|a| a.role.contains(ArtistRole::ARTIST))
             .map(|a| ResponseArtist {id: a.artist.id.clone(), name: a.artist.name.clone()})

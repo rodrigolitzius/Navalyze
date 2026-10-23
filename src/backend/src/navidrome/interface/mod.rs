@@ -8,11 +8,12 @@ use axum::{body::Bytes, http::HeaderValue};
 use bitflags::bitflags;
 use reqwest::{Method, RequestBuilder, header};
 use uuid::Uuid;
+use isolang::Language;
 
 use crate::{
     handlers::LoginRequest, navidrome::{
         interface::{error::NavidromeSessionError, scrobble::{Scrobble, ScrobbleWithSong}},
-        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession},
+        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession, NativeLanguage},
         subsonic::{NavidromeSubsonicSession, SubsonicAlbum, SubsonicArtist, SubsonicPlaylist}
     },
     reqwest::ReqwestAPiErrorExt
@@ -45,6 +46,11 @@ pub struct Playlist {
     pub song_ids: Vec<String>
 }
 
+#[derive(PartialEq, Clone)]
+pub struct SongLanguage {
+    pub language: String
+}
+
 pub struct SongData {
     pub id: String,
     pub title: String,
@@ -53,7 +59,8 @@ pub struct SongData {
     pub album_id: String,
     pub album_artist: String,
     pub duration: f64,
-    pub artists: Vec<SongArtist>
+    pub artists: Vec<SongArtist>,
+    pub languages: Vec<SongLanguage>
 }
 
 pub struct SongArtist {
@@ -163,7 +170,6 @@ impl NavidromeInterface {
 
         let mut result = Vec::new();
 
-
         for scrobble in &self.scrobbles {
             result.push(ScrobbleWithSong {
                 scrobble: scrobble,
@@ -255,6 +261,14 @@ impl FromNative for SongArtist {
     }
 }
 
+impl FromNative for SongLanguage {
+    type Native = NativeLanguage;
+
+    fn from_native(native: Self::Native) -> Self {
+        return Self { language: native.language }
+    }
+}
+
 impl FromNative for Artist {
     type Native = NativeArtist;
 
@@ -316,7 +330,8 @@ impl FromNative for SongData {
             album_id: native.album_id,
             album_artist: native.album_artist,
             duration: native.duration,
-            artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect()
+            artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect(),
+            languages: native.languages.into_iter().map(|l| SongLanguage::from_native(l)).collect()
         };
     }
 }
@@ -332,5 +347,28 @@ impl From<Vec<&str>> for ArtistRole {
         }
 
         return result;
+    }
+}
+
+impl SongData {
+    pub fn languages_to_str(&self) -> Option<String> {
+        if self.languages.is_empty() {
+            return None;
+        }
+
+        let mut result = self.languages.iter().map(|l| {
+            if l.language == "zxx" {
+                "Instrumental".to_string()
+            } else {
+                match Language::from_639_3(&l.language) {
+                    Some(v) => v.to_string(),
+                    None => l.language.clone()
+                }
+            }
+        }).collect::<Vec<String>>();
+
+        result.sort();
+
+        return Some(result.join(", "));
     }
 }

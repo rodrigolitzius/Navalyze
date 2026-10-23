@@ -21,7 +21,7 @@ pub async fn most_played_tracks(
     let mut all_tracks: Vec<TrackStat> = tracks_stat.into_values().collect();
 
     all_tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
-    let select = response_filter.select(&all_tracks);
+    let select = response_filter.select(all_tracks);
 
     return Ok(Json(serde_json::to_value(select).unwrap()));
 }

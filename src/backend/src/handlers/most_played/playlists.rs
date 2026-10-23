@@ -23,7 +23,7 @@ pub async fn most_played_playlists(
     let mut response: Vec<PlaylistStat> = playlist_stats.into_iter().map(|p| p.1).collect();
 
     response.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
-    let select = response_filter.select(&response);
+    let select = response_filter.select(response);
 
     return Ok(Json(serde_json::to_value(select).unwrap()));
 }

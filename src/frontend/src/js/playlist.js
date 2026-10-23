@@ -37,7 +37,7 @@ for (const property of properties) {
 let playlist_activity = await api.get_playlist_graph(playlist_id, 50)
 playlist_activity = await playlist_activity.json()
 
-build_time_graph(document.getElementById("graph-playlist"), playlist_activity)
+build_time_graph(document.getElementById("graph-playlist"), {[playlist.name]: playlist_activity})
 
 let max = Math.max(...playlist.tracks.map(item => item.played_hours))
 

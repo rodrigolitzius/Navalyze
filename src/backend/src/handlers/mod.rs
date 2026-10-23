@@ -3,6 +3,7 @@ pub mod other;
 pub mod single;
 pub mod most_played;
 pub mod extract;
+pub mod distribution;
 
 use std::collections::HashMap;
 use tokio::sync::RwLock;

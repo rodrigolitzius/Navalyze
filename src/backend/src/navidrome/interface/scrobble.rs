@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 use chrono::{DateTime, Datelike, TimeZone, WeekdaySet};
 
 use crate::{
     handlers::extract::Range,
-    navidrome::interface::SongData
+    navidrome::interface::{SongData, SongLanguage}
 };
 
 #[derive(Clone, Deserialize)]
@@ -13,6 +15,7 @@ pub struct Scrobble {
     pub submission_time: u64
 }
 
+#[derive(Clone)]
 pub struct ScrobbleWithSong<'a> {
     pub scrobble: &'a Scrobble,
     pub track: &'a SongData
@@ -21,9 +24,14 @@ pub struct ScrobbleWithSong<'a> {
 pub trait ScrobbleWithSongFilter<'a> {
     fn filter_range(self, range: Range) -> Self;
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self;
+    fn filter_language(self, languages: &Vec<&SongLanguage>) -> Self;
     fn filter_album(self, album_ids: &Vec<&str>) -> Self;
     fn filter_artist(self, artist_ids: &Vec<&str>) -> Self;
     fn filter_track(self, track_ids: &Vec<&str>) -> Self;
+}
+
+pub trait ScrobbleWithSongExt<'a> {
+    fn get_all_languages(&self) -> HashMap<String, Vec<SongLanguage>>;
 }
 
 impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
@@ -34,6 +42,23 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self {
         self.into_iter().filter(|s| {
             weekdays.contains(s.scrobble.date_time(timezone.clone()).unwrap().weekday())
+        }).collect()
+    }
+
+    fn filter_language(self, languages: &Vec<&SongLanguage>) -> Self {
+        self.into_iter().filter(|scrobble| {
+            let scrobble_languages = &scrobble.track.languages;
+
+            let mut all = Vec::new();
+            for language in languages {
+                all.push(scrobble_languages.contains(language));
+            }
+
+            for scrobble_language in scrobble_languages {
+                all.push(languages.contains(&scrobble_language));
+            }
+
+            all.iter().all(|l| *l)
         }).collect()
     }
 
@@ -57,6 +82,26 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
 
     fn filter_track(self, track_ids: &Vec<&str>) -> Self {
         return self.into_iter().filter(|s| track_ids.contains(&&s.track.id.as_str())).collect();
+    }
+}
+
+impl<'a> ScrobbleWithSongExt<'a> for Vec<ScrobbleWithSong<'a>> {
+    fn get_all_languages(&self) -> HashMap<String, Vec<SongLanguage>> {
+        let mut result: HashMap<String, Vec<SongLanguage>> = HashMap::new();
+
+        for scrobble in self {
+            let languages_str = match scrobble.track.languages_to_str() {
+                Some(v) => v,
+                None => continue
+            };
+
+            match result.get_mut(&languages_str) {
+                Some(_) => {}
+                None => {result.insert(languages_str, scrobble.track.languages.clone());}
+            }
+        }
+
+        return result;
     }
 }
 

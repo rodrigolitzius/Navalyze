@@ -28,23 +28,30 @@ function format_hours(hours) {
 }
 
 function build_time_graph(ctx, api_data) {
-    let data = new Array
+    console.log(api_data)
+    let datasets = new Array
     let timezone = localStorage.getItem("timezone")
 
     Object.entries(api_data).forEach((k, _) => {
-        data.push({
-            x: Temporal.Instant.fromEpochMilliseconds(k[0] * 1000).toZonedDateTimeISO(timezone).toString().slice(0, 19),
-            y: k[1]
+        let data = new Array
+
+        Object.entries(k[1]).forEach((k2, _) => {
+            data.push({
+                x: Temporal.Instant.fromEpochMilliseconds(k2[0] * 1000).toZonedDateTimeISO(timezone).toString().slice(0, 19),
+                y: k2[1]
+            })
+        })
+
+        datasets.push({
+            label: k[0],
+            data: data
         })
     })
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            datasets: [{
-                label: 'Hours',
-                data: data,
-            }]
+            datasets: datasets
         },
         options: {
             maintainAspectRatio: false,
@@ -56,7 +63,7 @@ function build_time_graph(ctx, api_data) {
                     type: "time"
                 }
             }
-        }
+        },
     });
 }
 

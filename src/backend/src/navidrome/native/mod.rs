@@ -19,6 +19,10 @@ pub struct LoginResponse {
     pub token: String
 }
 
+pub struct NativeLanguage {
+    pub language: String
+}
+
 pub struct NativeAlbum {
     pub name: String,
     pub artists: Vec<NativeArtist>
@@ -43,5 +47,6 @@ pub struct NativeSongData {
     pub album_id: String,
     pub album_artist: String,
     pub duration: f64,
-    pub artists: Vec<NativeSongArtist>
+    pub artists: Vec<NativeSongArtist>,
+    pub languages: Vec<NativeLanguage>
 }

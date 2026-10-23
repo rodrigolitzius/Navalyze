@@ -56,7 +56,7 @@ for (const track of album.tracks) {
     track_list.querySelector(".track:last-of-type").style.setProperty("--ratio", track.played_hours/max)
 }
 
-let abum_activity = await api.get_album_graph(album_id, 50)
-abum_activity = await abum_activity.json()
+let album_activity = await api.get_album_graph(album_id, 50)
+album_activity = await album_activity.json()
 
-build_time_graph(document.getElementById("graph-album"), abum_activity)
+build_time_graph(document.getElementById("graph-album"), {[album.name]: album_activity})

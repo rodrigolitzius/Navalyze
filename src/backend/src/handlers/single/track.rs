@@ -18,7 +18,7 @@ pub async fn track_info(
     }
 
     let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.scrobble.submission_time).collect();
-    let timestamps = response_filter.select(&timestamps);
+    let timestamps = response_filter.select(timestamps);
 
     let songs_stats = TrackStat::group(scrobbles);
 

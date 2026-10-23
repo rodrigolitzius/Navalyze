@@ -52,4 +52,4 @@ for (const album of artist.albums) {
 let artist_activity = await api.get_artist_graph(artist_id, 50)
 artist_activity = await artist_activity.json()
 
-build_time_graph(document.getElementById("graph-artist"), artist_activity)
+build_time_graph(document.getElementById("graph-artist"), {[artist.name]: artist_activity})

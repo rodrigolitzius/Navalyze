@@ -13,6 +13,7 @@ pub mod artist;
 pub mod album;
 pub mod track;
 pub mod playlist;
+pub mod languages;
 
 use chrono::DateTime;
 use chrono_tz::Tz;

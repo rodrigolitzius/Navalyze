@@ -73,4 +73,4 @@ if (Array.isArray(track)) {
 let track_activity = await api.get_track_graph(track_id, 50)
 track_activity = await track_activity.json()
 
-build_time_graph(document.getElementById("graph-track"), track_activity)
+build_time_graph(document.getElementById("graph-track"), {[track.name]: track_activity})

@@ -465,8 +465,8 @@ impl Range {
 }
 
 impl ResponseFilter {
-    pub fn select<'a, T>(&self, response: &'a Vec<T>) -> Vec<&'a T>{
-        return response.iter().skip(self.offset).take(self.limit).collect();
+    pub fn select<'a, T>(&self, response: Vec<T>) -> Vec<T>{
+        return response.into_iter().skip(self.offset).take(self.limit).collect();
     }
 }
 

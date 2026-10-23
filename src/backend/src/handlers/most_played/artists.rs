@@ -22,7 +22,7 @@ pub async fn most_played_artists(
     let mut all_artists: Vec<ArtistStat> = artist_stat.into_values().collect();
 
     all_artists.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
-    let select = response_filter.select(&all_artists);
+    let select = response_filter.select(all_artists);
 
     return Ok(Json(serde_json::to_value(select).unwrap()));
 }

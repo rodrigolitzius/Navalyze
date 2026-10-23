@@ -25,6 +25,7 @@ pub trait ScrobbleWithSongFilter<'a> {
     fn filter_range(self, range: Range) -> Self;
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self;
     fn filter_language(self, languages: &Vec<&SongLanguage>) -> Self;
+    fn filter_release_types(self, types: &Vec<&str>) -> Self;
     fn filter_genre(self, genres: &Vec<&str>) -> Self;
     fn filter_album(self, album_ids: &Vec<&str>) -> Self;
     fn filter_artist(self, artist_ids: &Vec<&str>) -> Self;
@@ -63,6 +64,16 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect()
     }
 
+    fn filter_release_types(self, types: &Vec<&str>) -> Self {
+        return self.into_iter().filter(|s| {
+            let contains: Vec<bool> = s.track.release_types.iter().map(|r| {
+                types.contains(&r.release_type.as_str())
+            }).collect();
+
+            contains.iter().any(|b| *b)
+        }).collect();
+    }
+
     fn filter_genre(self, genres: &Vec<&str>) -> Self {
         return self.into_iter().filter(|s| {
             let contains: Vec<bool> = s.track.genres.iter().map(|g| {
@@ -70,7 +81,6 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
             }).collect();
 
             contains.iter().any(|b| *b)
-
         }).collect();
     }
 

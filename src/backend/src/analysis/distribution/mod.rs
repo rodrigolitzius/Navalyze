@@ -4,3 +4,4 @@
 // If they did have an ID, they should go to the root of the analysis module and the api/most-played/ (Navalyze API) route
 
 pub mod languages;
+pub mod release_types;

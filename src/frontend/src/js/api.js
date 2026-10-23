@@ -67,6 +67,12 @@ class Api {
         return fetch(request)
     }
 
+    async get_release_types_graph(resolution, limit) {
+        var request = this.new_request(`time/release-types`, {res: resolution, limit: limit})
+
+        return fetch(request)
+    }
+
     async get_track_graph(id, resolution) {
         var request = this.new_request(`time/track/${id}`, {res: resolution})
 
@@ -156,6 +162,12 @@ class Api {
 
     get_languages(limit) {
         var request = this.new_request(`dist/languages`, {limit: limit})
+
+        return fetch(request)
+    }
+
+    get_release_types(limit) {
+        var request = this.new_request(`dist/release-types`, {limit: limit})
 
         return fetch(request)
     }

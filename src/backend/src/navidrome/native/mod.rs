@@ -44,6 +44,9 @@ pub struct NativeGenre {
     pub name: String,
 }
 
+pub struct NativeReleaseType {
+    pub name: String
+}
 
 pub struct NativeSongData {
     pub id: String,
@@ -55,5 +58,6 @@ pub struct NativeSongData {
     pub duration: f64,
     pub artists: Vec<NativeSongArtist>,
     pub languages: Vec<NativeLanguage>,
-    pub genres: Vec<NativeGenre>
+    pub genres: Vec<NativeGenre>,
+    pub release_types: Vec<NativeReleaseType>
 }

@@ -63,5 +63,25 @@ async function genres_graphs(graph_div) {
     build_time_graph(line, line_api_data)
 }
 
+async function release_types_graphs(graph_div) {
+    let doughnut = graph_div
+        .querySelector(".doughnut")
+        .querySelector("canvas")
+    let doughnut_api_data = await api.get_release_types(5)
+    doughnut_api_data = await doughnut_api_data.json()
+
+    build_doughnut_graph(doughnut, doughnut_api_data)
+
+    let line = graph_div
+        .querySelector(".line")
+        .querySelector("canvas")
+
+    let line_api_data = await api.get_release_types_graph(50, 5)
+    line_api_data = await line_api_data.json()
+
+    build_time_graph(line, line_api_data)
+}
+
 languages_graphs(document.getElementById("languages").querySelector(".graph-div"))
 genres_graphs(document.getElementById("genres").querySelector(".graph-div"))
+release_types_graphs(document.getElementById("release-types").querySelector(".graph-div"))

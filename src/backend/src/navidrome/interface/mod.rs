@@ -13,7 +13,7 @@ use isolang::Language;
 use crate::{
     handlers::LoginRequest, navidrome::{
         interface::{error::NavidromeSessionError, scrobble::{Scrobble, ScrobbleWithSong}},
-        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession, NativeLanguage, NativeGenre},
+        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession, NativeLanguage, NativeGenre, NativeReleaseType},
         subsonic::{NavidromeSubsonicSession, SubsonicAlbum, SubsonicArtist, SubsonicPlaylist}
     },
     reqwest::ReqwestAPiErrorExt
@@ -46,11 +46,6 @@ pub struct Playlist {
     pub song_ids: Vec<String>
 }
 
-#[derive(PartialEq, Clone)]
-pub struct SongLanguage {
-    pub language: String
-}
-
 pub struct SongData {
     pub id: String,
     pub title: String,
@@ -61,6 +56,7 @@ pub struct SongData {
     pub duration: f64,
     pub artists: Vec<SongArtist>,
     pub genres: Vec<SongGenre>,
+    pub release_types: Vec<SongReleaseType>,
     pub languages: Vec<SongLanguage>
 }
 
@@ -73,6 +69,16 @@ pub struct SongArtist {
 pub struct SongGenre {
     pub name: String,
     pub id: String
+}
+
+#[derive(PartialEq, Clone)]
+pub struct SongLanguage {
+    pub language: String
+}
+
+#[derive(PartialEq, Clone)]
+pub struct SongReleaseType {
+    pub release_type: String
 }
 
 pub struct Image {
@@ -284,6 +290,14 @@ impl FromNative for SongGenre {
     }
 }
 
+impl FromNative for SongReleaseType {
+    type Native = NativeReleaseType;
+
+    fn from_native(native: Self::Native) -> Self {
+        return Self {release_type: native.name}
+    }
+}
+
 impl FromNative for Artist {
     type Native = NativeArtist;
 
@@ -347,7 +361,8 @@ impl FromNative for SongData {
             duration: native.duration,
             artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect(),
             genres: native.genres.into_iter().map(|g| SongGenre::from_native(g)).collect(),
-            languages: native.languages.into_iter().map(|l| SongLanguage::from_native(l)).collect()
+            languages: native.languages.into_iter().map(|l| SongLanguage::from_native(l)).collect(),
+            release_types: native.release_types.into_iter().map(|r| SongReleaseType::from_native(r)).collect()
         };
     }
 }

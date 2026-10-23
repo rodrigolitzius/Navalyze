@@ -15,6 +15,7 @@ pub mod track;
 pub mod playlist;
 pub mod languages;
 pub mod genres;
+pub mod release_types;
 
 use chrono::DateTime;
 use chrono_tz::Tz;

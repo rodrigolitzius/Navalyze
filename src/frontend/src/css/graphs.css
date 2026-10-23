@@ -3,9 +3,8 @@ canvas {
 }
 
 .doughnut {
-    width: 24%;
+    width: 25%;
     aspect-ratio: 1/1;
-    margin-right: 1%;
 }
 
 .line {
@@ -15,7 +14,9 @@ canvas {
 .graph-div {
     margin-top: 10px;
     display: flex;
-    height: 400px;
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1607/456
 }
 
 @media (max-width: 600px) {

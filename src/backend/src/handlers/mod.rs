@@ -13,10 +13,9 @@ use uuid::Uuid;
 
 use axum::{
     extract::{Query, Json, State, Path},
-    http::{StatusCode, HeaderMap, Method},
+    http::{StatusCode, HeaderMap},
     body::Bytes
 };
-use reqwest::header;
 
 use crate::{
     api::{ApiState, LoginSession, error::*},

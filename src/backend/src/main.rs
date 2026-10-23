@@ -15,7 +15,7 @@ use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, relay::*, stats::*, auth_check::*, art::*, server_settings::*},
+        other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
@@ -35,7 +35,6 @@ async fn start_backend(state: ApiState, binding_address: String) {
 
     let app = Router::new()
         // Other
-        .route("/api/relay/{*tail}", get(relay))
         .route("/api/art/{*id}", get(art))
         .route("/api/recent", get(recent))
         .route("/api/stats", get(stats))

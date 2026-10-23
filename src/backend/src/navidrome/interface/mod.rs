@@ -13,7 +13,7 @@ use isolang::Language;
 use crate::{
     handlers::LoginRequest, navidrome::{
         interface::{error::NavidromeSessionError, scrobble::{Scrobble, ScrobbleWithSong}},
-        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession, NativeLanguage},
+        native::{NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NavidromeNativeSession, NativeLanguage, NativeGenre},
         subsonic::{NavidromeSubsonicSession, SubsonicAlbum, SubsonicArtist, SubsonicPlaylist}
     },
     reqwest::ReqwestAPiErrorExt
@@ -60,12 +60,19 @@ pub struct SongData {
     pub album_artist: String,
     pub duration: f64,
     pub artists: Vec<SongArtist>,
+    pub genres: Vec<SongGenre>,
     pub languages: Vec<SongLanguage>
 }
 
 pub struct SongArtist {
     pub artist: Artist,
     pub role: ArtistRole
+}
+
+#[derive(PartialEq)]
+pub struct SongGenre {
+    pub name: String,
+    pub id: String
 }
 
 pub struct Image {
@@ -269,6 +276,14 @@ impl FromNative for SongLanguage {
     }
 }
 
+impl FromNative for SongGenre {
+    type Native = NativeGenre;
+
+    fn from_native(native: Self::Native) -> Self {
+        return Self { name: native.name, id: native.id }
+    }
+}
+
 impl FromNative for Artist {
     type Native = NativeArtist;
 
@@ -331,6 +346,7 @@ impl FromNative for SongData {
             album_artist: native.album_artist,
             duration: native.duration,
             artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect(),
+            genres: native.genres.into_iter().map(|g| SongGenre::from_native(g)).collect(),
             languages: native.languages.into_iter().map(|l| SongLanguage::from_native(l)).collect()
         };
     }

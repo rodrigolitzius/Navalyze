@@ -17,7 +17,7 @@ pub async fn most_played_artists(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let artist_stat = ArtistStat::group(scrobbles, &artist_roles);
+    let artist_stat = ArtistStat::group(&scrobbles, &artist_roles);
 
     let mut all_artists: Vec<ArtistStat> = artist_stat.into_values().collect();
 

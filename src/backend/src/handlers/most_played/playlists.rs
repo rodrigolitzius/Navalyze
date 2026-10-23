@@ -18,7 +18,7 @@ pub async fn most_played_playlists(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let playlist_stats = PlaylistStat::group(scrobbles, &playlists);
+    let playlist_stats = PlaylistStat::group(&scrobbles, &playlists);
 
     let mut response: Vec<PlaylistStat> = playlist_stats.into_iter().map(|p| p.1).collect();
 

@@ -16,7 +16,7 @@ pub struct PlaylistStat {
 
 impl PlaylistStat {
     pub fn group(
-        scrobbles_with_songs: Vec<ScrobbleWithSong>,
+        scrobbles_with_songs: &Vec<ScrobbleWithSong>,
         playlists: &Vec<Playlist>
     ) -> HashMap<String, PlaylistStat> {
         let mut playlist_stat: HashMap<String, PlaylistStat> = HashMap::new();

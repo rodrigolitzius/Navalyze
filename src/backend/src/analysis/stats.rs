@@ -17,7 +17,7 @@ pub struct Stats {
 
 impl Stats {
     pub fn group(
-        scrobbles_with_songs: Vec<ScrobbleWithSong>
+        scrobbles_with_songs: &Vec<ScrobbleWithSong>
     ) -> Stats {
         let mut result = Stats {
             plays: 0,

@@ -25,7 +25,7 @@ pub async fn playlist_info(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let songs_stats = TrackStat::group(scrobbles);
+    let songs_stats = TrackStat::group(&scrobbles);
 
     let mut tracks: Vec<TrackStat> = songs_stats.into_values().collect();
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});

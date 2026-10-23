@@ -25,7 +25,7 @@ pub struct TrackStat {
 
 impl TrackStat {
     pub fn group(
-        scrobbles_with_songs: Vec<ScrobbleWithSong>
+        scrobbles_with_songs: &Vec<ScrobbleWithSong>
     ) -> HashMap<String, TrackStat> {
         let mut track_stat: HashMap<String, TrackStat> = HashMap::new();
 

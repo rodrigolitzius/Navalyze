@@ -20,7 +20,7 @@ pub async fn track_info(
     let timestamps: Vec<u64> = scrobbles.iter().map(|s| s.scrobble.submission_time).collect();
     let timestamps = response_filter.select(timestamps);
 
-    let songs_stats = TrackStat::group(scrobbles);
+    let songs_stats = TrackStat::group(&scrobbles);
 
     let mut tracks: Vec<TrackStat> = songs_stats.into_values().collect();
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});

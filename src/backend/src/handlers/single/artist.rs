@@ -44,7 +44,7 @@ pub async fn artist_info(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let albums_stat = AlbumStat::group(scrobbles);
+    let albums_stat = AlbumStat::group(&scrobbles);
 
     let (artist_type, gender) = match mbz_artist {
         Some(v) => (v.artist_type, v.gender),

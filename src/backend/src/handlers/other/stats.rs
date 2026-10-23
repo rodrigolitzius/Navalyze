@@ -19,7 +19,7 @@ pub async fn stats(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let stats = Stats::group(scrobbles);
+    let stats = Stats::group(&scrobbles);
 
     return Ok(Json(serde_json::to_value(stats).unwrap()))
 }

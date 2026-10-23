@@ -16,9 +16,9 @@ use crate::{
     api::{ApiState, Settings},
     handlers::{
         other::{login::*, recent::*, relay::*, stats::*, auth_check::*, art::*},
-        most_played::{artists::*, albums::*, tracks::*, playlists::*},
+        most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
-        time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*},
+        time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*},
         distribution::{languages::*}
     }
 };
@@ -47,6 +47,7 @@ async fn start_backend(state: ApiState, binding_address: String) {
         .route("/api/most-played/albums", get(most_played_albums))
         .route("/api/most-played/tracks", get(most_played_tracks))
         .route("/api/most-played/playlists", get(most_played_playlists))
+        .route("/api/most-played/genres", get(most_played_genres))
 
         // single
         .route("/api/playlist/{*id}", get(playlist_info))
@@ -61,6 +62,7 @@ async fn start_backend(state: ApiState, binding_address: String) {
         .route("/api/time/track/{*id}", get(track_time))
         .route("/api/time/playlist/{*id}", get(playlist_time))
         .route("/api/time/languages", get(languages_time))
+        .route("/api/time/genres", get(genres_time))
 
         // distribution
         .route("/api/dist/languages", get(languages))

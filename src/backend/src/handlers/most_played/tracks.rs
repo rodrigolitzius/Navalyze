@@ -16,7 +16,7 @@ pub async fn most_played_tracks(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let tracks_stat = TrackStat::group(scrobbles);
+    let tracks_stat = TrackStat::group(&scrobbles);
 
     let mut all_tracks: Vec<TrackStat> = tracks_stat.into_values().collect();
 

@@ -16,7 +16,7 @@ pub async fn most_played_albums(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let album_stat = AlbumStat::group(scrobbles);
+    let album_stat = AlbumStat::group(&scrobbles);
 
     let mut all_albums: Vec<AlbumStat> = album_stat.into_values().collect();
 

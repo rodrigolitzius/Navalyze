@@ -11,7 +11,7 @@ use crate::{
         interface::{
             ArtistRole, error::NavidromeSessionError, scrobble::Scrobble
         },
-        native::{LoginResponse, NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NativeLanguage, NavidromeNativeSession},
+        native::{LoginResponse, NativeAlbum, NativeArtist, NativeSongArtist, NativeSongData, NativeLanguage, NativeGenre, NavidromeNativeSession},
     }, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
 };
 
@@ -28,12 +28,19 @@ struct DeserializeSongData {
     album_artist_id: String,
     duration: f64,
     participants: DeserializeParticipants,
+    genres: Option<Vec<DeserializeGenre>>,
     tags: Option<DeserializeTags>
 }
 
 #[derive(Serialize, Deserialize)]
 struct DeserializeTags {
     language: Option<Vec<String>>
+}
+
+#[derive(Serialize, Deserialize)]
+struct DeserializeGenre {
+    name: String,
+    id: String
 }
 
 #[derive(Serialize, Deserialize)]
@@ -189,6 +196,14 @@ impl NavidromeNativeSession {
                 }
             }
 
+            let mut genres: Vec<NativeGenre> = Vec::new();
+
+            if let Some(song_genres) = song_data.genres {
+                for genre in song_genres {
+                    genres.push(NativeGenre {id: genre.id, name: genre.name});
+                }
+            }
+
             let song_data = NativeSongData {
                 id: song_data.id,
                 title: song_data.title,
@@ -198,7 +213,8 @@ impl NavidromeNativeSession {
                 album_artist: song_data.album_artist,
                 duration: song_data.duration,
                 artists: artists.into_values().collect(),
-                languages: languages
+                languages: languages,
+                genres: genres
             };
 
             result.insert(song_data.id.clone(), song_data);

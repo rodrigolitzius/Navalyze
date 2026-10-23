@@ -61,6 +61,12 @@ class Api {
         return fetch(request)
     }
 
+    async get_genres_graph(resolution, limit) {
+        var request = this.new_request(`time/genres`, {res: resolution, limit: limit})
+
+        return fetch(request)
+    }
+
     async get_track_graph(id, resolution) {
         var request = this.new_request(`time/track/${id}`, {res: resolution})
 
@@ -102,6 +108,12 @@ class Api {
 
     get_most_played_playlists(limit, offset) {
         var request = this.new_request(`most-played/playlists`, {limit: limit, offset: offset ?? 0})
+
+        return fetch(request)
+    }
+
+    get_most_played_genres(limit, offset) {
+        var request = this.new_request(`most-played/genres`, {limit: limit, offset: offset ?? 0})
 
         return fetch(request)
     }

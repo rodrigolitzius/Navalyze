@@ -4,5 +4,10 @@ bind = "[::]:8080"
 # Whether to allow connections to Navidrome instances without a valid SSL certificate
 allow_invalid_certs = false
 
+# By default, the user can specify a custom URL to connect to any Navidrome instance.
+# Setting this value only allows Navalyze to connect to a single Navidrome instance.
+# Unless you're hosting Navalyze for multiple people with different Navidrome instances, you should set this
+navidrome_url = "http://localhost:4533"
+
 # Your ListenBrainz token. Used to fetch additional info about your library
 # lbz_token = ""

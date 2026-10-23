@@ -181,6 +181,14 @@ class Api {
 
         return fetch(request)
     }
+
+    get_server_settings() {
+        var request = new Request("/api/server-settings", {
+            method: "GET",
+        })
+
+        return fetch(request)
+    }
 }
 
 async function get_image_url(api, id, size) {

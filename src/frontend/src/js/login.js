@@ -2,6 +2,16 @@ import {Api} from "./api.js"
 
 const api = new Api()
 
+let server_settings = await api.get_server_settings()
+server_settings = await server_settings.json()
+
+let navidrome_url_field = document.getElementById("login-form").querySelector(".navidrome-url-field")
+
+navidrome_url_field.hidden = server_settings.static_navidrome_url
+navidrome_url_field.querySelector("input").required = !server_settings.static_navidrome_url
+
+document.querySelector(".login-card").hidden = false
+
 function get_form() {
     const form = document.querySelector("#login-form")
     const btn = document.querySelector("#login-btn")
@@ -26,7 +36,7 @@ form.addEventListener("submit", async function (event) {
     const password = document.querySelector("#password").value
     const timezone = document.querySelector("#timezone").value
 
-    if (!url || !username || !password || !timezone) {
+    if (!(url || server_settings.static_navidrome_url) || !username || !password || !timezone) {
         alert("Preencha todos os campos")
         return
     }
@@ -47,7 +57,6 @@ form.addEventListener("submit", async function (event) {
 
         if (data.id) {
             localStorage.setItem("token", data.id)
-            localStorage.setItem("navidrome-url", url)
             localStorage.setItem("timezone", timezone)
             window.location.replace("index.html")
         } else {

@@ -15,7 +15,7 @@ use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, relay::*, stats::*, auth_check::*, art::*},
+        other::{login::*, recent::*, relay::*, stats::*, auth_check::*, art::*, server_settings::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
@@ -41,6 +41,7 @@ async fn start_backend(state: ApiState, binding_address: String) {
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
         .route("/api/auth-check", get(auth_check))
+        .route("/api/server-settings", get(server_settings))
 
         // most-played
         .route("/api/most-played/artists", get(most_played_artists))

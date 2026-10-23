@@ -9,7 +9,7 @@
     <script type="module" src="js/login.js" defer></script>
 </head>
 <body>
-    <div class="login-card">
+    <div class="login-card" hidden>
         <div class="login-brand">
             <span class="login-brand-name">Navalyze</span>
         </div>
@@ -17,7 +17,7 @@
         <p class="login-subtitle">Welcome back! Please log in to your Navidrome instance</p>
 
         <form id="login-form">
-            <div class="form-group">
+            <div class="form-group navidrome-url-field" hidden>
                 <label for="navidrome-url">Navidrome URL</label>
                 <input type="url" id="navidrome-url" placeholder="enter your URL" required>
             </div>

@@ -9,7 +9,11 @@ pub async fn login(
     State(state): State<ApiState>,
     Json(login_request): Json<RawLoginRequest>
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    let login_request: LoginRequest = login_request.into();
+    let mut login_request: LoginRequest = login_request.into();
+
+    if let Some(static_navidrome_url) = &state.settings.navidrome_url {
+        login_request.url = static_navidrome_url.clone();
+    }
 
     let navidrome_interface = NavidromeInterface::new(login_request.clone(), state.settings.allow_invalid_certs).await?;
 

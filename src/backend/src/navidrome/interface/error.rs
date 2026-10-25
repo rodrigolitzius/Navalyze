@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use reqwest::StatusCode;
 use crate::{reqwest::ReqwestApiError, api::error::ApiError};
 
@@ -33,11 +35,13 @@ impl From<NavidromeSessionError> for ApiError {
     fn from(value: NavidromeSessionError) -> Self {
         return match value {
             NavidromeSessionError::Reqwest(e) => ApiError::Internal(
-                format!("Reqwest failed: {}", e.to_string())
+                format!("Reqwest failed: {}", get_reqwest_error_msg(e))
             ),
+
             NavidromeSessionError::Unreachable(e) => ApiError::NavidromeUnreachable(
-                format!("Navidrome could not be reached: {}", e.to_string())
+                format!("Navidrome could not be reached: {}", get_reqwest_error_msg(e))
             ),
+
             NavidromeSessionError::Unauthorized => ApiError::Unauthorized(
                 "Invalid credentials".into()
             ),
@@ -59,4 +63,16 @@ impl From<NavidromeSessionError> for ApiError {
             )
         }
     }
+}
+
+fn get_reqwest_error_msg(error: reqwest::Error) -> String {
+    let mut full_error = String::from(error.to_string());
+
+    let mut error = error.source();
+    while let Some(source) = error {
+        full_error.push_str(format!(" => {}", source.to_string()).as_str());
+        error = source.source();
+    }
+
+    return full_error;
 }

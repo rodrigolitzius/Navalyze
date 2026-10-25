@@ -25,13 +25,13 @@ use crate::{
 
 const APP_NAME: &'static str = "Navalyze";
 
-async fn start_backend(state: ApiState, binding_address: String) {
+async fn start_backend(state: ApiState, binding_address: String, dist_dir: String) {
     let cors = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let frontend = ServeDir::new("./dist");
+    let frontend = ServeDir::new(dist_dir);
 
     let app = Router::new()
         // Other
@@ -97,5 +97,5 @@ async fn main() {
 
     let state = ApiState::new(mbz_session, settings.clone()).expect("Failed to initialize API state");
 
-    start_backend(state, settings.bind.clone()).await;
+    start_backend(state, settings.bind, settings.dist_dir).await;
 }

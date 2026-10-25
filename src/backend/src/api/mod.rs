@@ -5,7 +5,7 @@ use std::{collections::HashMap, str::FromStr, sync::Arc};
 use tokio::sync::RwLock;
 use serde::Deserialize;
 use uuid::Uuid;
-use clap::*;
+use clap::{parser::ValueSource, *};
 use toml;
 
 use crate::{
@@ -42,7 +42,8 @@ pub struct Settings {
     pub allow_invalid_certs: bool,
     pub bind: String,
     pub lbz_token: Option<Uuid>,
-    pub navidrome_url: Option<String>
+    pub navidrome_url: Option<String>,
+    pub dist_dir: String
 }
 
 #[derive(Clone)]
@@ -86,13 +87,21 @@ impl Settings {
             .arg(Arg::new("bind").short('b').help("Address the server will listen on."))
             .arg(Arg::new("navidrome-url").short('n').help("The address for the Navidrome instance"))
             .arg(Arg::new("allow-invalid-certs").short('c').help("Whether to allow connections to Navidrome instances without a valid SSL certificate.").action(ArgAction::SetTrue))
+            .arg(Arg::new("dist-dir").short('d').help("The directory with the website files"))
             .get_matches();
 
         if let Some(v) = matches.get_one::<String>("bind") { self.bind = v.clone(); }
-        if let Some(v) = matches.get_one::<bool>("allow-invalid-certs") { self.allow_invalid_certs = v.clone(); }
         if let Some(v) = matches.get_one::<String>("navidrome-url") { self.navidrome_url = Some(v.clone()) }
+        if let Some(v) = matches.get_one::<String>("dist-dir") { self.dist_dir = v.clone(); }
+
         if let Some(v) = matches.get_one::<String>("lbz-token") {
             self.lbz_token = Some(Uuid::from_str(v.as_str())?);
+        }
+
+        if let Some(ValueSource::CommandLine) = matches.value_source("allow-invalid-certs") {
+            if let Some(v) = matches.get_one::<bool>("allow-invalid-certs") {
+                self.allow_invalid_certs = v.clone();
+            }
         }
 
         return Ok(self);

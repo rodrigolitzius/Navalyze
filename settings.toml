@@ -7,7 +7,11 @@ allow_invalid_certs = false
 # By default, the user can specify a custom URL to connect to any Navidrome instance.
 # Setting this value only allows Navalyze to connect to a single Navidrome instance.
 # Unless you're hosting Navalyze for multiple people with different Navidrome instances, you should set this
-navidrome_url = "http://localhost:4533"
+# navidrome_url = "http://localhost:4533"
 
 # Your ListenBrainz token. Used to fetch additional info about your library
+# Note this is experimental and can make Navalyze unstable
 # lbz_token = ""
+
+# This determines the folder containing the files for Navalyze's website. This setting is ignored while running docker
+dist_dir = "./dist"

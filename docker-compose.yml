@@ -1,11 +1,9 @@
 services:
   navalyze:
-    build: .
+    image: rodrigolitzius/navalyze:dev
     ports:
       - "8080:8080"
     volumes:
-      - navalyze-data:/data
+      - ./data:/data
     restart: unless-stopped
-
-volumes:
-  navalyze-data:
+    # network_mode: host # Uncomment this for easily accessing any Navidrome instance

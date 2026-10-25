@@ -53,9 +53,13 @@ No binary releases are currently available, so you'll have to build it yourself:
 ## Docker
 1. Run this to build the docker image yourself: `docker build -t rodrigolitzius/navalyze:dev .`
 
-1. Create a folder for Navalyze. Inside that create another one called `data` _before_ running the container. If you run the container before creating the directory, Docker will create one automatically with the wrong permissions, so you'll get permission errors while trying to move or edit files inside it.
+1. Create a folder for Navalyze. Inside it add the [`./docker-compose.yml`](./docker-compose.yml) 
+
+1. Still in the same folder, create another one called `data` _before_ running the container. If you run the container before creating the directory, Docker will create one automatically with the wrong permissions, so you'll get permission errors while trying to move or edit files inside it.
 
 1. Move the [default settings file](./settings.toml) to the `data` folder and edit what you need. Every setting has a comment above explaining it.
+
+1. Now run with `docker compose up`. If no errors show up, you're good to go. Access Navalyze by going to http://127.0.0.1:8080
 
 When running Navalyze inside a docker container, you have to make sure your Navidrome instance(s) are acessible from inside the container. There are a few ways to do that depending on your setup and preferences:
 

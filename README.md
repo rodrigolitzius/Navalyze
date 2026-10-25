@@ -42,53 +42,60 @@ Finally, a lot of services don't offer many informations about your history. Nav
 > [!NOTE]
 Only Navidrome versions 0.64.0 and above are supported.
 
-No binary releases are currently available, so you'll have to build it yourself:
-
-1. Clone the repo: `git clone https://github.com/rodrigolitzius/Navalyze`
-
-1. Go into the project folder: `cd Navalyze`
-
-1. Choose how to install Navalyze: [Docker](#docker) (Recommended) and [manual compilation](#compiling) (Useful for developers)
+You have two options to run Navalyze: [Docker](#docker) (Recommended) and [manual compilation](#compiling) (Useful for developers)
 
 ## Docker
-1. Run this to build the docker image yourself: `docker build -t rodrigolitzius/navalyze:dev .`
+1. Create a folder for Navalyze. Place and name it however you want
 
-1. Create a folder for Navalyze. Inside it add the [`./docker-compose.yml`](./docker-compose.yml) 
+1. Copy the [`docker-compose.yml`](./docker-compose.yml) file to it
 
 1. Still in the same folder, create another one called `data` _before_ running the container. If you run the container before creating the directory, Docker will create one automatically with the wrong permissions, so you'll get permission errors while trying to move or edit files inside it.
 
-1. Move the [default settings file](./settings.toml) to the `data` folder and edit what you need. Every setting has a comment above explaining it.
+1. Copy the [default settings file](./settings.toml) to the `data` folder and edit what you need. Every setting has a comment above explaining it.
 
-1. Now run with `docker compose up`. If no errors show up, you're good to go. Access Navalyze by going to http://127.0.0.1:8080
+1. Now run with `docker compose up`. If no errors show up, you can now access Navalyze by going to http://127.0.0.1:8080.
 
-When running Navalyze inside a docker container, you have to make sure your Navidrome instance(s) are acessible from inside the container. There are a few ways to do that depending on your setup and preferences:
+1. Read [this](#navidrome-reachability)
 
-### Navidrome running locally
-If you're running Navidrome on the same machine as Navalyze, Here's some options:
-Note that this is not an exhaustive list
+### Navidrome reachability
+After setting up your container, you'll want to make sure your Navidrome instance(s) are acessible from inside the container. There are a few ways to do that depending on your setup and preferences:
 
-1. The easiest way is to set your network mode inside the container to host. All you have to do is uncomment `network_mode: host` in `docker-compose.yml`. file Refer to [this](https://docs.docker.com/compose/how-tos/networking/#change-the-network-mode) for more details on this.
+#### Navidrome running locally
+If you're running Navidrome on the same machine as Navalyze, Here's a non-exhaustive list of what you can do to be able to access Navidrome from the container:
+
+1. The easiest way is to set your network mode inside the container to host. All you have to do is uncomment `network_mode: host` in the `docker-compose.yml`. file Refer to [this](https://docs.docker.com/compose/how-tos/networking/#change-the-network-mode) for more details on this.
 
 1. You can also add the Navalyze service to your Navidrome's docker-compose.yml file. Refer [here](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-docker-compose/)
 
 1. Lastly, you can create two networks that both Navalyze and Navidrome share: [compose networking](https://docs.docker.com/compose/how-tos/networking/)
 
-### Navidrome running externally
-If Navidrome is running outside of your machine, you don't have to set up anything, because every docker container can access the outside internet by default. However, if Navidrome is only reachable by IPv6, you will also have to set up [IPv6 networking](https://docs.docker.com/engine/daemon/ipv6/). You will get a "Network unreachable" error otherwise. 
+#### Navidrome running externally
+If Navidrome is running outside of your machine, you don't have to set up anything, because every docker container can access the outside internet by default. 
 
-If you don't know whether it is IPv6 only, it probably isn't.
+However, if Navidrome is only reachable by IPv6, you will also have to set up [IPv6 networking](https://docs.docker.com/engine/daemon/ipv6/). You will get a "Network unreachable" error otherwise. You don't have to configure IPv6 networking if using the `host` network mode.
+
+If you don't know whether your Navidrome instace is IPv6 only, it probably isn't.
+
+### Updating
+To update navalyze, simply go into your Navalyze folder and run `docker compose pull`
 
 ## Compiling
-1. Firstly, you'll need to install these:
+1. Install de dependencies:
     - frontend: [npm](https://www.npmjs.com/) (used to install Vite and the frontend dependencies)
     - backend: [Rust](https://rust-lang.org/) (nightly version, because of [Polonius](https://blog.rust-lang.org/2026/08/04/enabling-polonius-alpha-on-nightly/))
     - building: [Just](https://just.systems/) (A simple way to combine backend and frontend builds)
 
-1. After cloning and installing dependencies, run `just build` to build.
+1. Clone the repo: `git clone https://github.com/rodrigolitzius/Navalyze`
+
+1. Go into the project folder: `cd Navalyze`
+
+1. run `just build` to build.
 
 1. Move the [`settings.toml`](./settings.toml) to the `build` folder created by the previous step and edit it to your needs. If you prefer the command line, run `just run "--help"` to see the available options. Options set in the CLI override those in `settings.toml`.
 
 1. Finally, to run, do `just run ""`, or `just run "<options>"`
+
+If you want to build the docker image, simply do `docker build -t rodrigolitzius/navalyze:dev .` and change the image name inside `docker-compose.yml` accordingly
 
 # MusicBrainz integration
 > [!NOTE]

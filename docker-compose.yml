@@ -1,6 +1,6 @@
 services:
   navalyze:
-    image: rodrigolitzius/navalyze:dev
+    image: ghcr.io/rodrigolitzius/navalyze:dev
     ports:
       - "8080:8080"
     volumes:

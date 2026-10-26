@@ -9,6 +9,9 @@ allow_invalid_certs = false
 # Unless you're hosting Navalyze for multiple people with different Navidrome instances, you should set this
 # navidrome_url = "http://localhost:4533"
 
+# How long to wait before checking if new scrobbles are available (In seconds)
+scrobble_update_interval = 30
+
 # Your ListenBrainz token. Used to fetch additional info about your library
 # Note this is experimental and can make Navalyze unstable
 # lbz_token = ""

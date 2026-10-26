@@ -28,7 +28,7 @@ pub async fn artist_info(
     RangeWithDefault(range): RangeWithDefault,
     weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    let session = &mut session.write().await;
+    let session = &session.read().await;
 
     let artist = session.navidrome_interface.get_artist(&id).await?;
 

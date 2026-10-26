@@ -43,7 +43,8 @@ pub struct Settings {
     pub bind: String,
     pub lbz_token: Option<Uuid>,
     pub navidrome_url: Option<String>,
-    pub dist_dir: String
+    pub dist_dir: String,
+    pub scrobble_update_interval: u64,
 }
 
 #[derive(Clone)]
@@ -88,11 +89,13 @@ impl Settings {
             .arg(Arg::new("navidrome-url").short('n').help("The address for the Navidrome instance"))
             .arg(Arg::new("allow-invalid-certs").short('c').help("Whether to allow connections to Navidrome instances without a valid SSL certificate.").action(ArgAction::SetTrue))
             .arg(Arg::new("dist-dir").short('d').help("The directory with the website files"))
+            .arg(Arg::new("update-interval").short('i').help("The interval for checking new scrobbles periodically"))
             .get_matches();
 
         if let Some(v) = matches.get_one::<String>("bind") { self.bind = v.clone(); }
         if let Some(v) = matches.get_one::<String>("navidrome-url") { self.navidrome_url = Some(v.clone()) }
         if let Some(v) = matches.get_one::<String>("dist-dir") { self.dist_dir = v.clone(); }
+        if let Some(v) = matches.get_one::<u64>("update-interval") { self.scrobble_update_interval = *v; }
 
         if let Some(v) = matches.get_one::<String>("lbz-token") {
             self.lbz_token = Some(Uuid::from_str(v.as_str())?);

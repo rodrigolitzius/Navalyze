@@ -178,9 +178,7 @@ impl NavidromeInterface {
     }
 
     // ===== LIBRARY =====
-    pub async fn get_library<'a>(&'a mut self) -> Result<Vec<ScrobbleWithSong<'a>>, NavidromeSessionError> {
-        self.update_library().await?;
-
+    pub async fn get_library<'a>(&'a self) -> Result<Vec<ScrobbleWithSong<'a>>, NavidromeSessionError> {
         let mut result = Vec::new();
 
         for scrobble in &self.scrobbles {
@@ -193,17 +191,22 @@ impl NavidromeInterface {
         return Ok(result);
     }
 
-    async fn update_library(&mut self) -> Result<&Vec<Scrobble>, NavidromeSessionError> {
+    pub async fn get_new_scrobbles(&self) -> Result<Option<Vec<Scrobble>>, NavidromeSessionError> {
         let last_scrobble = self.scrobbles.iter().map(|s| s.submission_time).max().unwrap_or(0);
 
-        let mut new_scrobbles = self.native_session.scrobble(last_scrobble).await?;
+        let new_scrobbles = self.native_session.scrobble(last_scrobble).await?;
 
-        if new_scrobbles.len() > 0 {
-            self.update_hashmap(new_scrobbles.iter().map(|s| s.media_file_id.as_str()).collect()).await?;
-            self.scrobbles.append(&mut new_scrobbles);
-        }
+        return Ok(
+            if !new_scrobbles.is_empty() { Some(new_scrobbles) }
+            else { None }
+        )
+    }
 
-        return Ok(&self.scrobbles);
+    pub async fn apply_new_scrobbles(&mut self, scrobbles: Vec<Scrobble>) -> Result<(), NavidromeSessionError> {
+        self.update_hashmap(scrobbles.iter().map(|s| s.media_file_id.as_str()).collect()).await?;
+        self.scrobbles.extend(scrobbles);
+
+        return Ok(())
     }
 
     async fn update_hashmap(&mut self, ids: Vec<&str>) -> Result<(), NavidromeSessionError> {

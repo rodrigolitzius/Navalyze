@@ -8,7 +8,7 @@ pub async fn track_time(
     RangeWithDefault(range): RangeWithDefault,
     weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    let navidrome = &mut session.write().await.navidrome_interface;
+    let navidrome = &session.read().await.navidrome_interface;
 
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range)

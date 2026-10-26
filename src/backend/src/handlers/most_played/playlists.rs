@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use crate::handlers::most_played::prelude::*;
 use crate::analysis::playlists::PlaylistStat;
 
@@ -9,8 +11,6 @@ pub async fn most_played_playlists(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &session.read().await.navidrome_interface;
 
-    let playlists = navidrome.playlists().await?;
-
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range);
 
@@ -18,7 +18,7 @@ pub async fn most_played_playlists(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let playlist_stats = PlaylistStat::group(&scrobbles, &playlists);
+    let playlist_stats = PlaylistStat::group(&scrobbles, &navidrome.playlists);
 
     let mut response: Vec<PlaylistStat> = playlist_stats.into_iter().map(|p| p.1).collect();
 

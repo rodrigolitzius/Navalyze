@@ -2,7 +2,7 @@
 pub mod scrobble;
 pub mod error;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use axum::{body::Bytes, http::HeaderValue};
 use bitflags::bitflags;
@@ -43,7 +43,7 @@ pub struct Album {
 pub struct Playlist {
     pub name: String,
     pub id: String,
-    pub song_ids: Vec<String>
+    pub song_ids: HashSet<String>
 }
 
 pub struct SongData {
@@ -92,7 +92,8 @@ pub struct NavidromeInterface {
     native_session: NavidromeNativeSession,
     subsonic_session: NavidromeSubsonicSession,
     tracks_hashmap: TrackHashmap,
-    scrobbles: Vec<Scrobble>
+    scrobbles: Vec<Scrobble>,
+    pub playlists: Vec<Playlist>,
 }
 
 impl NavidromeInterface {
@@ -101,11 +102,20 @@ impl NavidromeInterface {
         let subsonic_session = NavidromeSubsonicSession::new(request.clone(), allow_invalid_certs).await?;
 
         let scrobbles = native_session.scrobble(0).await?;
+
+        let mut playlists: Vec<Playlist> = Vec::new();
+
+        for subsonic_playlist_id in subsonic_session.get_playlist_ids().await? {
+            let playlist = subsonic_session.get_playlist(&subsonic_playlist_id).await?;
+
+            playlists.push(Playlist::from_subsonic(playlist));
+        }
+
         let tracks_hashmap: HashMap<String, SongData> = native_session.song(Vec::new()).await?.into_iter().map(|s| {
             (s.0, SongData::from_native(s.1))
         }).collect();
 
-        return Ok(Self {native_session, subsonic_session, tracks_hashmap, scrobbles});
+        return Ok(Self {native_session, subsonic_session, tracks_hashmap, scrobbles, playlists});
     }
 
     // ===== API =====
@@ -132,24 +142,14 @@ impl NavidromeInterface {
         return Ok(Album::from_navidrome(native_album, subsonic_album));
     }
 
-    pub async fn get_playlist(&self, id: &String) -> Result<Playlist, NavidromeSessionError> {
-        let playlist = self.subsonic_session.get_playlist(id).await?;
-
-        return Ok(Playlist::from_subsonic(playlist));
-    }
-
-    pub async fn playlists(&self) -> Result<Vec<Playlist>, NavidromeSessionError> {
-        let subsonic_playlists = self.subsonic_session.get_playlist_ids().await?;
-
-        let mut result: Vec<Playlist> = Vec::new();
-
-        for subsonic_playlist_id in subsonic_playlists {
-            let playlist = self.get_playlist(&subsonic_playlist_id).await?;
-
-            result.push(playlist);
+    pub async fn get_playlist<'a>(&'a self, id: &String) -> Option<&'a Playlist> {
+        for playlist in &self.playlists {
+            if playlist.id == *id {
+                return Some(playlist);
+            }
         }
 
-        return Ok(result);
+        return None;
     }
 
     pub async fn get_art(&self, id: &str, size: Option<&String>) -> Result<Image, NavidromeSessionError> {

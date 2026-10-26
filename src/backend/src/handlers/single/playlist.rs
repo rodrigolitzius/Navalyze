@@ -15,7 +15,8 @@ pub async fn playlist_info(
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &session.read().await.navidrome_interface;
 
-    let playlist = navidrome.get_playlist(&id).await?;
+    let playlist = navidrome.get_playlist(&id).await.
+        ok_or(ApiError::BadRequest("Unknown playlist".into()))?;
 
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range)
@@ -31,7 +32,7 @@ pub async fn playlist_info(
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
 
     let response = Response {
-        name: playlist.name,
+        name: playlist.name.clone(),
         tracks: tracks
     };
 

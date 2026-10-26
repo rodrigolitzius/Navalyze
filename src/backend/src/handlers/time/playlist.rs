@@ -10,7 +10,7 @@ pub async fn playlist_time(
 )  -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &session.read().await.navidrome_interface;
 
-    let playlist = navidrome.get_playlist(&id).await?;
+    let playlist = navidrome.get_playlist(&id).await.ok_or(ApiError::BadRequest("Unknown playlist".into()))?;
 
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range)

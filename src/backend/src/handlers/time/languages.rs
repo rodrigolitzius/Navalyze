@@ -23,7 +23,7 @@ pub async fn languages_time(
 
     for (language_str, languages) in scrobbles.get_all_languages().into_iter() {
         let scrobbles_copy = scrobbles.clone()
-            .filter_language(&languages.iter().map(|s| s).collect());
+            .filter_language(&languages.into_iter().map(|s| s).collect());
 
         let data = to_datetime_duration_vec(scrobbles_copy, timezone);
 

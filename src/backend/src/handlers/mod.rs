@@ -5,7 +5,7 @@ pub mod most_played;
 pub mod extract;
 pub mod distribution;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use tokio::sync::RwLock;
 use serde::{Deserialize};
 use serde_json::json;

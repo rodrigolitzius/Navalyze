@@ -11,7 +11,7 @@ pub async fn track_info(
 
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range)
-        .filter_track(&Vec::from([id.as_str()]));
+        .filter_track(&HashSet::from([id.as_str()]));
 
     if let Some(days) = weekdays {
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)

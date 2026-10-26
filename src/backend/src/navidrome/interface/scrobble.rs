@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use serde::Deserialize;
 use chrono::{DateTime, Datelike, TimeZone, WeekdaySet};
@@ -24,12 +24,12 @@ pub struct ScrobbleWithSong<'a> {
 pub trait ScrobbleWithSongFilter<'a> {
     fn filter_range(self, range: Range) -> Self;
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self;
-    fn filter_language(self, languages: &Vec<&SongLanguage>) -> Self;
-    fn filter_release_types(self, types: &Vec<&str>) -> Self;
-    fn filter_genre(self, genres: &Vec<&str>) -> Self;
-    fn filter_album(self, album_ids: &Vec<&str>) -> Self;
-    fn filter_artist(self, artist_ids: &Vec<&str>) -> Self;
-    fn filter_track(self, track_ids: &Vec<&str>) -> Self;
+    fn filter_language(self, languages: &HashSet<SongLanguage>) -> Self;
+    fn filter_release_types(self, types: &HashSet<&str>) -> Self;
+    fn filter_genre(self, genres: &HashSet<&str>) -> Self;
+    fn filter_album(self, album_ids: &HashSet<&str>) -> Self;
+    fn filter_artist(self, artist_ids: &HashSet<&str>) -> Self;
+    fn filter_track(self, track_ids: &HashSet<&str>) -> Self;
 }
 
 pub trait ScrobbleWithSongExt<'a> {
@@ -47,7 +47,7 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect()
     }
 
-    fn filter_language(self, languages: &Vec<&SongLanguage>) -> Self {
+    fn filter_language(self, languages: &HashSet<SongLanguage>) -> Self {
         self.into_iter().filter(|scrobble| {
             let scrobble_languages = &scrobble.track.languages;
 
@@ -64,7 +64,7 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect()
     }
 
-    fn filter_release_types(self, types: &Vec<&str>) -> Self {
+    fn filter_release_types(self, types: &HashSet<&str>) -> Self {
         return self.into_iter().filter(|s| {
             let contains: Vec<bool> = s.track.release_types.iter().map(|r| {
                 types.contains(&r.release_type.as_str())
@@ -74,7 +74,7 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect();
     }
 
-    fn filter_genre(self, genres: &Vec<&str>) -> Self {
+    fn filter_genre(self, genres: &HashSet<&str>) -> Self {
         return self.into_iter().filter(|s| {
             let contains: Vec<bool> = s.track.genres.iter().map(|g| {
                 genres.contains(&g.id.as_str())
@@ -84,11 +84,11 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect();
     }
 
-    fn filter_album(self, album_ids: &Vec<&str>) -> Self {
-        return self.into_iter().filter(|s| album_ids.contains(&&s.track.album_id.as_str())).collect();
+    fn filter_album(self, album_ids: &HashSet<&str>) -> Self {
+        return self.into_iter().filter(|s| album_ids.contains(&s.track.album_id.as_str())).collect();
     }
 
-    fn filter_artist(self, artist_ids: &Vec<&str>) -> Self {
+    fn filter_artist(self, artist_ids: &HashSet<&str>) -> Self {
         return self.into_iter().filter(|s| {
             let track_artist_ids: Vec<&str> = s.track.artists.iter().map(|a| a.artist.id.as_str()).collect();
 
@@ -102,8 +102,8 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
         }).collect();
     }
 
-    fn filter_track(self, track_ids: &Vec<&str>) -> Self {
-        return self.into_iter().filter(|s| track_ids.contains(&&s.track.id.as_str())).collect();
+    fn filter_track(self, track_ids: &HashSet<&str>) -> Self {
+        return self.into_iter().filter(|s| track_ids.contains(&s.track.id.as_str())).collect();
     }
 }
 

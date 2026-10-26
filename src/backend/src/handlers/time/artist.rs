@@ -12,7 +12,7 @@ pub async fn artist_time(
 
     let mut scrobbles = navidrome.get_library().await?
         .filter_range(range)
-        .filter_artist(&Vec::from([id.as_str()]));
+        .filter_artist(&HashSet::from([id.as_str()]));
 
     if let Some(days) = weekdays {
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)

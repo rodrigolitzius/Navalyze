@@ -23,7 +23,7 @@ pub async fn genres_time(
 
     for (genre_id, genre_stat) in GenreStat::group(&scrobbles) {
         let scrobbles_copy = scrobbles.clone()
-            .filter_genre(&Vec::from([genre_id.as_str()]));
+            .filter_genre(&HashSet::from([genre_id.as_str()]));
 
         let data = to_datetime_duration_vec(scrobbles_copy, timezone);
 

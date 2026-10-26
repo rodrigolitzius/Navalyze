@@ -23,7 +23,7 @@ pub async fn release_types_time(
 
     for release_type in get_release_types(&scrobbles).into_keys() {
         let scrobbles_copy = scrobbles.clone()
-            .filter_release_types(&Vec::from(&[release_type.as_str()]));
+            .filter_release_types(&HashSet::from([release_type.as_str()]));
 
         let data = to_datetime_duration_vec(scrobbles_copy, timezone);
 

@@ -71,7 +71,7 @@ pub struct SongGenre {
     pub id: String
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(Eq, PartialEq, Clone, Hash)]
 pub struct SongLanguage {
     pub language: String
 }

@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use crate::handlers::most_played::prelude::*;
 use crate::analysis::playlists::PlaylistStat;
 

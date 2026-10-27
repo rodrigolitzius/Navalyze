@@ -9,25 +9,21 @@ pub fn group(
     data: &Vec<(DateTime<Tz>, f64)>,
     resolution: u64
 ) -> HashMap<u64, f64> {
-    let timestamps = data.iter().map(|f| f.0.timestamp()).collect::<Vec<i64>>();
+    let timestamps: Vec<i64> = data.iter().map(|f| f.0.timestamp()).collect();
 
     let min = timestamps.iter().min().unwrap_or(&0);
     let max = timestamps.iter().max().unwrap_or(&0);
 
-    let elapsed = (max - min) as f64;
+    let elapsed = max - min;
 
-    let bin_count = resolution;
-    let bin_size = (elapsed / (resolution as f64)) as u64;
+    let values: Vec<(u64, f64)> = data.iter().map(|d| {
+        let timestamp = (d.0.timestamp() - min) as u64;
+        (timestamp, d.1)
+    }).collect();
 
-    let mut values: Vec<(u64, f64)> = Vec::new();
-
-    for (datetime, duration) in data {
-        let datetime = datetime.timestamp() - min;
-
-        values.push((datetime as u64, *duration));
-    }
-
-    let bins = insert_bin(bin_count, bin_size, &values);
-
-    return bins.into_iter().map(|t| (t.0 + (*min as u64), t.1)).collect::<HashMap<u64, f64>>();
+    return insert_bin(resolution, elapsed as u64, &values)
+        .unwrap_or(values)
+        .into_iter()
+        .map(|t| (t.0 + (*min as u64), t.1))
+        .collect();
 }

@@ -9,15 +9,12 @@ pub fn group(
     data: &Vec<(DateTime<Tz>, f64)>,
     resolution: u64
 ) -> HashMap<u64, f64> {
-    let bin_size = (24*60*60) / resolution;
+    let values: Vec<(u64, f64)> = data.iter().map(|d| {
+        let time = d.0.num_seconds_from_midnight() as u64;
+        (time, d.1)
+    }).collect();
 
-    let mut values: Vec<(u64, f64)> = Vec::new();
-
-    for (datetime, duration) in data {
-        let datetime = datetime.num_seconds_from_midnight();
-
-        values.push((datetime as u64, *duration));
-    }
-
-    return insert_bin(resolution, bin_size, &values);
+    return insert_bin(resolution, 24*60*60, &values)
+        .unwrap_or(values)
+        .into_iter().collect();
 }

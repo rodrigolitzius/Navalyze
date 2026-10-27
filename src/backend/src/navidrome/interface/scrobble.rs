@@ -38,7 +38,7 @@ pub trait ScrobbleWithSongExt<'a> {
 
 impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
     fn filter_range(self, range: Range) -> Self {
-        return self.into_iter().filter(|s| range.contains(&s.scrobble.submission_time)).collect();
+        return self.into_iter().filter(|s| range.contains(s.scrobble.submission_time)).collect();
     }
 
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self {
@@ -76,11 +76,9 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
 
     fn filter_genre(self, genres: &HashSet<&str>) -> Self {
         return self.into_iter().filter(|s| {
-            let contains: Vec<bool> = s.track.genres.iter().map(|g| {
+            s.track.genres.iter().any(|g| {
                 genres.contains(&g.id.as_str())
-            }).collect();
-
-            contains.iter().any(|b| *b)
+            })
         }).collect();
     }
 

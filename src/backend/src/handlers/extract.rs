@@ -459,8 +459,8 @@ impl Default for ArtistRoles {fn default() -> Self {return Self(ArtistRole::ARTI
 // ========== Other ===========
 // ============================
 impl Range {
-    pub fn contains(&self, other: &u64) -> bool {
-        return (self.start <= *other) && (self.end >= *other);
+    pub fn contains(&self, other: u64) -> bool {
+        return (self.start <= other) && (self.end >= other);
     }
 }
 

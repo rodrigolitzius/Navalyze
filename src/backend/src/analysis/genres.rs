@@ -24,23 +24,15 @@ impl GenreStat {
             let duration_hour = scrobble.track.duration / (60.0*60.0);
 
             for genre in &scrobble.track.genres {
-                match genre_stat.get_mut(&genre.id) {
-                    Some(v) => {
-                        (*v).plays += 1;
-                        (*v).played_hours += duration_hour
-                    },
-                    None => {
-                        genre_stat.insert(
-                            genre.id.clone(),
-                            GenreStat {
-                                name: genre.name.clone(),
-                                id: genre.id.clone(),
-                                plays: 1,
-                                played_hours: duration_hour
-                            }
-                        );
-                    }
-                };
+                let entry = genre_stat.entry(genre.id.clone()).or_insert(GenreStat {
+                    name: genre.name.clone(),
+                    id: genre.id.clone(),
+                    plays: 0,
+                    played_hours: 0.0
+                });
+
+                entry.played_hours += duration_hour;
+                entry.plays += 1;
             }
         }
 

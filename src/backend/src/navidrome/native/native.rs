@@ -176,15 +176,11 @@ impl NavidromeNativeSession {
             let mut artists: HashMap<String, NativeSongArtist> = HashMap::new();
 
             for song_artist in all_artists {
-                match artists.get_mut(&song_artist.artist.id) {
-                    None => {
-                        artists.insert(song_artist.artist.id.clone(), NativeSongArtist {artist: song_artist.artist, role: song_artist.role});
-                    }
+                let entry = artists.entry(song_artist.artist.id.clone()).or_insert(NativeSongArtist {
+                    artist: song_artist.artist, role: song_artist.role.clone()
+                });
 
-                    Some(v) => {
-                        (*v).role |= song_artist.role
-                    }
-                }
+                (*entry).role |= song_artist.role
             }
 
             let mut languages: Vec<NativeLanguage> = Vec::new();

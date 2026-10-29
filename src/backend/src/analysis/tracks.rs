@@ -32,28 +32,20 @@ impl TrackStat {
         for scrobble in scrobbles_with_songs {
             let duration_hour = scrobble.track.duration / (60.0*60.0);
 
-            match track_stat.get_mut(&scrobble.track.id.clone()) {
-                Some(v) => {
-                    (*v).plays += 1;
-                    (*v).played_hours += duration_hour
-                },
-                None => {
-                    track_stat.insert(
-                        scrobble.track.id.clone(),
-                        TrackStat {
-                            name: scrobble.track.title.clone(),
-                            artists: scrobble.track.artists.iter().map(|a|
-                                TrackStatArtists {id: a.artist.id.clone(), name: a.artist.name.clone()}
-                            ).collect(),
-                            album: scrobble.track.album.clone(),
-                            album_id: scrobble.track.album_id.clone(),
-                            id: scrobble.track.id.clone(),
-                            plays: 1,
-                            played_hours: duration_hour
-                        }
-                    );
-                }
-            };
+            let entry = track_stat.entry(scrobble.track.id.clone()).or_insert(TrackStat {
+                name: scrobble.track.title.clone(),
+                artists: scrobble.track.artists.iter().map(|a|
+                    TrackStatArtists {id: a.artist.id.clone(), name: a.artist.name.clone()}
+                ).collect(),
+                album: scrobble.track.album.clone(),
+                album_id: scrobble.track.album_id.clone(),
+                id: scrobble.track.id.clone(),
+                plays: 0,
+                played_hours: 0.0
+            });
+
+            entry.played_hours += duration_hour;
+            entry.plays += 1;
         }
 
         return track_stat;

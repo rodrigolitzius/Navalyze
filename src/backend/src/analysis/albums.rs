@@ -24,24 +24,16 @@ impl AlbumStat {
         for scrobble in scrobbles_with_songs {
             let duration_hour = scrobble.track.duration / (60.0*60.0);
 
-            match album_stat.get_mut(&scrobble.track.album_id.clone()) {
-                Some(v) => {
-                    (*v).plays += 1;
-                    (*v).played_hours += duration_hour
-                },
-                None => {
-                    album_stat.insert(
-                        scrobble.track.album_id.clone(),
-                        AlbumStat {
-                            name: scrobble.track.album.clone(),
-                            artist: scrobble.track.album_artist.clone(),
-                            id: scrobble.track.album_id.clone(),
-                            plays: 1,
-                            played_hours: duration_hour
-                        }
-                    );
-                }
-            };
+            let entry = album_stat.entry(scrobble.track.album_id.clone()).or_insert(AlbumStat {
+                name: scrobble.track.album.clone(),
+                artist: scrobble.track.album_artist.clone(),
+                id: scrobble.track.album_id.clone(),
+                plays: 0,
+                played_hours: 0.0
+            });
+
+            entry.played_hours += duration_hour;
+            entry.plays += 1;
         }
 
         return album_stat;

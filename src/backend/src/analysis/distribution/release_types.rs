@@ -13,10 +13,7 @@ pub fn get_release_types(scrobbles_with_songs: &Vec<ScrobbleWithSong>) -> HashMa
         let release_types = &scrobble.track.release_types;
 
         for release_type in release_types {
-            match result.get_mut(&release_type.release_type) {
-                Some(v) => *v += duration,
-                None => {result.insert(release_type.release_type.clone(), duration);}
-            }
+            *result.entry(release_type.release_type.clone()).or_insert(0.0) += duration;
         }
     }
 

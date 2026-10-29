@@ -15,10 +15,7 @@ pub fn get_languages(scrobbles_with_songs: &Vec<ScrobbleWithSong>) -> HashMap<St
             None => continue
         };
 
-        match result.get_mut(&track_languages_str) {
-            Some(v) => *v += duration,
-            None => {result.insert(track_languages_str.clone(), duration);}
-        }
+        *result.entry(track_languages_str).or_insert(0.0) += duration;
     }
 
     return result;

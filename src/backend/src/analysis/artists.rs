@@ -27,23 +27,15 @@ impl ArtistStat {
             for song_artist in &scrobble.track.artists {
                 if !song_artist.role.intersects(artist_types.clone()) {continue;}
 
-                match artist_stat.get_mut(&song_artist.artist.id) {
-                    Some(v) => {
-                        (*v).plays += 1;
-                        (*v).played_hours += duration_hour
-                    },
-                    None => {
-                        artist_stat.insert(
-                            song_artist.artist.id.clone(),
-                            ArtistStat {
-                                id: song_artist.artist.id.clone(),
-                                name: song_artist.artist.name.clone(),
-                                plays: 1,
-                                played_hours: duration_hour
-                            }
-                        );
-                    }
-                };
+                let entry = artist_stat.entry(song_artist.artist.id.clone()).or_insert(ArtistStat {
+                    id: song_artist.artist.id.clone(),
+                    name: song_artist.artist.name.clone(),
+                    plays: 0,
+                    played_hours: 0.0
+                });
+
+                entry.played_hours += duration_hour;
+                entry.plays += 1;
             }
         }
 

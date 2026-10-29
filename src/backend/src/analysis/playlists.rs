@@ -27,20 +27,15 @@ impl PlaylistStat {
             for playlist in playlists {
                 if !playlist.song_ids.contains(&scrobble.track.id) {continue;}
 
-                match playlist_stat.get_mut(&playlist.id) {
-                    Some(v) => {
-                        (*v).plays += 1;
-                        (*v).played_hours += duration_hour
-                    },
-                    None => {
-                        playlist_stat.insert(playlist.id.clone(), PlaylistStat {
-                            id: playlist.id.clone(),
-                            name: playlist.name.clone(),
-                            played_hours: duration_hour,
-                            plays: 1
-                        });
-                    }
-                };
+                let entry = playlist_stat.entry(playlist.id.clone()).or_insert(PlaylistStat {
+                    id: playlist.id.clone(),
+                    name: playlist.name.clone(),
+                    played_hours: 0.0,
+                    plays: 0
+                });
+
+                entry.played_hours += duration_hour;
+                entry.plays += 1;
             }
         }
 

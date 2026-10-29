@@ -115,10 +115,7 @@ impl<'a> ScrobbleWithSongExt<'a> for Vec<ScrobbleWithSong<'a>> {
                 None => continue
             };
 
-            match result.get_mut(&languages_str) {
-                Some(_) => {}
-                None => {result.insert(languages_str, scrobble.track.languages.clone());}
-            }
+            result.entry(languages_str).or_insert(scrobble.track.languages.clone());
         }
 
         return result;

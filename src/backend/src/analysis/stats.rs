@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 use serde::Serialize;
 
@@ -19,34 +19,30 @@ impl Stats {
     pub fn group(
         scrobbles_with_songs: &Vec<ScrobbleWithSong>
     ) -> Stats {
-        let mut result = Stats {
-            plays: 0,
-            played_hours: 0.0,
-            tracks: 0,
-            albums: 0,
-            artists: 0
-        };
+        let mut tracks = HashSet::new();
+        let mut albums = HashSet::new();
+        let mut artists = HashSet::new();
 
-        let mut tracks = HashMap::new();
-        let mut albums = HashMap::new();
-        let mut artists = HashMap::new();
+        let mut played_hours = 0.0;
+        let mut plays = 0;
 
         for scrobble in scrobbles_with_songs {
-            result.plays += 1;
-            result.played_hours += scrobble.track.duration / (60.0*60.0);
+            played_hours += scrobble.track.duration / (60.0*60.0);
+            plays += 1;
 
-            tracks.insert(scrobble.track.id.clone(), "");
-            albums.insert(scrobble.track.album_id.clone(), "");
+            tracks.insert(scrobble.track.id.clone());
+            albums.insert(scrobble.track.album_id.clone());
 
             for song_artist in &scrobble.track.artists {
-                let _ = artists.insert(song_artist.artist.id.clone(), "");
+                let _ = artists.insert(song_artist.artist.id.clone());
             }
         }
 
-        result.tracks = tracks.len();
-        result.albums = albums.len();
-        result.artists = artists.len();
-
-        return result;
+        return Stats {
+            albums: albums.len(),
+            tracks: tracks.len(),
+            artists: artists.len(),
+            plays, played_hours
+        };
     }
 }

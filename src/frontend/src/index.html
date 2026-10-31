@@ -6,6 +6,11 @@
     <script type="module">
         import {Api} from "./js/api.js"
 
+        let token_in_url = new URLSearchParams(window.location.search).get("with-token");
+        if (token_in_url) {
+            localStorage.setItem("token", token_in_url)
+        }
+
         let api = new Api
 
         let is_logged_in = await api.auth_check()

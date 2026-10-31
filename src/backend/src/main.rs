@@ -7,9 +7,10 @@ mod storage;
 mod analysis;
 mod reqwest;
 
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, process::exit};
 
 use axum::{Router, routing::{get, post}};
+use tokio::signal::unix::{SignalKind, signal};
 use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 
 use crate::{
@@ -97,5 +98,16 @@ async fn main() {
 
     let state = ApiState::new(mbz_session, settings.clone()).expect("Failed to initialize API state");
 
-    start_backend(state, settings.bind, settings.dist_dir).await;
+    tokio::spawn(start_backend(state, settings.bind, settings.dist_dir));
+
+    let mut stream = signal(SignalKind::terminate()).expect("Failed to listen to SIGTERM");
+
+    tokio::select! {
+        _ = tokio::signal::ctrl_c() => {},
+        _ = stream.recv() => {}
+    }
+
+    println!("Shutting down");
+
+    exit(0);
 }

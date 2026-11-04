@@ -23,7 +23,6 @@ If you're developing your own project and need any of the above data, you can us
 ## Known issues
 (Clearly not an exhaustive list. These are just important things to keep in mind)
 - Your Navalyze session can expire and the website doesn't realize it, so it just breaks.
-- No logout button. You have to change the url to /login.html manually
 
 # Why Navalyze?
 There are various services with the goal of storing and analyzing your listening history, so what makes Navalyze different?

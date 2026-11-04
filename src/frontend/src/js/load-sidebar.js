@@ -28,7 +28,7 @@ if (filter_active) {
 
 let last_focused_input = null;
 let weekdays = [true, true, true, true, true, true, true]
-let artist_types = [true, true, true]
+let artist_types = [true, false, false]
 
 document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(function (element) {
     let weekdays_ls = localStorage.getItem("weekdays")
@@ -214,8 +214,6 @@ document.querySelectorAll("input#artist-type-artist, input#artist-type-album, in
             artist_types[i] = (artist == "1")
         })
     }
-
-    console.log(artist_types)
 
     let id = element.id
 

@@ -28,7 +28,6 @@ function format_hours(hours) {
 }
 
 function build_time_graph(ctx, api_data) {
-    console.log(api_data)
     let datasets = new Array
     let timezone = localStorage.getItem("timezone")
 

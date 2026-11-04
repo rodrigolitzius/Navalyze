@@ -50,6 +50,7 @@ pub struct SubsonicPlaylists {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubsonicResponsePlaylistsVec {
+    #[serde(default)]
     pub playlist: Vec<SubsonicPlaylists>
 }
 

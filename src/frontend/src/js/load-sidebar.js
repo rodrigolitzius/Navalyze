@@ -11,6 +11,17 @@ popover_filter = await popover_filter.text()
 page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
 
+const filter_active =
+    localStorage.getItem("start_ts") !== null ||
+    localStorage.getItem("end_ts") !== null ||
+    (localStorage.getItem("weekdays") ?? "").includes("0")
+
+if (filter_active) {
+    document
+        .querySelector('[popovertarget="global-filter"]')
+        .classList.add("has-filter")
+}
+
 let last_focused_input = null;
 let weekdays = [true, true, true, true, true, true, true]
 

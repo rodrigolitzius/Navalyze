@@ -227,3 +227,10 @@ document.getElementById("clear-filter").addEventListener("click", function () {
 
     window.location.reload()
 })
+
+document.getElementById("logout-btn").addEventListener("click", function () {
+    // token, timezone and the filter (start_ts, end_ts, weekdays) all live in localStorage
+    localStorage.clear()
+
+    window.location.replace("login.html")
+})

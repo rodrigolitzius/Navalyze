@@ -8,8 +8,12 @@ sidebar_html = await sidebar_html.text()
 let popover_filter = await fetch("filter-popover.html")
 popover_filter = await popover_filter.text()
 
+let popover_settings = await fetch("settings-popover.html")
+popover_settings = await popover_settings.text()
+
 page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
+page.insertAdjacentHTML("afterbegin", popover_settings)
 
 const filter_active =
     localStorage.getItem("start_ts") !== null ||
@@ -24,6 +28,7 @@ if (filter_active) {
 
 let last_focused_input = null;
 let weekdays = [true, true, true, true, true, true, true]
+let artist_types = [true, true, true]
 
 document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(function (element) {
     let weekdays_ls = localStorage.getItem("weekdays")
@@ -198,6 +203,53 @@ document.querySelectorAll("button#ts-set-time").forEach(function (button) {
         if (new_time != null) {
             last_focused_input.value = new_time.toString().slice(0, 16)
         }
+    })
+})
+
+document.querySelectorAll("input#artist-type-artist, input#artist-type-album, input#artist-type-composer").forEach(function (element) {
+    let artist_types_ls = localStorage.getItem("artist-types")
+
+    if (artist_types_ls != null) {
+        artist_types_ls.split(",").forEach((artist, i) => {
+            artist_types[i] = (artist == "1")
+        })
+    }
+
+    console.log(artist_types)
+
+    let id = element.id
+
+    if (id == "artist-type-artist") {
+        element.checked = artist_types[0]
+    }
+
+    if (id == "artist-type-album") {
+        element.checked = artist_types[1]
+    }
+
+    if (id == "artist-type-composer") {
+        element.checked = artist_types[2]
+    }
+
+    element.addEventListener("change", function (event) {
+        let checked = event.target.checked
+
+        if (id == "artist-type-artist") {
+            artist_types[0] = checked
+        }
+
+        if (id == "artist-type-album") {
+            artist_types[1] = checked
+        }
+
+        if (id == "artist-type-composer") {
+            artist_types[2] = checked
+        }
+
+        localStorage.setItem(
+            "artist-types",
+            artist_types.map((v) => v ? "1" : "0").join(",")
+        )
     })
 })
 

@@ -4,42 +4,42 @@
     <form>
         <div class="ts-row space-between">
             <span>
-                <label for="start-ts">M</label>
+                <label>M</label>
                 <input type="checkbox" class="mon">
             </span>
 
             <span>
-                <label for="start-ts">T</label>
+                <label>T</label>
                 <input type="checkbox" class="tue">
             </span>
 
             <span>
-                <label for="start-ts">W</label>
+                <label>W</label>
                 <input type="checkbox" class="wed">
             </span>
 
             <span>
-                <label for="start-ts">T</label>
+                <label>T</label>
                 <input type="checkbox" class="thu">
             </span>
 
             <span>
-                <label for="start-ts">F</label>
+                <label>F</label>
                 <input type="checkbox" class="fri">
             </span>
 
             <span>
-                <label for="start-ts">S</label>
+                <label>S</label>
                 <input type="checkbox" class="sat">
             </span>
 
             <span>
-                <label for="start-ts">S</label>
+                <label>S</label>
                 <input type="checkbox" class="sun">
             </span>
         </div>
 
-        <div class="ts-row space-between">
+        <div class="space-between">
             <span>
                 <label for="start-ts">Starting datetime</label>
                 <input type="datetime-local" id="start-ts">
@@ -51,16 +51,12 @@
             </span>
         </div>
 
-        <br>
-
         <div>
             <button type="button" id="ts-set-time" class="ts-set-now">Now</button>
             <button type="button" id="ts-set-time" class="ts-set-last-week">Last week</button>
             <button type="button" id="ts-set-time" class="ts-set-last-month">Last month</button>
             <button type="button" id="ts-set-time" class="ts-set-last-year">Last year</button>
         </div>
-
-        <br>
 
         <div>
             <button type="button" id="ts-set-time" class="ts-set-january">January</button>
@@ -80,19 +76,9 @@
             <button type="button" id="ts-set-time" class="ts-set-december">December</button>
         </div>
 
-        <br>
-
         <div class="space-between">
             <button class="default-button" type="button" id="submit-filter">Submit</button>
             <button class="default-button" type="button" id="clear-filter">Clear</button>
         </div>
     </form>
-</div>
-
-<div id="settings" class="card" popover>
-    <h1 class="card-name">Settings</h1>
-    <p class="card-desc">Manage your session</p>
-    <div class="settings-actions">
-        <button type="button" id="logout-btn" class="default-button">Log out</button>
-    </div>
 </div>

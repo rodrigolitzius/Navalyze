@@ -1,3 +1,22 @@
+function local_storage_weekdays_to_string(weekdays) {
+    let weekdays_string = new Array
+    weekdays.split(",").forEach((day, i) => {
+        if (day == "1") {
+            weekdays_string.push(`${i}`)
+        }
+    })
+    return weekdays_string.join(",")
+}
+
+function local_storage_artist_types_to_string(artist_types) {
+    return artist_types.split(",").map((artist, i) => {
+        if (artist != "1") { return }
+        if (i == 0) { return "artist" }
+        else if (i == 1) { return "album" }
+        else if (i == 2) { return "composer" }
+    }).join(",")
+}
+
 class Api {
     new_request(endpoint, params) {
         const token = localStorage.getItem("token")
@@ -7,13 +26,7 @@ class Api {
         const timezone = localStorage.getItem("timezone") ?? ""
         const weekdays = localStorage.getItem("weekdays") ?? "1,1,1,1,1,1,1"
 
-        let weekdays_string = new Array
-        weekdays.split(",").forEach((day, i) => {
-            if (day == "1") {
-                weekdays_string.push(`${i}`)
-            }
-        })
-        weekdays_string = weekdays_string.join(",")
+        let weekdays_string = local_storage_weekdays_to_string(weekdays)
 
         const default_params = new URLSearchParams({
             ...params,
@@ -95,7 +108,12 @@ class Api {
     }
 
     get_most_played_artists(limit, offset) {
-        var request = this.new_request(`most-played/artists`, {limit: limit, offset: offset ?? 0})
+        var request = this.new_request(`most-played/artists`,
+            {
+                limit: limit, offset: offset ?? 0,
+                type: local_storage_artist_types_to_string(localStorage.getItem("artist-types") ?? "1,1,0")
+            }
+        )
 
         return fetch(request)
     }

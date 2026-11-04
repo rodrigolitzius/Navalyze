@@ -30,6 +30,7 @@ export default defineConfig({
                 recent: resolve(import.meta.dirname, "src/recent.html"),
                 sidebar: resolve(import.meta.dirname, "src/sidebar.html"),
                 filter_popover: resolve(import.meta.dirname, "src/filter-popover.html"),
+                settings_popover: resolve(import.meta.dirname, "src/settings-popover.html")
             }
         },
     },

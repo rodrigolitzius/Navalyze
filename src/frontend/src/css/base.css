@@ -428,8 +428,12 @@ main {
     gap: 4px;
 
 
-    .push-end {
+    .isolated-icons {
+        display: inherit;
+        flex-direction: inherit;
+        /*top for a vertical bar and left for a horizontal bar*/
         margin-top: auto;
+        margin-left: auto;
     }
 
     .nav-link {

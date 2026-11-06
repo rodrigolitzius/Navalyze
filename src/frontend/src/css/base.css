@@ -411,15 +411,13 @@ main {
     margin-right: var(--sidebar-margin);
     top: var(--sidebar-margin);
     height: calc(100vh - 2 * var(--sidebar-margin));
+}
 
-    button {
-        background-color: inherit;
-        color: inherit;
-        border: inherit;
-        font: inherit;
-        outline: inherit;
-        cursor: pointer;
-    }
+/* reset sem ID para não ganhar de .nav-link:hover / .active / .has-filter */
+.nav-links button.nav-link {
+    background: none;
+    border: none;
+    font: inherit;
 }
 
 .nav-links {
@@ -459,6 +457,16 @@ main {
         &:disabled {
             cursor: default;
             opacity: 0.55;
+        }
+
+        &.active {
+            background-color: var(--secondary-color);
+            color: var(--accent-color-2);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
         }
     }
 }

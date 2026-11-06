@@ -15,6 +15,21 @@ page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
 page.insertAdjacentHTML("afterbegin", popover_settings)
 
+// ===== Item ativo da sidebar =====
+const current_page = window.location.pathname.split("/").pop() || "dashboard.html"
+const parent_page = {
+    "index.html": "dashboard.html",
+    "artist.html": "artists.html",
+    "album.html": "albums.html",
+    "track.html": "tracks.html",
+    "playlist.html": "playlists.html",
+}
+const active_href = parent_page[current_page] ?? current_page
+
+document.querySelectorAll("#sidebar a.nav-link").forEach(function (link) {
+    link.classList.toggle("active", link.getAttribute("href") === active_href)
+})
+
 const filter_active =
     localStorage.getItem("start_ts") !== null ||
     localStorage.getItem("end_ts") !== null ||

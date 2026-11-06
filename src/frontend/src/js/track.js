@@ -1,6 +1,6 @@
 import { Api, get_image_url } from "./api.js"
 import { build_link_list, artist_link, album_link } from "./html.js"
-import { format_hours, build_time_graph } from "./util.js";
+import { format_hours, build_time_graph, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -18,21 +18,16 @@ if (Array.isArray(track)) {
         </div>`
     )
 } else {
-    let image_url = null
-    try {
-        image_url = await get_image_url(api, track_id, 700)
-    } catch {
-        image_url = null
-    }
-
     header.insertAdjacentHTML("beforeend",
-        `<img src="${image_url}">
+        `<img>
         <div class="content">
             <h1 class="track-title">${track.name}</h1>
             <div id="artists" class="link-list"></div>
             <div id="album" class="link-list"></div>
         </div>`
     )
+
+    load_images(api, [{id: track_id, size: 700, img: header.querySelector("img")}])
 
     build_link_list(
         header.querySelector("#album"),

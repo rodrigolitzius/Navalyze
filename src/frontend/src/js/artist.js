@@ -1,7 +1,6 @@
-import { Temporal } from "temporal-polyfill";
 import { Api, get_image_url } from "./api.js"
 import { album_link } from "./html.js";
-import { format_hours, build_time_graph } from "./util.js";
+import { format_hours, build_time_graph, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -37,17 +36,23 @@ for (const property of properties) {
 }
 
 let albums = document.getElementById("albums")
+let images = new Array()
+
 for (const album of artist.albums) {
     albums.insertAdjacentHTML("beforeend",
         `<a href="${album_link(album.id)}" class="card">
             <div>
-                <img class="card-img" src=${await get_image_url(api, album.id, 400)}>
+                <img class="card-img">
                 <p class="card-name">${album.name}</p>
                 <p class="card-footer" title="${album.plays} plays">${format_hours(album.played_hours)}</p>
             </div>
         </a>`
     )
+
+    images.push({id: album.id, size: 400, img: albums.lastElementChild.querySelector("img")})
 }
+
+load_images(api, images)
 
 let artist_activity = await api.get_artist_graph(artist_id, 50)
 artist_activity = await artist_activity.json()

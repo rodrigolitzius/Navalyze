@@ -1,6 +1,7 @@
-import { Api, get_image_url } from "./api.js"
+import { Api } from "./api.js"
 import { build_link_list, artist_link, album_link, track_link } from "./html.js";
 import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { load_images_sync } from "./util.js";
 
 let api = new Api()
 
@@ -11,6 +12,8 @@ let recent = await api.get_recently_played(PAGE_SIZE, PAGE_SIZE*page)
 recent = await recent.json()
 
 let recent_html = document.querySelector("#played-list")
+let images = new Array()
+
 for (const song of recent) {
     let played_date = new Date(song.timestamp * 1000)
     let played_date_string = played_date.toLocaleString("pt-br", { timeZone: localStorage.getItem("timezone") || undefined })
@@ -18,7 +21,7 @@ for (const song of recent) {
     recent_html.insertAdjacentHTML("beforeend",
         `<a href="${track_link(song.id)}">
             <div class="track-entry">
-                <img class="track-img" src=${await get_image_url(api, song.id, 400)}>
+                <img class="track-img">
                 <div class="track-contents">
                     <p class="track-title">${song.title}</p>
                     <div class="track-artist link-list"></div>
@@ -30,6 +33,8 @@ for (const song of recent) {
             </div>
         </a>`
     )
+
+    images.push({id: song.id, size: 400, img: recent_html.lastElementChild.querySelector("img")})
 
     for (const artist of song.artists) {
         build_link_list(
@@ -45,3 +50,5 @@ for (const song of recent) {
         album_link(song.album_id),
     )
 }
+
+load_images_sync(api, images)

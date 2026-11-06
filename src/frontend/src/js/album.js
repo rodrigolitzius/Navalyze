@@ -1,6 +1,6 @@
-import { Api, get_image_url } from "./api.js"
+import { Api } from "./api.js"
 import { build_link_list, artist_link, track_link } from "./html.js";
-import { format_hours, build_time_graph } from "./util.js";
+import { format_hours, build_time_graph, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -12,13 +12,15 @@ album = await album.json()
 let album_div = document.getElementById("image-header")
 
 album_div.insertAdjacentHTML("beforeend",
-    `<img src="${await get_image_url(api, album_id, 700)}">
+    `<img>
     <div class="content">
         <h1>${album.name}</h1>
         <div id="artists" class="link-list"></div>
         <div id="properties" class="round-list"></div>
     </div>`
 )
+
+load_images(api, [{id: album_id, size: 700, img: album_div.querySelector("img")}])
 
 for (const artist of album.artists) {
     build_link_list(album_div.querySelector("#artists"), artist.name, artist_link(artist.id))

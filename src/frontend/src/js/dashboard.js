@@ -1,17 +1,9 @@
 import { Api, get_image_url } from "./api.js"
 import { track_link } from "./html.js"
-import { relative_time, format_hours } from "./util.js"
+import { relative_time, format_hours, load_images } from "./util.js"
 import { Chart } from "chart.js/auto"
 
 const api = new Api()
-
-async function safe_image_url(entry_id, size) {
-    try {
-        return await get_image_url(api, entry_id, size)
-    } catch {
-        return null
-    }
-}
 
 function thumb_html(image_url) {
     return image_url
@@ -25,10 +17,8 @@ async function fill_featured_item(entry, featured_id, href) {
 
     if (!entry) return
 
-    const image_url = await safe_image_url(entry.id, 800)
-
     const inner = `
-        ${image_url ? `<img src="${image_url}" alt="">` : `<div class="ranked-thumb-empty"></div>`}
+        <img alt="">
         <div class="list-featured-info">
             <div class="list-featured-text">
                 <p class="list-featured-name">${entry.name}</p>
@@ -42,6 +32,8 @@ async function fill_featured_item(entry, featured_id, href) {
             ? `<a class="list-featured-link" href="${href}?id=${entry.id}">${inner}</a>`
             : `<div class="list-featured-link">${inner}</div>`
     )
+
+    load_images(api, [{id: entry.id, size: 800, img: featured.querySelector("img")}])
 }
 
 async function fill_ranked_list(entries, list_id, featured_id, href) {
@@ -58,13 +50,14 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
 
     const rest = entries.slice(1, 5)
 
+    let images = new Array()
+
     for (let i = 0; i < rest.length; i++) {
         const entry = rest[i]
-        const image_url = await safe_image_url(entry.id, 200)
 
         const inner = `
             <span class="ranked-rank">${i + 2}</span>
-            ${thumb_html(image_url)}
+            <img class="ranked-thumb">
             <div class="ranked-info">
                 <p class="ranked-name">${entry.name}</p>
             </div>
@@ -76,7 +69,11 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
                 ? `<li><a class="ranked-item" href="${href}?id=${entry.id}">${inner}</a></li>`
                 : `<li><div class="ranked-item">${inner}</div></li>`
         )
+
+        images.push({id: entry.id, size: 200, img: list.lastElementChild.querySelector("img")})
     }
+
+    load_images(api, images)
 }
 
 async function fill_recent_strip(songs) {
@@ -88,19 +85,24 @@ async function fill_recent_strip(songs) {
         return
     }
 
+    let images = new Array()
+
     for (const song of songs) {
-        const image_url = await safe_image_url(song.id, 400)
         const artist_names = (song.artists || []).map(a => a.name).join(", ")
 
         strip.insertAdjacentHTML("beforeend",
             `<a class="recent-card" href="${track_link(song.id)}">
-                ${image_url ? `<img src="${image_url}" alt="">` : `<img alt="">`}
+                <img alt="">
                 <p class="recent-title">${song.title}</p>
                 <p class="recent-sub">${artist_names}</p>
                 <p class="recent-time">${relative_time(song.timestamp)}</p>
             </a>`
         )
+
+        images.push({id: song.id, size: 400, img: strip.lastElementChild.querySelector("img")})
     }
+
+    load_images(api, images)
 }
 
 async function load_stats() {

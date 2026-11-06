@@ -1,3 +1,4 @@
+import { get_image_url } from './api';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-temporal/register';
 
@@ -66,4 +67,44 @@ function build_time_graph(ctx, api_data) {
     });
 }
 
-export {relative_time, format_hours, build_time_graph }
+async function safe_image_url(api, entry_id, size) {
+    try {
+        return get_image_url(api, entry_id, size)
+    } catch {
+        return null
+    }
+}
+
+function dedup_image_urls(api, imgs) {
+    let url_map = new Map()
+
+    let result = imgs.map((entry) => {
+        let url = url_map.get(entry.id)
+        if (!url) {
+            url = safe_image_url(api, entry.id, entry.size)
+            url_map.set(entry.id, url)
+        }
+
+        return {
+            id: entry.id, url: url, size: entry.size, img: entry.img
+        }
+    })
+
+    console.log(result)
+
+    return result
+}
+
+function load_images(api, imgs) {
+    dedup_image_urls(api, imgs).forEach(async (entry) => {
+        entry.img.src = await entry.url
+    })
+}
+
+async function load_images_sync(api, imgs) {
+    for (const entry of dedup_image_urls(api, imgs)) {
+        entry.img.src = await entry.url
+    }
+}
+
+export {relative_time, format_hours, build_time_graph, load_images, load_images_sync }

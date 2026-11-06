@@ -1,6 +1,6 @@
-import { Api, get_image_url } from "./api.js"
-import { build_link_list, artist_link, track_link } from "./html.js";
-import { format_hours, build_time_graph } from "./util.js";
+import { Api } from "./api.js"
+import { track_link } from "./html.js";
+import { format_hours, build_time_graph, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -12,13 +12,15 @@ playlist = await playlist.json()
 let playlist_div = document.getElementById("image-header")
 
 playlist_div.insertAdjacentHTML("beforeend",
-    `<img src="${await get_image_url(api, playlist_id, 700)}">
+    `<img>
     <div class="content">
         <h1>${playlist.name}</h1>
         <div id="artists" class="link-list"></div>
         <div id="properties" class="round-list"></div>
     </div>`
 )
+
+load_images(api, [{id: playlist_id, size: 700, img: playlist_div.querySelector("img")}])
 
 let playlist_content = playlist_div.querySelector("#properties")
 

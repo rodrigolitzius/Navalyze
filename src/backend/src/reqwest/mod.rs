@@ -1,6 +1,7 @@
 use reqwest::{Error, StatusCode, Response};
 use serde::{de::DeserializeOwned};
 
+#[derive(Debug)]
 pub enum ReqwestApiError {
     Connection(Error),
     Unauthorized(StatusCode),

@@ -13,7 +13,8 @@ use crate::{
     mbz::MbzSession,
     sqlite::InternalDB,
     storage::Storage,
-    api::error::SettingsError
+    api::error::SettingsError,
+    make_a_wrapped::MakeAWrapped
 };
 
 pub struct LoginSession {
@@ -43,6 +44,7 @@ pub struct Settings {
     pub bind: String,
     pub lbz_token: Option<Uuid>,
     pub navidrome_url: Option<String>,
+    pub make_a_wrapped_url: Option<String>,
     pub dist_dir: String,
     pub scrobble_update_interval: u64,
 }
@@ -51,14 +53,18 @@ pub struct Settings {
 pub struct ApiState {
     pub sessions: Arc<Sessions>,
     pub storage: Arc<Storage>,
+    pub make_a_wrapped: Arc<Option<MakeAWrapped>>,
     pub settings: Arc<Settings>
 }
 
 impl ApiState {
     pub fn new(mbz: Option<MbzSession>, settings: Settings) -> Result<Self, rusqlite::Error> {
+        let make_a_wrapped = settings.make_a_wrapped_url.clone().map(|url| MakeAWrapped::new(&url));
+
         let result = Self {
             sessions: Arc::new(RwLock::new(HashMap::new())),
             storage: Arc::new(Storage::new(InternalDB::new("data.db".into())?, mbz)),
+            make_a_wrapped: Arc::new(make_a_wrapped),
             settings: Arc::new(settings)
         };
 
@@ -87,6 +93,7 @@ impl Settings {
             .arg(Arg::new("lbz-token").short('l').help("Your ListenBrainz token. (Optional)"))
             .arg(Arg::new("bind").short('b').help("Address the server will listen on."))
             .arg(Arg::new("navidrome-url").short('n').help("The address for the Navidrome instance"))
+            .arg(Arg::new("make-a-wrapped-url").short('w').help("The address for a Make A Wrapped API"))
             .arg(Arg::new("allow-invalid-certs").short('c').help("Whether to allow connections to Navidrome instances without a valid SSL certificate.").action(ArgAction::SetTrue))
             .arg(Arg::new("dist-dir").short('d').help("The directory with the website files"))
             .arg(Arg::new("update-interval").short('i').help("The interval for checking new scrobbles periodically"))
@@ -94,6 +101,7 @@ impl Settings {
 
         if let Some(v) = matches.get_one::<String>("bind") { self.bind = v.clone(); }
         if let Some(v) = matches.get_one::<String>("navidrome-url") { self.navidrome_url = Some(v.clone()) }
+        if let Some(v) = matches.get_one::<String>("make-a-wrapped-url") { self.make_a_wrapped_url = Some(v.clone()) }
         if let Some(v) = matches.get_one::<String>("dist-dir") { self.dist_dir = v.clone(); }
         if let Some(v) = matches.get_one::<u64>("update-interval") { self.scrobble_update_interval = *v; }
 

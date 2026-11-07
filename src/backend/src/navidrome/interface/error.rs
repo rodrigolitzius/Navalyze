@@ -7,10 +7,12 @@ pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
     Unreachable(reqwest::Error),
     ParseJson(serde_json::Error),
+    ParseHeader(String),
     NoContentType,
     Status(StatusCode),
     Unauthorized,
-    SongNotFound
+    SongNotFound,
+    XTotalCountMissing
 }
 
 impl From<ReqwestApiError> for NavidromeSessionError {
@@ -60,7 +62,15 @@ impl From<NavidromeSessionError> for ApiError {
 
             NavidromeSessionError::SongNotFound => ApiError::Internal(
                 "Tried to get data for an invalid song. The server probably in an out-of-date state.".into()
-            )
+            ),
+
+            NavidromeSessionError::XTotalCountMissing => ApiError::Internal(
+                "Navidrome did not respond with an X-Total-Count header".into()
+            ),
+
+            NavidromeSessionError::ParseHeader(s) => ApiError::Internal(
+                s
+            ),
         }
     }
 }

@@ -101,7 +101,7 @@ impl NavidromeInterface {
         let native_session = NavidromeNativeSession::new(request.clone(), allow_invalid_certs).await?;
         let subsonic_session = NavidromeSubsonicSession::new(request.clone(), allow_invalid_certs).await?;
 
-        let scrobbles = native_session.scrobble(0).await?;
+        let scrobbles = get_scrobbles_paginated(&native_session, 20_000).await?;
 
         let mut playlists: Vec<Playlist> = Vec::new();
 
@@ -111,9 +111,7 @@ impl NavidromeInterface {
             playlists.push(Playlist::from_subsonic(playlist));
         }
 
-        let tracks_hashmap: HashMap<String, SongData> = native_session.song(Vec::new()).await?.into_iter().map(|s| {
-            (s.0, SongData::from_native(s.1))
-        }).collect();
+        let tracks_hashmap: HashMap<String, SongData> = get_tracks_paginated(&native_session, 1000).await?;
 
         return Ok(Self {native_session, subsonic_session, tracks_hashmap, scrobbles, playlists});
     }
@@ -194,7 +192,7 @@ impl NavidromeInterface {
     pub async fn get_new_scrobbles(&self) -> Result<Option<Vec<Scrobble>>, NavidromeSessionError> {
         let last_scrobble = self.scrobbles.iter().map(|s| s.submission_time).max().unwrap_or(0);
 
-        let new_scrobbles = self.native_session.scrobble(last_scrobble).await?;
+        let (_, new_scrobbles) = self.native_session.scrobble(last_scrobble, None, None).await?;
 
         return Ok(
             if !new_scrobbles.is_empty() { Some(new_scrobbles) }
@@ -215,7 +213,7 @@ impl NavidromeInterface {
                 continue;
             }
 
-            let mut song = self.native_session.song(Vec::from([
+            let (_, mut song) = self.native_session.song(Vec::from([
                 ("id".to_string(), id.to_string())
             ])).await?;
 
@@ -405,4 +403,44 @@ impl SongData {
 
         return Some(result.join(", "));
     }
+}
+
+async fn get_scrobbles_paginated(native_session: &NavidromeNativeSession, page_size: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+    let mut scrobbles = Vec::new();
+    let mut fetched_scrobbles = 0;
+    let mut total_scrobbles = None;
+
+    while total_scrobbles.unwrap_or(u64::MAX) > fetched_scrobbles {
+        let (new_total_scrobbles, mut new_scrobbles) = native_session
+            .scrobble(0, Some(fetched_scrobbles), Some(fetched_scrobbles+page_size)).await?;
+
+        total_scrobbles = Some(new_total_scrobbles);
+        fetched_scrobbles += new_scrobbles.len() as u64;
+
+        scrobbles.append(&mut new_scrobbles);
+    }
+
+    return Ok(scrobbles);
+}
+
+async fn get_tracks_paginated(native_session: &NavidromeNativeSession, page_size: u64) -> Result<HashMap<String, SongData>, NavidromeSessionError> {
+    let mut tracks = HashMap::new();
+    let mut fetched_tracks = 0;
+    let mut total_tracks = None;
+
+    while total_tracks.unwrap_or(u64::MAX) > fetched_tracks {
+        let mut queries: Vec<(String, String)> = Vec::new();
+        queries.push(("_start".into(), fetched_tracks.to_string()));
+        queries.push(("_end".into(), (fetched_tracks+page_size).to_string()));
+
+        let (new_total_scrobbles, new_scrobbles) = native_session
+            .song(queries).await?;
+
+        total_tracks = Some(new_total_scrobbles);
+        fetched_tracks += new_scrobbles.len() as u64;
+
+        tracks.extend(new_scrobbles);
+    }
+
+    return Ok(tracks.into_iter().map(|t| (t.0, SongData::from_native(t.1))).collect());
 }

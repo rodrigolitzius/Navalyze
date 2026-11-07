@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::{Client, Response};
 use uuid::Uuid;
 
 use std::{collections::HashMap};
@@ -132,7 +132,7 @@ impl NavidromeNativeSession {
         });
     }
 
-    pub async fn song(&self, queries: Vec<(String, String)>) -> Result<HashMap<String, NativeSongData>, NavidromeSessionError> {
+    pub async fn song(&self, queries: Vec<(String, String)>) -> Result<(u64, HashMap<String, NativeSongData>), NavidromeSessionError> {
         let url = format!("{}/api/song/", self.url);
 
         let response = self.client
@@ -141,6 +141,8 @@ impl NavidromeNativeSession {
             .send()
             .await
             .map_reqwest_api_err()?;
+
+        let total_songs = Self::get_x_total_count_header(&response)?;
 
         let response = response.into_json::<Vec<DeserializeSongData>>().await?;
 
@@ -225,7 +227,7 @@ impl NavidromeNativeSession {
             result.insert(song_data.id.clone(), song_data);
         }
 
-        return Ok(result);
+        return Ok((total_songs, result));
     }
 
     pub async fn album(&self, id: &str) -> Result<NativeAlbum, NavidromeSessionError> {
@@ -255,13 +257,13 @@ impl NavidromeNativeSession {
         return Ok(result);
     }
 
-    pub async fn scrobble(&self, after_timestamp: u64) -> Result<Vec<Scrobble>, NavidromeSessionError> {
+    pub async fn scrobble(&self, after_timestamp: u64, start: Option<u64>, end: Option<u64>) -> Result<(u64, Vec<Scrobble>), NavidromeSessionError> {
         let url = format!("{}/api/scrobble/", self.url);
 
         let mut queries: Vec<(String, String)> = Vec::new();
         queries.push(("from".into(), after_timestamp.to_string()));
-        queries.push(("_start".into(), 1.to_string()));
-        queries.push(("_end".into(), 9999999.to_string()));
+        queries.push(("_start".into(), start.unwrap_or(1).to_string()));
+        queries.push(("_end".into(), end.unwrap_or(9999999).to_string()));
 
         let response = self.client
             .get(&url)
@@ -270,8 +272,19 @@ impl NavidromeNativeSession {
             .await
             .map_reqwest_api_err()?;
 
+        let total_scrobbles: u64 = Self::get_x_total_count_header(&response)?;
+
         let response = response.into_json::<Vec<Scrobble>>().await?;
 
-        return Ok(response);
+        return Ok((total_scrobbles, response));
+    }
+
+    pub fn get_x_total_count_header(response: &Response) -> Result<u64, NavidromeSessionError> {
+        return Ok(response
+            .headers()
+            .get("X-Total-Count").ok_or_else(|| NavidromeSessionError::XTotalCountMissing)?
+            .to_str().map_err(|_| NavidromeSessionError::ParseHeader("Failed to convert X-Total-Count header to string".into()))?
+            .parse().map_err(|_| NavidromeSessionError::ParseHeader("Failed to parse X-Total-Count to u64".into()))?
+        );
     }
 }

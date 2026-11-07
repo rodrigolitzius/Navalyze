@@ -1,6 +1,6 @@
 use crate::handlers::time::prelude::*;
-use crate::navidrome::interface::scrobble::ScrobbleWithSongExt;
 use crate::handlers::extract::ResponseFilterWithDefault;
+use crate::analysis::time::languages;
 
 pub async fn languages_time(
     SessionExtractor(session): SessionExtractor,
@@ -19,16 +19,7 @@ pub async fn languages_time(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let mut all_languages: HashMap<String, HashMap<u64, f64>> = HashMap::new();
-
-    for (language_str, languages) in scrobbles.get_all_languages().into_iter() {
-        let scrobbles_copy = scrobbles.clone()
-            .filter_language(&languages.into_iter().map(|s| s).collect());
-
-        let data = to_datetime_duration_vec(scrobbles_copy, timezone);
-
-        all_languages.insert(language_str, date::group(&data, resolution));
-    }
+    let all_languages = languages::group(&scrobbles, resolution, timezone);
 
     let mut sorted_languages: Vec<(String, HashMap<u64, f64>)> = all_languages.into_iter().collect();
     sorted_languages.sort_by(|a, b| {

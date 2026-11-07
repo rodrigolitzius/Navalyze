@@ -1,5 +1,8 @@
 pub mod frequency;
 pub mod date;
+pub mod genres;
+pub mod release_types;
+pub mod languages;
 
 pub fn insert_bin(bin_subdiv: u64, bin_max: u64, values: &Vec<(u64, f64)>) -> Option<Vec<(u64, f64)>> {
     // bin_max in unlikely to be divisible by bin_subdiv,

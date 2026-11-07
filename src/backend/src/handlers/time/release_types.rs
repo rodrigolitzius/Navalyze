@@ -1,6 +1,6 @@
 use crate::handlers::time::prelude::*;
 use crate::handlers::extract::ResponseFilterWithDefault;
-use crate::analysis::distribution::release_types::get_release_types;
+use crate::analysis::time::release_types;
 
 pub async fn release_types_time(
     SessionExtractor(session): SessionExtractor,
@@ -19,16 +19,7 @@ pub async fn release_types_time(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let mut all_release_types: HashMap<String, HashMap<u64, f64>> = HashMap::new();
-
-    for release_type in get_release_types(&scrobbles).into_keys() {
-        let scrobbles_copy = scrobbles.clone()
-            .filter_release_types(&HashSet::from([release_type.as_str()]));
-
-        let data = to_datetime_duration_vec(scrobbles_copy, timezone);
-
-        all_release_types.insert(release_type, date::group(&data, resolution));
-    }
+    let all_release_types = release_types::group(&scrobbles, resolution, timezone);
 
     let mut sorted_release_types: Vec<(String, HashMap<u64, f64>)> = all_release_types.into_iter().collect();
     sorted_release_types.sort_by(|a, b| {

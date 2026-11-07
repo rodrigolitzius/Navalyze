@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use serde::Deserialize;
 use chrono::{DateTime, Datelike, TimeZone, WeekdaySet};
@@ -24,16 +24,18 @@ pub struct ScrobbleWithSong<'a> {
 pub trait ScrobbleWithSongFilter<'a> {
     fn filter_range(self, range: Range) -> Self;
     fn filter_weekdays<T: TimeZone>(self, weekdays: WeekdaySet, timezone: T) -> Self;
-    fn filter_language(self, languages: &HashSet<SongLanguage>) -> Self;
-    fn filter_release_types(self, types: &HashSet<&str>) -> Self;
-    fn filter_genre(self, genres: &HashSet<&str>) -> Self;
     fn filter_album(self, album_ids: &HashSet<&str>) -> Self;
     fn filter_artist(self, artist_ids: &HashSet<&str>) -> Self;
     fn filter_track(self, track_ids: &HashSet<&str>) -> Self;
-}
 
-pub trait ScrobbleWithSongExt<'a> {
-    fn get_all_languages(&self) -> HashMap<String, Vec<SongLanguage>>;
+    // These ones were used in the past. I'll keep them as i want to, in the future
+    // have endpoints for individual languages, genres and release_types
+    #[allow(unused)]
+    fn filter_language(self, languages: &HashSet<SongLanguage>) -> Self;
+    #[allow(unused)]
+    fn filter_release_types(self, types: &HashSet<&str>) -> Self;
+    #[allow(unused)]
+    fn filter_genre(self, genres: &HashSet<&str>) -> Self;
 }
 
 impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
@@ -102,23 +104,6 @@ impl<'a> ScrobbleWithSongFilter<'a> for Vec<ScrobbleWithSong<'a>> {
 
     fn filter_track(self, track_ids: &HashSet<&str>) -> Self {
         return self.into_iter().filter(|s| track_ids.contains(&s.track.id.as_str())).collect();
-    }
-}
-
-impl<'a> ScrobbleWithSongExt<'a> for Vec<ScrobbleWithSong<'a>> {
-    fn get_all_languages(&self) -> HashMap<String, Vec<SongLanguage>> {
-        let mut result: HashMap<String, Vec<SongLanguage>> = HashMap::new();
-
-        for scrobble in self {
-            let languages_str = match scrobble.track.languages_to_str() {
-                Some(v) => v,
-                None => continue
-            };
-
-            result.entry(languages_str).or_insert(scrobble.track.languages.clone());
-        }
-
-        return result;
     }
 }
 

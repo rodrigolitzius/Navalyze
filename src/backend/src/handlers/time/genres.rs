@@ -1,6 +1,6 @@
 use crate::handlers::time::prelude::*;
 use crate::handlers::extract::ResponseFilterWithDefault;
-use crate::analysis::genres::GenreStat;
+use crate::analysis::time::genres;
 
 pub async fn genres_time(
     SessionExtractor(session): SessionExtractor,
@@ -19,16 +19,7 @@ pub async fn genres_time(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let mut all_genres: HashMap<String, HashMap<u64, f64>> = HashMap::new();
-
-    for (genre_id, genre_stat) in GenreStat::group(&scrobbles) {
-        let scrobbles_copy = scrobbles.clone()
-            .filter_genre(&HashSet::from([genre_id.as_str()]));
-
-        let data = to_datetime_duration_vec(scrobbles_copy, timezone);
-
-        all_genres.insert(genre_stat.name, date::group(&data, resolution));
-    }
+    let all_genres = genres::group(&scrobbles, resolution, timezone);
 
     let mut sorted_genres: Vec<(String, HashMap<u64, f64>)> = all_genres.into_iter().collect();
     sorted_genres.sort_by(|a, b| {

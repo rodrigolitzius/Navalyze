@@ -9,6 +9,10 @@ allow_invalid_certs = false
 # Unless you're hosting Navalyze for multiple people with different Navidrome instances, you should set this
 # navidrome_url = "http://localhost:4533"
 
+# This is the API for the "make a wrapped" tool created by DevMatei (https://github.com/DevMatei/make-a-wrapped)
+# If you choose to self host this service, you can change the URL here. If you want it disabled, just comment this out
+make_a_wrapped_url = "https://wrapped.devmatei.com/api/v1"
+
 # How long to wait before checking if new scrobbles are available (In seconds)
 scrobble_update_interval = 30
 

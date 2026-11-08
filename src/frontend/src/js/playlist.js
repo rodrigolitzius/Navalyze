@@ -1,6 +1,7 @@
 import { Api } from "./api.js"
 import { track_link } from "./html.js";
 import { format_hours, build_time_graph, load_images } from "./util.js";
+import { CeriousScroll } from '@ceriousdevtech/cerious-scroll';
 
 const api = new Api()
 
@@ -41,20 +42,35 @@ playlist_activity = await playlist_activity.json()
 
 build_time_graph(document.getElementById("graph-playlist"), {[playlist.name]: playlist_activity})
 
+let track_list = document.getElementById("track-list")
 let max = Math.max(...playlist.tracks.map(item => item.played_hours))
 
-let track_list = document.getElementById("track-list")
+const data = playlist.tracks.map((element, index) => ({
+    id: element.id,
+    name: element.name,
+    plays: element.plays,
+    played_hours: element.played_hours,
+    ratio: element.played_hours/max
+}))
 
-for (const track of playlist.tracks) {
-    track_list.insertAdjacentHTML("beforeend",
-        `<div class="track">
-            <div class="left">
-                <a class="track-title" href="${track_link(track.id)}">${track.name}</a>
-                <p class="track-time" title="${track.plays} plays">${format_hours(track.played_hours)}</p>
-            </div>
-            <span class="track-bar"</span>
-        </div>`
+console.log(data)
+
+function render() {
+    scroller.renderViewport(
+        track_list.clientHeight,
+        track_list,
+        (index, element) => {
+            element.innerHTML =
+            `<div class="track" style="--ratio: ${data[index].ratio};">
+                <div class="left">
+                    <a class="track-title" href="${track_link(data[index].id)}">${data[index].name}</a>
+                    <p class="track-time" title="${data[index].plays} plays">${format_hours(data[index].played_hours)}</p>
+                </div>
+                <span class="track-bar"</span>
+            </div>`;
+        }
     )
-
-    track_list.querySelector(".track:last-of-type").style.setProperty("--ratio", track.played_hours/max)
 }
+
+let scroller = new CeriousScroll(track_list, playlist.tracks.length, {onScroll: render})
+render()

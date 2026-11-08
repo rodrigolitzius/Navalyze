@@ -165,8 +165,12 @@ async function load_graphs() {
 
         let data = new Array
         for (const [key, value] of Object.entries(graph_data)) {
+            let [hour_part, minute_part] = [
+                Math.trunc(key / (60 * 60)).toString().padStart(2, "0"),
+                ((key / 60) % 60).toString().padEnd(2, "0")
+            ]
             data.push({
-                x: ((key / (24 * 60 * 60)) * 24).toString(),
+                x: `${hour_part}:${minute_part}`,
                 y: value
             })
         }

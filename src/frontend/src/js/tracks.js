@@ -8,8 +8,8 @@ let api = new Api()
 load_nav_buttons(document.querySelector("#nav-buttons"), "tracks.html")
 let [page_start, page_end] = get_page()
 
-let tracks = await api.get_most_played_albums(page_end-page_start, page_start)
-tracks = await tracks_response.json()
+let tracks = await api.get_most_played_tracks(page_end-page_start, page_start)
+tracks = await tracks.json()
 
 let list = document.getElementById("tracks-list")
 let images = new Array()

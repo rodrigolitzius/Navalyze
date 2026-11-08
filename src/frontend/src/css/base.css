@@ -307,7 +307,12 @@ html {
     background-color: var(--content-color);
     border-radius: var(--border-radius);
     margin-bottom: 5px;
+    margin-inline: 15px;
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--border-radius);
     padding: 10px;
+    position: sticky;
+    bottom: 10px;
 
     .default-button {
         width: 80px;

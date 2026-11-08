@@ -7,14 +7,6 @@ function get_page_size() {
     return parseInt(page_size_input.value, 10)
 }
 
-// 0 20
-// 20 40
-// 40 60
-
-// 60 80
-// 40 60
-// 20 40
-
 function load_nav_buttons(parent_element, page_url) {
     get_page_size()
 
@@ -22,7 +14,6 @@ function load_nav_buttons(parent_element, page_url) {
 
     parent_element.querySelector("#next-page").addEventListener("click", function () {
         let page_size = get_page_size()
-        console.log(`Size: ${page_size}, start: ${start}, end: ${end}, s+s: ${start+page_size}, e+s: ${end+page_size}`,start+page_size, end+page_size)
         window.location.replace(`${page_url}?start=${end}&end=${end+page_size}`)
     });
 

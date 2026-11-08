@@ -1,4 +1,5 @@
-import {Api} from "./api.js"
+import { Api } from "./api.js"
+import { setup_timezone_select } from "./util.js"
 
 const api = new Api()
 
@@ -19,14 +20,14 @@ function get_form() {
     return [form, btn]
 }
 
-function fill_default_timezone() {
-    const timezone_input = document.querySelector("#timezone")
+function fill_default_timezone(timezone_input) {
     timezone_input.value = Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
 const [form, btn] = get_form()
 
-fill_default_timezone()
+let timezone_input = document.querySelector("#timezone")
+setup_timezone_select(timezone_input)
 
 form.addEventListener("submit", async function (event) {
     event.preventDefault()

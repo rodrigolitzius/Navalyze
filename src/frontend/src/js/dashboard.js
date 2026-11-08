@@ -1,6 +1,6 @@
-import { Api, get_image_url } from "./api.js"
+import { Api } from "./api.js"
 import { track_link } from "./html.js"
-import { relative_time, format_hours, load_images } from "./util.js"
+import { relative_time, format_hours, load_images, setup_timezone_select } from "./util.js"
 import { Chart } from "chart.js/auto"
 
 const api = new Api()
@@ -188,38 +188,6 @@ async function load_graphs() {
     }
 }
 
-function setup_timezone_select() {
-    const select = document.getElementById("timezone-select")
-
-    const system_timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const current_timezone = localStorage.getItem("timezone") || system_timezone
-
-    const timezones = typeof Intl.supportedValuesOf === "function"
-        ? Intl.supportedValuesOf("timeZone")
-        : [system_timezone]
-
-    if (!timezones.includes(current_timezone)) {
-        timezones.unshift(current_timezone)
-    }
-
-    for (const timezone of timezones) {
-        const option = document.createElement("option")
-        option.value = timezone
-        option.textContent = timezone.replaceAll("_", " ")
-        if (timezone === current_timezone) option.selected = true
-        select.appendChild(option)
-    }
-
-    if (!localStorage.getItem("timezone")) {
-        localStorage.setItem("timezone", current_timezone)
-    }
-
-    select.addEventListener("change", () => {
-        localStorage.setItem("timezone", select.value)
-    })
-}
-
-setup_timezone_select()
 load_stats()
 load_top_lists()
 load_recent()

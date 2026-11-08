@@ -90,8 +90,6 @@ function dedup_image_urls(api, imgs) {
         }
     })
 
-    console.log(result)
-
     return result
 }
 
@@ -107,4 +105,33 @@ async function load_images_sync(api, imgs) {
     }
 }
 
-export {relative_time, format_hours, build_time_graph, load_images, load_images_sync }
+function setup_timezone_select(select) {
+    const system_timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const current_timezone = localStorage.getItem("timezone") || system_timezone
+
+    const timezones = typeof Intl.supportedValuesOf === "function"
+        ? Intl.supportedValuesOf("timeZone")
+        : [system_timezone]
+
+    if (!timezones.includes(current_timezone)) {
+        timezones.unshift(current_timezone)
+    }
+
+    for (const timezone of timezones) {
+        const option = document.createElement("option")
+        option.value = timezone
+        option.textContent = timezone.replaceAll("_", " ")
+        if (timezone === current_timezone) option.selected = true
+        select.appendChild(option)
+    }
+
+    if (!localStorage.getItem("timezone")) {
+        localStorage.setItem("timezone", current_timezone)
+    }
+
+    select.addEventListener("change", () => {
+        localStorage.setItem("timezone", select.value)
+    })
+}
+
+export {relative_time, format_hours, build_time_graph, load_images, load_images_sync,setup_timezone_select }

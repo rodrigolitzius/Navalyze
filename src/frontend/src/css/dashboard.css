@@ -11,11 +11,6 @@
     font-size: 1.7em;
     margin: 0;
 }
-#top-bar-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
 .selector-button {
     display: flex;
     align-items: center;
@@ -308,11 +303,9 @@
 @media (max-width: 1200px) {
     #stat-cards { grid-template-columns: repeat(3, 1fr); }
     #top-lists { grid-template-columns: repeat(2, 1fr); }
-    .graph-card {height: 300px;}
 }
 @media (max-width: 600px) {
     #main { padding: 18px; }
     #stat-cards { grid-template-columns: repeat(2, 1fr); }
     #top-lists { grid-template-columns: 1fr; }
-    .graph-card {height: 100px;}
 }

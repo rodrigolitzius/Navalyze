@@ -1,4 +1,5 @@
 import { Temporal } from 'temporal-polyfill'
+import { setup_timezone_select } from './util'
 
 const page = document.getElementById("layout")
 
@@ -310,3 +311,5 @@ document.getElementById("logout-btn").addEventListener("click", function () {
 
     window.location.replace("login.html")
 })
+
+setup_timezone_select(document.querySelector(".timezone select"))

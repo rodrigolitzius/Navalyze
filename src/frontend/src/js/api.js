@@ -9,6 +9,9 @@ function local_storage_weekdays_to_string(weekdays) {
 }
 
 function local_storage_artist_types_to_string(artist_types) {
+    if (!artist_types) {
+        return null
+    }
     return artist_types.split(",").map((artist, i) => {
         if (artist != "1") { return }
         if (i == 0) { return "artist" }
@@ -108,12 +111,12 @@ class Api {
     }
 
     get_most_played_artists(limit, offset) {
-        var request = this.new_request(`most-played/artists`,
-            {
-                limit: limit, offset: offset ?? 0,
-                type: local_storage_artist_types_to_string(localStorage.getItem("artist-types") ?? "1,1,0")
-            }
-        )
+        let params = { limit: limit, offset: offset ?? 0 }
+        let artist_types = local_storage_artist_types_to_string(localStorage.getItem("artist-types"))
+        if (artist_types) {
+            params.type = artist_types
+        }
+        var request = this.new_request(`most-played/artists`, params)
 
         return fetch(request)
     }

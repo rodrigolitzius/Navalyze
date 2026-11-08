@@ -43,7 +43,7 @@ if (filter_active) {
 
 let last_focused_input = null;
 let weekdays = [true, true, true, true, true, true, true]
-let artist_types = [true, false, false]
+let artist_types = [false, false, false]
 
 document.querySelectorAll(".mon, .tue, .wed, .thu, .fri, .sat, .sun").forEach(function (element) {
     let weekdays_ls = localStorage.getItem("weekdays")

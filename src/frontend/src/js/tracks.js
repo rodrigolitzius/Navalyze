@@ -6,10 +6,10 @@ import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
 let api = new Api()
 
 load_nav_buttons(document.querySelector("#nav-buttons"), "tracks.html")
-let page = get_page()
+let [page_start, page_end] = get_page()
 
-let tracks_response = await api.get_most_played_tracks(PAGE_SIZE, PAGE_SIZE * page)
-let tracks = await tracks_response.json()
+let tracks = await api.get_most_played_albums(page_end-page_start, page_start)
+tracks = await tracks_response.json()
 
 let list = document.getElementById("tracks-list")
 let images = new Array()

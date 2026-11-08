@@ -1,13 +1,13 @@
 import { Api } from "./api.js"
-import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { load_nav_buttons, get_page } from "./load-page-change.js"
 import { format_hours, load_images } from "./util.js";
 
 let api = new Api()
 
 load_nav_buttons(document.querySelector("#nav-buttons"), "artists.html")
-let page = get_page()
+let [page_start, page_end] = get_page()
 
-let artists = await api.get_most_played_artists(PAGE_SIZE, PAGE_SIZE*page)
+let artists = await api.get_most_played_artists(page_end-page_start, page_start)
 artists = await artists.json()
 
 let artist_list = document.getElementById("artists-list")

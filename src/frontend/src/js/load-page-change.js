@@ -1,27 +1,60 @@
 const PAGE_SIZE = 20
 
-function load_nav_buttons(parent_element, page_url) {
-    let page = get_page()
+function get_page_size() {
+    let page_size_input = document.getElementById("page-size-selector")
+    page_size_input.value = localStorage.getItem("page-size") ?? localStorage.setItem("page-size", PAGE_SIZE)
 
-    parent_element.querySelector("#next-page").addEventListener("click", function() {
-        window.location.replace(`${page_url}?page=${page+1}`)
+    return parseInt(page_size_input.value, 10)
+}
+
+// 0 20
+// 20 40
+// 40 60
+
+// 60 80
+// 40 60
+// 20 40
+
+function load_nav_buttons(parent_element, page_url) {
+    get_page_size()
+
+    let [start, end] = get_page()
+
+    parent_element.querySelector("#next-page").addEventListener("click", function () {
+        let page_size = get_page_size()
+        console.log(`Size: ${page_size}, start: ${start}, end: ${end}, s+s: ${start+page_size}, e+s: ${end+page_size}`,start+page_size, end+page_size)
+        window.location.replace(`${page_url}?start=${end}&end=${end+page_size}`)
     });
 
     parent_element.querySelector("#previous-page").addEventListener("click", function () {
-        let next = page-1
-        if (page <= 0) {
-            next = 0
+        let page_size = get_page_size()
+
+        let new_start = Math.max(0, start - page_size)
+        let new_end = Math.max(0, start)
+        if (new_end <= new_start) {
+            new_end = new_start + page_size
         }
-        window.location.replace(`${page_url}?page=${next}`)
+        if ((new_end - new_start) < page_size) {
+            new_end += page_size - (new_end - new_start)
+        }
+        window.location.replace(`${page_url}?start=${new_start}&end=${new_end}`)
     });
+
+    parent_element.querySelector("#page-size-selector").addEventListener("input", function () {
+        localStorage.setItem("page-size", this.value)
+    })
 }
 
 function get_page() {
-    let page = new URLSearchParams(window.location.search).get("page");
-    page = page ? parseInt(page, 10) : 0
-    if (Number.isNaN(page) || page < 0) page = 0
+    let start = new URLSearchParams(window.location.search).get("start");
+    let end = new URLSearchParams(window.location.search).get("end");
+    start = start ? parseInt(start, 10) : 0
+    end = end ? parseInt(end, 10) : get_page_size()
 
-    return page
-  }
+    if (Number.isNaN(start) || start < 0) start = 0
+    if (Number.isNaN(end) || end < 0) end = get_page_size()
 
-export { load_nav_buttons, get_page, PAGE_SIZE}
+    return [start, end]
+}
+
+export { load_nav_buttons, get_page, PAGE_SIZE }

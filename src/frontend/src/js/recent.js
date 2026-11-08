@@ -1,14 +1,14 @@
 import { Api } from "./api.js"
 import { build_link_list, artist_link, album_link, track_link } from "./html.js";
-import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { load_nav_buttons, get_page } from "./load-page-change.js"
 import { load_images_sync } from "./util.js";
 
 let api = new Api()
 
 load_nav_buttons(document.querySelector("#nav-buttons"), "recent.html")
-let page = get_page()
+let [page_start, page_end] = get_page()
 
-let recent = await api.get_recently_played(PAGE_SIZE, PAGE_SIZE*page)
+let recent = await api.get_recently_played(page_end-page_start, page_start)
 recent = await recent.json()
 
 let recent_html = document.querySelector("#played-list")

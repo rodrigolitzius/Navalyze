@@ -1,6 +1,6 @@
 import { Api } from "./api.js"
 import { track_link } from "./html.js"
-import { relative_time, format_hours, load_images, setup_timezone_select } from "./util.js"
+import { relative_time, format_hours, load_images } from "./util.js"
 import { Chart } from "chart.js/auto"
 
 const api = new Api()

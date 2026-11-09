@@ -1,7 +1,7 @@
 import { Api } from "./api.js"
 import { build_link_list, artist_link, album_link, track_link } from "./html.js";
 import { load_nav_buttons, get_page } from "./load-page-change.js"
-import { load_images_sync } from "./util.js";
+import { load_images } from "./util.js";
 
 let api = new Api()
 
@@ -51,4 +51,4 @@ for (const song of recent) {
     )
 }
 
-load_images_sync(api, images)
+load_images(api, images)

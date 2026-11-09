@@ -75,13 +75,18 @@ async function safe_image_url(api, entry_id, size) {
     }
 }
 
+function lazy(fn) {
+    let promise = null
+    return () => (promise ??= fn())
+}
+
 function dedup_image_urls(api, imgs) {
     let url_map = new Map()
 
     let result = imgs.map((entry) => {
         let url = url_map.get(entry.id)
         if (!url) {
-            url = safe_image_url(api, entry.id, entry.size)
+            url = lazy(() => safe_image_url(api, entry.id, entry.size))
             url_map.set(entry.id, url)
         }
 
@@ -93,15 +98,9 @@ function dedup_image_urls(api, imgs) {
     return result
 }
 
-function load_images(api, imgs) {
-    dedup_image_urls(api, imgs).forEach(async (entry) => {
-        entry.img.src = await entry.url
-    })
-}
-
-async function load_images_sync(api, imgs) {
+async function load_images(api, imgs) {
     for (const entry of dedup_image_urls(api, imgs)) {
-        entry.img.src = await entry.url
+        entry.img.src = await entry.url()
     }
 }
 
@@ -134,4 +133,10 @@ function setup_timezone_select(select) {
     })
 }
 
-export {relative_time, format_hours, build_time_graph, load_images, load_images_sync,setup_timezone_select }
+function sleep_ms(time) {
+    return new Promise(resolve => {
+        setTimeout(resolve, time);
+    });
+}
+
+export {relative_time, format_hours, build_time_graph, load_images, setup_timezone_select }

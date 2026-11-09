@@ -20,7 +20,7 @@ album_div.insertAdjacentHTML("beforeend",
     </div>`
 )
 
-load_images(api, [{id: album_id, size: 700, img: album_div.querySelector("img")}])
+load_images(api, [{id: album_id, size: 700, container: album_div}])
 
 for (const artist of album.artists) {
     build_link_list(album_div.querySelector("#artists"), artist.name, artist_link(artist.id))

@@ -1,5 +1,6 @@
 import { Api } from "./api.js"
-import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { playlist_link } from "./html.js";
+import { load_nav_buttons, get_page } from "./load-page-change.js"
 import { format_hours, load_images } from "./util.js";
 
 let api = new Api()
@@ -15,16 +16,18 @@ let images = new Array()
 
 for (const playlist of playlists) {
     playlist_list.insertAdjacentHTML("beforeend",
-        `<a href="playlist.html?id=${playlist.id}" class="playlist-entry">
-            <div class="card album-entry">
-                <img class="card-img">
+        `<a href="${playlist_link(playlist.id)}" class="playlist-entry">
+            <div class="card playlist-entry">
+                <div class="img-container">
+                    <img class="card-img">
+                </div>
                 <p class="card-name">${playlist.name}</p>
-                <p class="card-footer" title="${playlist.plays}">${format_hours(playlist.played_hours)}</p>
+                <p class="card-footer" title="${playlist.plays} plays">${format_hours(playlist.played_hours)}</p>
             </div>
         </a>`
     )
 
-    images.push({id: playlist.id, size: 400, img: playlist_list.lastElementChild.querySelector("img")})
+    images.push({id: playlist.id, size: 400, container: playlist_list.lastElementChild})
 }
 
 load_images(api, images)

@@ -1,7 +1,7 @@
 import { Api, get_image_url } from "./api.js"
 import { format_hours, load_images } from "./util.js"
 import { build_link_list, album_link, track_link } from "./html.js"
-import { load_nav_buttons, get_page, PAGE_SIZE } from "./load-page-change.js"
+import { load_nav_buttons, get_page } from "./load-page-change.js"
 
 let api = new Api()
 
@@ -33,7 +33,7 @@ for (let i = 0; i < tracks.length; i++) {
         `
     )
 
-    images.push({id: track.id, size: 400, img: list.lastElementChild.querySelector("img")})
+    images.push({id: track.id, size: 400, container: list.lastElementChild})
 
     let entry = list.lastElementChild
 

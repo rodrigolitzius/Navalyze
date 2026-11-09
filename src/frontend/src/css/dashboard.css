@@ -141,7 +141,6 @@
     object-fit: cover;
     display: block;
     border-radius: var(--border-radius);
-    background-color: var(--secondary-color);
 }
 .list-featured-badge {
     position: absolute;
@@ -166,6 +165,7 @@
     gap: 10px;
     padding: 26px 12px 10px 12px;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    border-radius: var(--border-radius);
 }
 .list-featured-text {
     min-width: 0;
@@ -275,15 +275,26 @@
     width: 100%;
     object-fit: cover;
     border-radius: var(--border-radius);
-    background-color: var(--secondary-color);
     margin-bottom: 8px;
 }
+
+.recent-title, .recent-sub, .recent-time {
+    margin: 0;
+    padding: 0;
+}
+
+.recent-time {
+    margin-top: 3px;
+}
+
 .recent-title {
     font-size: 0.85em;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 5px;
+
 }
 .recent-sub, .recent-time {
     font-size: 0.76em;
@@ -291,14 +302,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin: 0;
-    padding: 0;
-    margin-top: 2px;
-}
-
-.recent-title, .recent-sub, .recent-time {
-    margin: 0;
-    padding: 0;
 }
 @media (max-width: 1200px) {
     #stat-cards { grid-template-columns: repeat(3, 1fr); }

@@ -34,7 +34,7 @@ for (const song of recent) {
         </a>`
     )
 
-    images.push({id: song.id, size: 400, img: recent_html.lastElementChild.querySelector("img")})
+    images.push({id: song.id, size: 400, container: recent_html.lastElementChild})
 
     for (const artist of song.artists) {
         build_link_list(

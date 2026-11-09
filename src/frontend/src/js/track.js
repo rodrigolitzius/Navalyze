@@ -27,7 +27,7 @@ if (Array.isArray(track)) {
         </div>`
     )
 
-    load_images(api, [{id: track_id, size: 700, img: header.querySelector("img")}])
+    load_images(api, [{id: track_id, size: 700, container: header}])
 
     build_link_list(
         header.querySelector("#album"),

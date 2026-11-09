@@ -1,5 +1,3 @@
-import { get_image_url } from "./api"
-
 function artist_link(id) {
     return `artist.html?id=${id}`
 }
@@ -12,10 +10,14 @@ function track_link(id) {
     return `track.html?id=${id}`
 }
 
+function playlist_link(id) {
+    return `playlist.html?id=${id}`
+}
+
 function build_link_list(element, text, link) {
     element.insertAdjacentHTML("beforeend",
         `<a href="${link}">${text}</a><p>,</p>`
     )
 }
 
-export {build_link_list, artist_link, album_link, track_link}
+export {build_link_list, artist_link, album_link, track_link, playlist_link}

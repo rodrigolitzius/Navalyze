@@ -1,0 +1,47 @@
+#artists-list, #albums-list, #playlists-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.artist-entry, .album-entry, .playlist-entry, .top-list-card, .recent-card {
+    height: 100%;
+
+    .img-container {
+        aspect-ratio: 1/1;
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--border-radius);
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: relative;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            transform: scale(1.15);
+            background-image: var(--img-url);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(15px);
+        }
+    }
+}
+
+@media (max-width: 1600px) {
+    #artists-list, #albums-list { grid-template-columns: 1fr 1fr 1fr 1fr }
+}
+
+@media (max-width: 1000px) {
+    #artists-list, #albums-list { grid-template-columns: 1fr 1fr 1fr }
+}
+
+@media (max-width: 600px) {
+    #artists-list, #albums-list { grid-template-columns: 1fr 1fr }
+}

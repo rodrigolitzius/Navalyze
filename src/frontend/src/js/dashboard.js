@@ -18,7 +18,9 @@ async function fill_featured_item(entry, featured_id, href) {
     if (!entry) return
 
     const inner = `
-        <img alt="">
+        <div class="img-container">
+            <img class="card-img">
+        </div>
         <div class="list-featured-info">
             <div class="list-featured-text">
                 <p class="list-featured-name">${entry.name}</p>
@@ -33,7 +35,7 @@ async function fill_featured_item(entry, featured_id, href) {
             : `<div class="list-featured-link">${inner}</div>`
     )
 
-    load_images(api, [{id: entry.id, size: 800, img: featured.querySelector("img")}])
+    load_images(api, [{id: entry.id, size: 800, container: featured}])
 }
 
 async function fill_ranked_list(entries, list_id, featured_id, href) {
@@ -46,15 +48,11 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
         return
     }
 
-    await fill_featured_item(entries[0], featured_id, href)
-
-    const rest = entries.slice(1, 5)
+    await fill_featured_item(entries.shift(), featured_id, href)
 
     let images = new Array()
 
-    for (let i = 0; i < rest.length; i++) {
-        const entry = rest[i]
-
+    entries.forEach((entry, i) => {
         const inner = `
             <span class="ranked-rank">${i + 2}</span>
             <img class="ranked-thumb">
@@ -70,8 +68,8 @@ async function fill_ranked_list(entries, list_id, featured_id, href) {
                 : `<li><div class="ranked-item">${inner}</div></li>`
         )
 
-        images.push({id: entry.id, size: 200, img: list.lastElementChild.querySelector("img")})
-    }
+        images.push({id: entry.id, size: 200, container: list.lastElementChild})
+    })
 
     load_images(api, images)
 }
@@ -92,14 +90,16 @@ async function fill_recent_strip(songs) {
 
         strip.insertAdjacentHTML("beforeend",
             `<a class="recent-card" href="${track_link(song.id)}">
-                <img alt="">
+                <div class="img-container">
+                    <img class="card-img">
+                </div>
                 <p class="recent-title">${song.title}</p>
                 <p class="recent-sub">${artist_names}</p>
                 <p class="recent-time">${relative_time(song.timestamp)}</p>
             </a>`
         )
 
-        images.push({id: song.id, size: 400, img: strip.lastElementChild.querySelector("img")})
+        images.push({id: song.id, size: 400, container: strip.lastElementChild})
     }
 
     load_images(api, images)
@@ -122,7 +122,7 @@ async function load_stats() {
 
 async function load_top_lists() {
     try {
-        const response = await api.get_most_played_artists(30)
+        const response = await api.get_most_played_artists(5)
         const artists = await response.json()
         await fill_ranked_list(artists, "#top-artists", "#top-artists-featured", "artist.html")
     } catch (error) {
@@ -130,7 +130,7 @@ async function load_top_lists() {
     }
 
     try {
-        const response = await api.get_most_played_albums(30)
+        const response = await api.get_most_played_albums(5)
         const albums = await response.json()
         await fill_ranked_list(albums, "#top-albums", "#top-albums-featured", "album.html")
     } catch (error) {
@@ -138,7 +138,7 @@ async function load_top_lists() {
     }
 
     try {
-        const response = await api.get_most_played_tracks(30)
+        const response = await api.get_most_played_tracks(5)
         const tracks = await response.json()
         await fill_ranked_list(tracks, "#top-tracks", "#top-tracks-featured", "track.html")
     } catch (error) {

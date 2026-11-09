@@ -91,7 +91,7 @@ function dedup_image_urls(api, imgs) {
         }
 
         return {
-            id: entry.id, url: url, size: entry.size, img: entry.img
+            id: entry.id, url: url, size: entry.size, container: entry.container
         }
     })
 
@@ -100,7 +100,9 @@ function dedup_image_urls(api, imgs) {
 
 async function load_images(api, imgs) {
     for (const entry of dedup_image_urls(api, imgs)) {
-        entry.img.src = await entry.url()
+        let url = await entry.url()
+        entry.container.querySelector("img").src = url
+        entry.container.style.setProperty("--img-url", `url(${url})`)
     }
 }
 

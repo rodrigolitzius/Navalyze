@@ -1,4 +1,5 @@
 import { Api } from "./api.js"
+import { artist_link } from "./html.js";
 import { load_nav_buttons, get_page } from "./load-page-change.js"
 import { format_hours, load_images } from "./util.js";
 
@@ -15,16 +16,18 @@ let images = new Array()
 
 for (const artist of artists) {
     artist_list.insertAdjacentHTML("beforeend",
-        `<a href="artist.html?id=${artist.id}" class="album-entry">
-            <div class="card album-entry">
-                <img class="card-img">
+        `<a href="${artist_link(artist.id)}" class="artist-entry">
+            <div class="card artist-entry">
+                <div class="img-container">
+                    <img class="card-img">
+                </div>
                 <p class="card-name">${artist.name}</p>
-                <p class="card-footer" title="${artist.plays}">${format_hours(artist.played_hours)}</p>
+                <p class="card-footer" title="${artist.plays} plays">${format_hours(artist.played_hours)}</p>
             </div>
         </a>`
     )
 
-    images.push({id: artist.id, size: 400, img: artist_list.lastElementChild.querySelector("img")})
+    images.push({id: artist.id, size: 400, container: artist_list.lastElementChild})
 }
 
 load_images(api, images)

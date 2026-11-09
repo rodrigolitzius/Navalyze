@@ -35,21 +35,23 @@ for (const property of properties) {
     )
 }
 
-let albums = document.getElementById("albums")
+let albums = document.getElementById("albums-list")
 let images = new Array()
 
 for (const album of artist.albums) {
     albums.insertAdjacentHTML("beforeend",
-        `<a href="${album_link(album.id)}" class="card">
-            <div>
-                <img class="card-img">
+        `<a href="${album_link(album.id)}" class="album-entry">
+            <div class="card album-entry">
+                <div class="img-container">
+                    <img class="card-img">
+                </div>
                 <p class="card-name">${album.name}</p>
                 <p class="card-footer" title="${album.plays} plays">${format_hours(album.played_hours)}</p>
             </div>
         </a>`
     )
 
-    images.push({id: album.id, size: 400, img: albums.lastElementChild.querySelector("img")})
+    images.push({id: album.id, size: 400, container: albums.lastElementChild})
 }
 
 load_images(api, images)

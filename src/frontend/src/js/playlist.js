@@ -21,7 +21,7 @@ playlist_div.insertAdjacentHTML("beforeend",
     </div>`
 )
 
-load_images(api, [{id: playlist_id, size: 700, img: playlist_div.querySelector("img")}])
+load_images(api, [{id: playlist_id, size: 700, container: playlist_div}])
 
 let playlist_content = playlist_div.querySelector("#properties")
 

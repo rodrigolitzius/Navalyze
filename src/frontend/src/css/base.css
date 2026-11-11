@@ -527,7 +527,7 @@ main {
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.default-button:hover {
+.default-button:hover:not(:disabled) {
     background: var(--accent-color);
     color: #ffffff;
     transform: translateY(-1px);
@@ -536,8 +536,7 @@ main {
     transform: translateY(0);
 }
 .default-button:disabled {
-    opacity: 0.6;
-    cursor: wait;
+    cursor: default;
     transform: none;
 }
 

@@ -3,6 +3,28 @@ main.card > .card-name{
     margin-bottom: 10px;
 }
 
+#page-change {
+    margin-top: 10px;
+    margin-inline: 20px;
+    width: 200px;
+    display: flex;
+    position: sticky;
+    bottom: 20px;
+    background-color: var(--secondary-color);
+    margin-left: auto;
+
+    button {
+        font-size: 1.5em;
+        aspect-ratio: 1/1;
+        width: 40px;
+        height: 40px;
+        background-color: var(--accent-color-2);
+        border-width: 1px;
+        border-style: solid;
+        border-color: var(--secondary-color);
+    }
+}
+
 #albums {
     display: flex;
     gap: 10px;

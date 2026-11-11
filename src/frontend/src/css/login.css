@@ -90,6 +90,10 @@ body {
     font-family: inherit;
     font-size: 15px;
     font-weight: 700;
+
+    &:disabled {
+        cursor: wait;
+    }
 }
 
 .login-footer {

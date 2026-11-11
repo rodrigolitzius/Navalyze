@@ -15,6 +15,7 @@ pub struct TrackStatArtists {
 #[derive(Serialize, Clone)]
 pub struct TrackStat {
     pub name: String,
+    pub year: Option<u64>,
     pub artists: Vec<TrackStatArtists>,
     pub album: String,
     pub album_id: String,
@@ -41,11 +42,16 @@ impl TrackStat {
                 album_id: scrobble.track.album_id.clone(),
                 id: scrobble.track.id.clone(),
                 plays: 0,
-                played_hours: 0.0
+                played_hours: 0.0,
+                year: scrobble.track.original_year
             });
 
             entry.played_hours += duration_hour;
             entry.plays += 1;
+
+            if let (Some(entry_year), Some(track_year)) = (entry.year, scrobble.track.original_year) {
+                entry.year = Some(u64::min(entry_year, track_year))
+            }
         }
 
         return track_stat;

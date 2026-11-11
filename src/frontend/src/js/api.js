@@ -163,8 +163,17 @@ class Api {
         return fetch(request)
     }
 
-    get_artist(id) {
-        var request = this.new_request(`artist/${id}`)
+    get_artist(id, include, limit, offset) {
+        let params = {
+            include: include,
+            offset: offset ?? 0
+        };
+
+        if (limit) {
+            params.limit = limit
+        }
+
+        var request = this.new_request(`artist/${id}`, params)
 
         return fetch(request)
     }

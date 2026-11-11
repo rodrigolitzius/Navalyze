@@ -5,6 +5,7 @@ use axum::extract::{FromRef, FromRequestParts, OptionalFromRequestParts, Query};
 use axum::http::request::Parts;
 use chrono::{WeekdaySet, Weekday};
 use chrono_tz::Tz;
+use bitflags::bitflags;
 use uuid::Uuid;
 
 use crate::{
@@ -61,6 +62,13 @@ pub struct Range {
     pub end: u64
 }
 
+bitflags! {
+    pub struct ArtistResponseType: u8 {
+        const ALBUMS = 1;
+        const TRACKS = 2;
+    }
+}
+
 pub struct StartTs(pub u64);
 pub struct EndTS(pub u64);
 pub struct Limit(pub usize);
@@ -69,6 +77,7 @@ pub struct Timezone(pub Tz);
 pub struct Resolution(pub u64);
 pub struct Weekdays(pub WeekdaySet);
 pub struct ArtistRoles(pub ArtistRole);
+pub struct ArtistResponseInclude(pub ArtistResponseType);
 
 pub struct StartTsWithDefault(pub u64);
 pub struct EndTSWithDefault(pub u64);
@@ -192,6 +201,19 @@ impl<S: Send + Sync> FromRequestParts<S> for Resolution {
 }
 
 impl<S: Send + Sync> FromRequestParts<S> for ArtistRoles {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let queries = queries_from_request_parts(parts, state).await?;
+
+        return Self::from_query(&queries)
+    }
+}
+
+impl<S: Send + Sync> FromRequestParts<S> for ArtistResponseInclude {
     type Rejection = ApiError;
 
     async fn from_request_parts(
@@ -436,12 +458,34 @@ impl QueryParam for Limit {
 
 impl QueryParam for ArtistRoles {
     fn from_query(queries: &HashMap<String, String>) -> Result<Self, ApiError> {
-        // let artist_types_default = String::from("artist");
         let artist_strings: Vec<&str> = queries.get("type")
             .ok_or_else(|| ApiError::MissingParameter("Artist type(s) not specified".into()))?
             .split(",").collect();
 
         return Ok(Self(ArtistRole::from(artist_strings)))
+    }
+}
+
+impl QueryParam for ArtistResponseInclude {
+    fn from_query(queries: &HashMap<String, String>) -> Result<Self, ApiError> {
+        let includes: Vec<&str> = queries.get("include")
+            .ok_or_else(|| ApiError::MissingParameter("'include' not specified.".into()))?
+            .split(",").collect();
+
+        let mut result = ArtistResponseType::empty();
+
+        for include in includes {
+            match include {
+                "albums" => {result.insert(ArtistResponseType::ALBUMS);}
+                "tracks" => {result.insert(ArtistResponseType::TRACKS);}
+                v => {
+                    return Err(ApiError::BadRequest(
+                        format!("{} on 'include' parameter is not valid", v)));
+                }
+            }
+        }
+
+        return Ok(Self(result))
     }
 }
 

@@ -57,7 +57,8 @@ pub struct SongData {
     pub artists: Vec<SongArtist>,
     pub genres: Vec<SongGenre>,
     pub release_types: Vec<SongReleaseType>,
-    pub languages: Vec<SongLanguage>
+    pub languages: Vec<SongLanguage>,
+    pub original_year: Option<u64>
 }
 
 pub struct SongArtist {
@@ -360,6 +361,7 @@ impl FromNative for SongData {
             album_id: native.album_id,
             album_artist: native.album_artist,
             duration: native.duration,
+            original_year: native.original_year,
             artists: native.artists.into_iter().map(|a| SongArtist::from_native(a)).collect(),
             genres: native.genres.into_iter().map(|g| SongGenre::from_native(g)).collect(),
             languages: native.languages.into_iter().map(|l| SongLanguage::from_native(l)).collect(),

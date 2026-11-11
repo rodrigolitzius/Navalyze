@@ -59,5 +59,6 @@ pub struct NativeSongData {
     pub artists: Vec<NativeSongArtist>,
     pub languages: Vec<NativeLanguage>,
     pub genres: Vec<NativeGenre>,
-    pub release_types: Vec<NativeReleaseType>
+    pub release_types: Vec<NativeReleaseType>,
+    pub original_year: Option<u64>
 }

@@ -6,7 +6,7 @@ const api = new Api()
 
 let artist_id = new URLSearchParams(window.location.search).get("id");
 
-let artist = await api.get_artist(artist_id)
+let artist = await api.get_artist(artist_id, "albums")
 artist = await artist.json()
 
 let header = document.getElementById("img-header")
@@ -17,7 +17,7 @@ let content = header.querySelector(".content")
 content.querySelector(".title").textContent = artist.name
 
 build_round_list(content.querySelector(".properties"), [
-    `${artist.album_count} albums`,
+    `${artist.albums.length} albums`,
     artist.artist_type ? `${artist.artist_type}` : null,
     artist.gender ? `${artist.gender}` : null
 ])
@@ -26,6 +26,8 @@ build_content_stats(content.querySelector(".content-stats"), [
     { label: "Plays", value: `${artist.plays}` },
     { label: "Time played", value: format_hours(artist.played_hours) },
 ])
+
+content.querySelector(".artist-tracks").href = `tracks.html?artist=${artist_id}`
 
 let albums = document.getElementById("albums-list")
 let images = new Array()

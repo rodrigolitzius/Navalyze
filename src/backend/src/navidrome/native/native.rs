@@ -29,6 +29,7 @@ struct DeserializeSongData {
     duration: f64,
     participants: DeserializeParticipants,
     genres: Option<Vec<DeserializeGenre>>,
+    original_year: Option<u64>,
     tags: Option<DeserializeTags>
 }
 
@@ -221,7 +222,8 @@ impl NavidromeNativeSession {
                 artists: artists.into_values().collect(),
                 languages: languages,
                 genres: genres,
-                release_types: release_types
+                release_types: release_types,
+                original_year: song_data.original_year
             };
 
             result.insert(song_data.id.clone(), song_data);

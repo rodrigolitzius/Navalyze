@@ -14,7 +14,13 @@ function load_nav_buttons(parent_element, page_url) {
 
     parent_element.querySelector("#next-page").addEventListener("click", function () {
         let page_size = get_page_size()
-        window.location.replace(`${page_url}?start=${end}&end=${end+page_size}`)
+
+        let url = new URL(window.location.href)
+
+        url.searchParams.set("start", end)
+        url.searchParams.set("end", end+page_size)
+
+        window.location.replace(url)
     });
 
     parent_element.querySelector("#previous-page").addEventListener("click", function () {
@@ -28,7 +34,13 @@ function load_nav_buttons(parent_element, page_url) {
         if ((new_end - new_start) < page_size) {
             new_end += page_size - (new_end - new_start)
         }
-        window.location.replace(`${page_url}?start=${new_start}&end=${new_end}`)
+
+        let url = new URL(window.location.href)
+
+        url.searchParams.set("start", new_start)
+        url.searchParams.set("end", new_end)
+
+        window.location.replace(url)
     });
 
     parent_element.querySelector("#page-size-selector").addEventListener("input", function () {

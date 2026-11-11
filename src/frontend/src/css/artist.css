@@ -1,6 +1,22 @@
-main.card > .card-name{
-    font-size: 2em;
-    margin-bottom: 10px;
+.content-top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+
+    * {
+        margin: 0;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 2em;
+        /*margin-bottom: 10px;*/
+    }
+
+    .artist-tracks {
+        font-size: 1.1em;
+        text-decoration: none;
+    }
 }
 
 #page-change {

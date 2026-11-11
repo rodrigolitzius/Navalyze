@@ -6,6 +6,8 @@
 	<title>Album</title>
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/album.css">
+	<link rel="stylesheet" href="css/image-header.css">
+	<link rel="stylesheet" href="css/content-stats.css">
 	<script type="module" src="js/redirect-login.js" defer></script>
 	<script type="module" src="js/album.js" defer></script>
 	<script type="module" src="js/load-sidebar.js" defer></script>
@@ -13,7 +15,15 @@
 <body>
     <div id="layout">
         <main>
-            <section id="image-header" class="card"></section>
+            <section id="img-header" class="card">
+                <img class="img" src="">
+                <div class="content">
+                    <h1 class="title"></h1>
+                    <div class="artists link-list"></div>
+                    <div class="properties round-list"></div>
+                    <div class="content-stats"></div>
+                </div>
+            </section>
             <section class="card">
                 <h1 class="card-name">Tracks</h1>
                 <div class="track-list" id="track-list"></div>

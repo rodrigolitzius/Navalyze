@@ -1,5 +1,5 @@
 import { Api } from "./api.js"
-import { build_link_list, artist_link, track_link } from "./html.js";
+import { build_link_list, build_content_stats, build_round_list, artist_link, track_link } from "./html.js";
 import { format_hours, build_time_graph, load_images } from "./util.js";
 
 const api = new Api()
@@ -9,36 +9,25 @@ let album_id = new URLSearchParams(window.location.search).get("id");
 let album = await api.get_album(album_id)
 album = await album.json()
 
-let album_div = document.getElementById("image-header")
+let header = document.getElementById("img-header")
+load_images(api, [{id: album_id, size: 700, container: header}])
 
-album_div.insertAdjacentHTML("beforeend",
-    `<img>
-    <div class="content">
-        <h1>${album.name}</h1>
-        <div id="artists" class="link-list"></div>
-        <div id="properties" class="round-list"></div>
-    </div>`
-)
+let content = header.querySelector(".content")
 
-load_images(api, [{id: album_id, size: 700, container: album_div}])
+content.querySelector(".title").textContent = album.name
 
 for (const artist of album.artists) {
-    build_link_list(album_div.querySelector("#artists"), artist.name, artist_link(artist.id))
+    build_link_list(content.querySelector(".artists"), artist.name, artist_link(artist.id))
 }
 
-let album_content = album_div.querySelector("#properties")
-
-let properties = [
+build_round_list(content.querySelector(".properties"), [
     album.year ? `${album.year}` : null,
-]
+])
 
-for (const property of properties) {
-    if (!property) { continue; }
-
-    album_content.insertAdjacentHTML("beforeend",
-        `<span class="round-list-item">${property}</span>`
-    )
-}
+build_content_stats(content.querySelector(".content-stats"), [
+    { label: "Plays", value: `${album.plays}` },
+    { label: "Time played", value: format_hours(album.played_hours) },
+])
 
 let max = Math.max(...album.tracks.map(item => item.played_hours))
 

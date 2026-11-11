@@ -18,7 +18,9 @@ struct Response {
     album_count: u64,
     artist_type: Option<String>,
     gender: Option<String>,
-    albums: Vec<ResponseAlbum>
+    albums: Vec<ResponseAlbum>,
+    played_hours: f64,
+    plays: u64
 }
 
 pub async fn artist_info(
@@ -51,9 +53,15 @@ pub async fn artist_info(
         None => (None, None)
     };
 
+    let mut played_hours = 0.0;
+    let mut plays = 0;
+
     let mut albums_response: Vec<ResponseAlbum> = Vec::new();
     for album in albums_stat.into_values() {
         let year = session.navidrome_interface.get_album(&album.id.clone()).await?.year;
+
+        played_hours += album.played_hours;
+        plays += album.plays;
 
         albums_response.push(ResponseAlbum {
             artist: album.artist,
@@ -72,7 +80,8 @@ pub async fn artist_info(
         artist_type: artist_type,
         gender: gender,
         album_count: albums_response.len() as u64,
-        albums: albums_response
+        albums: albums_response,
+        played_hours, plays
     };
 
     return Ok(Json(serde_json::to_value(result).unwrap()));

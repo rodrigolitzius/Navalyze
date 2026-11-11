@@ -1,22 +1,22 @@
-#track-stats {
+.content-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 14px;
 
-    .track-stat-card {
+    .content-stats-card {
         background-color: var(--bg-color);
         border: 1px solid var(--secondary-color);
         border-radius: var(--border-radius);
         padding: 16px;
     }
 
-    .track-stat-label {
+    .content-stats-label {
         color: var(--muted-font-color);
         font-size: 0.85em;
         margin: 0 0 6px 0;
     }
 
-    .track-stat-value {
+    .content-stats-value {
         color: var(--primary-font-color);
         font-size: 1.4em;
         font-weight: bold;
@@ -24,9 +24,5 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-
-    @media (max-width: 700px) {
-        grid-template-columns: 1fr 1fr;
     }
 }

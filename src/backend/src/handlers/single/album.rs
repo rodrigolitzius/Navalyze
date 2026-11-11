@@ -12,7 +12,9 @@ struct Response {
     name: String,
     artists: Vec<ResponseArtist>,
     year: Option<u64>,
-    tracks: Vec<TrackStat>
+    tracks: Vec<TrackStat>,
+    played_hours: f64,
+    plays: u64
 }
 
 pub async fn album_info(
@@ -35,14 +37,22 @@ pub async fn album_info(
 
     let songs_stats = TrackStat::group(&scrobbles);
 
-    let mut tracks: Vec<TrackStat> = songs_stats.into_values().collect();
+    let mut played_hours = 0.0;
+    let mut plays = 0;
+
+    let mut tracks: Vec<TrackStat> = songs_stats.into_values().map(|t| {
+        played_hours += t.played_hours;
+        plays += t.plays;
+        t
+    }).collect();
     tracks.sort_by(|a, b| { b.played_hours.total_cmp(&a.played_hours)});
 
     let response = Response {
         name: album.name,
         artists: album.artists.into_iter().map(|a| ResponseArtist {id: a.id, name: a.name}).collect(),
         year: album.year,
-        tracks: tracks
+        tracks: tracks,
+        played_hours, plays
     };
 
     return Ok(Json(serde_json::to_value(response).unwrap()))

@@ -6,6 +6,8 @@
 	<title>Track</title>
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/track.css">
+	<link rel="stylesheet" href="css/image-header.css">
+	<link rel="stylesheet" href="css/content-stats.css">
 	<script type="module" src="js/redirect-login.js" defer></script>
 	<script type="module" src="js/track.js" defer></script>
 	<script type="module" src="js/load-sidebar.js" defer></script>
@@ -13,10 +15,14 @@
 <body>
     <div id="layout">
         <main>
-            <section id="image-header" class="card"></section>
-            <section class="card">
-                <h1 class="card-name">Statistics</h1>
-                <div id="track-stats"></div>
+            <section id="img-header" class="card">
+                <img class="img" src="">
+                <div class="content">
+                    <h1 class="title"></h1>
+                    <div class="artists link-list"></div>
+                    <div class="album link-list"></div>
+                    <div class="content-stats"></div>
+                </div>
             </section>
             <section id="graph">
                 <div class="graph-card card">

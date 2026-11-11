@@ -1,5 +1,5 @@
 import { Api } from "./api.js"
-import { track_link } from "./html.js";
+import { build_content_stats, track_link } from "./html.js";
 import { format_hours, build_time_graph, load_images } from "./util.js";
 import { CeriousScroll } from '@ceriousdevtech/cerious-scroll';
 
@@ -10,32 +10,17 @@ let playlist_id = new URLSearchParams(window.location.search).get("id");
 let playlist = await api.get_playlist(playlist_id)
 playlist = await playlist.json()
 
-let playlist_div = document.getElementById("image-header")
+let header = document.getElementById("img-header")
+load_images(api, [{ id: playlist_id, size: 700, container: header }])
 
-playlist_div.insertAdjacentHTML("beforeend",
-    `<img>
-    <div class="content">
-        <h1>${playlist.name}</h1>
-        <div id="artists" class="link-list"></div>
-        <div id="properties" class="round-list"></div>
-    </div>`
-)
+let content = header.querySelector(".content")
 
-load_images(api, [{id: playlist_id, size: 700, container: playlist_div}])
+content.querySelector(".title").textContent = playlist.name
 
-let playlist_content = playlist_div.querySelector("#properties")
-
-let properties = [
-    playlist.year ? `${playlist.year}` : null,
-]
-
-for (const property of properties) {
-    if (!property) { continue; }
-
-    playlist_content.insertAdjacentHTML("beforeend",
-        `<span class="round-list-item">${property}</span>`
-    )
-}
+build_content_stats(content.querySelector(".content-stats"), [
+    { label: "Plays", value: `${playlist.plays}` },
+    { label: "Time played", value: format_hours(playlist.played_hours) },
+])
 
 let playlist_activity = await api.get_playlist_graph(playlist_id, 50)
 playlist_activity = await playlist_activity.json()

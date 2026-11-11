@@ -1,13 +1,20 @@
-> [!WARNING]
-This is a WIP tool. Expect bugs and rough edges.
-
 # Navalyze
-This project aims to provide Navidrome users detailed and configurable analysis of their music listening history and habits, much like Last.fm and ListenBrainz.
+This project aims to provide Navidrome users extensive and configurable analysis of their music listening history and habits, much like Last.fm and ListenBrainz.
+
+## Images
+This is the home page. Check [images](./images/) if you want to see more
+
+Note the browser window was stretched so that all content fit the screenshot
+![dashboard](./images/dashboard.png)
 
 ## Features
+> [!WARNING]
+All functionality is complete, but i couldn't get enough people to test Navalyze with their own library. If you find a bug, please open an issue.
+
 This is what Navalyze currently supports:
 - How many artists/albums/tracks/scrobbles you have, including the total amount of time played
-- A list of your most played playlists/artists/albums/tracks and genres
+- A list of your most played playlists/artists/albums/tracks. Artists may include composers, album artists and regular artists (You can choose)
+- Most played songs by a specific artist
 - Statistics for any playlist/artist/album/track (For example, albums and playlists show all tracks and how much you played each one)
 - A graph of activity over time for your playlists/artists/albums/tracks and genres/languages/release-types.
 - A graph for how frequently you play songs during your day
@@ -17,12 +24,9 @@ Additionally:
 - You can filter your scrobbles by starting/ending date and time, so you can analyze your history from/to any point in time.
 - Your scrobbles are automatically updated.
 - Everything uses the duration of the songs for the analysis rather than the play count. This is often times more accurate since, for example, 10 plays on a 5m song is much more than 10 plays on a 2m song
+- History is analyzed per user.
 
 If you're developing your own project and need any of the above data, you can use Navalyze's API to fetch it. (As long as you follow the license). The API still needs a few touches for ease-of-use though.
-
-## Known issues
-(Clearly not an exhaustive list. These are just important things to keep in mind)
-- Your Navalyze session can expire and the website doesn't realize it, so it just breaks.
 
 # Why Navalyze?
 There are various services with the goal of storing and analyzing your listening history, so what makes Navalyze different?
@@ -35,7 +39,10 @@ It also means any changes in Navidrome (Like changing a file's metadata or manua
 
 Navalyze, however, is entirely integrated with Navidrome. Any information present in Navalyze will be consistent with Navidrome.
 
-Finally, a lot of services don't offer many informations about your history. Navalyze tries to give you as much as possible.
+Finally, a lot of services don't provide much info about your history. Navalyze tries to give you as much as possible.
+
+## Known issues
+- Your Navalyze session can, rarely, expire and the website doesn't realize it, so it just breaks, forcing the user to log out and back in again
 
 # How to use
 > [!NOTE]
@@ -79,7 +86,7 @@ If you don't know whether your Navidrome instace is IPv6 only, it probably isn't
 To update navalyze, simply go into your Navalyze folder and run `docker compose pull`
 
 ## Compiling
-1. Install de dependencies:
+1. Install the dependencies:
     - frontend: [npm](https://www.npmjs.com/) (used to install Vite and the frontend dependencies)
     - backend: [Rust](https://rust-lang.org/) (nightly version, because of [Polonius](https://blog.rust-lang.org/2026/08/04/enabling-polonius-alpha-on-nightly/))
     - building: [Just](https://just.systems/) (A simple way to combine backend and frontend builds)
@@ -98,7 +105,7 @@ If you want to build the docker image, simply do `docker build -t rodrigolitzius
 
 # MusicBrainz integration
 > [!NOTE]
-MusicBrainz integration is very WIP, and may break the user experience
+MusicBrainz integration experimental, and may break the user experience
 
 If your library has MusicBrainz tags, Navalyze can take advantage of them to gather additional information for analysis. See the settings for how to set it up.
 

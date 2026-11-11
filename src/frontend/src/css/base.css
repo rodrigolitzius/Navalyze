@@ -424,6 +424,21 @@ main {
     height: calc(100vh - 2 * var(--sidebar-margin));
 }
 
+#global-filter {
+    #start-input-indicator, #end-input-indicator {
+        margin-top: 5px;
+        display: block;
+        width: 100%;
+        height: 10px;
+        background-color: var(--accent-color);
+        border-radius: var(--border-radius);
+
+        &.inactive {
+            opacity: 0.5;
+        }
+    }
+}
+
 /* reset sem ID para não ganhar de .nav-link:hover / .active / .has-filter */
 .nav-links button.nav-link {
     background: none;

@@ -16,7 +16,7 @@ page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
 page.insertAdjacentHTML("afterbegin", popover_settings)
 
-// ===== Item ativo da sidebar =====
+// ===== Active sidebar item =====
 const current_page = window.location.pathname.split("/").pop() || "dashboard.html"
 const parent_page = {
     "index.html": "dashboard.html",
@@ -42,7 +42,12 @@ if (filter_active) {
         .classList.add("has-filter")
 }
 
-let last_focused_input = null;
+let start_datetime_input = document.querySelector("input#start-ts")
+let end_datetime_input = document.querySelector("input#end-ts")
+
+document.querySelector("#end-input-indicator").classList.add("inactive")
+
+let next_datetime_input = start_datetime_input;
 let weekdays = [true, true, true, true, true, true, true]
 let artist_types = [false, false, false]
 
@@ -132,15 +137,11 @@ document.querySelectorAll("input#start-ts, input#end-ts").forEach(function (elem
         let date = Temporal.Instant.fromEpochMilliseconds(end_ts * 1000).toZonedDateTimeISO(timezone)
         element.value = date.toString().slice(0, 16)
     }
-
-    element.addEventListener("focus", function() {
-        last_focused_input = element
-    })
 })
 
 document.querySelectorAll("button#ts-set-time").forEach(function (button) {
     button.addEventListener("click", function () {
-        if (last_focused_input == null) {
+        if (next_datetime_input == null) {
             return
         }
 
@@ -216,8 +217,26 @@ document.querySelectorAll("button#ts-set-time").forEach(function (button) {
             new_time = now.with({month: 12, day: 1, hour: 0, minute: 0, second: 0})
         }
 
+        // Clear
+        if (button_class == "ts-set-clear") {
+            new_time = ""
+        }
+
+
         if (new_time != null) {
-            last_focused_input.value = new_time.toString().slice(0, 16)
+            next_datetime_input.value = new_time.toString().slice(0, 16)
+
+            if (next_datetime_input == start_datetime_input) {
+                next_datetime_input = end_datetime_input
+                document.querySelector("#end-input-indicator").classList.remove("inactive")
+                document.querySelector("#start-input-indicator").classList.add("inactive")
+            }
+
+            else {
+                next_datetime_input = start_datetime_input
+                document.querySelector("#end-input-indicator").classList.add("inactive")
+                document.querySelector("#start-input-indicator").classList.remove("inactive")
+            }
         }
     })
 })

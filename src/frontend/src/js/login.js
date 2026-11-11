@@ -38,12 +38,12 @@ form.addEventListener("submit", async function (event) {
     const timezone = document.querySelector("#timezone").value
 
     if (!(url || server_settings.static_navidrome_url) || !username || !password || !timezone) {
-        alert("Preencha todos os campos")
+        alert("Fill all fields")
         return
     }
 
     const original_text = btn.textContent
-    btn.textContent = "Entrando..."
+    btn.textContent = "Working..."
     btn.disabled = true
 
     try {
@@ -51,7 +51,7 @@ form.addEventListener("submit", async function (event) {
 
         if (!response.ok) {
             let error_data = await response.json().catch(() => ({}))
-            throw new Error(error_data.error || `Erro HTTP ${response.status}`)
+            throw new Error(error_data.error || `HTTP Error: ${response.status}`)
         }
 
         let data = await response.json()
@@ -61,7 +61,7 @@ form.addEventListener("submit", async function (event) {
             localStorage.setItem("timezone", timezone)
             window.location.replace("index.html")
         } else {
-            alert("Login falhou: token não recebido")
+            alert("Login failed: token not received")
         }
     } catch (error) {
         alert(error.message)

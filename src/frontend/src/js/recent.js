@@ -16,7 +16,8 @@ let images = new Array()
 
 for (const song of recent) {
     let played_date = new Date(song.timestamp * 1000)
-    let played_date_string = played_date.toLocaleString("pt-br", { timeZone: localStorage.getItem("timezone") || undefined })
+    let played_date_string = played_date
+        .toLocaleString(undefined, { timeZone: localStorage.getItem("timezone") })
 
     recent_html.insertAdjacentHTML("beforeend",
         `<a href="${track_link(song.id)}">

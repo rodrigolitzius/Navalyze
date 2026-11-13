@@ -78,6 +78,7 @@ pub struct Resolution(pub u64);
 pub struct Weekdays(pub WeekdaySet);
 pub struct ArtistRoles(pub ArtistRole);
 pub struct ArtistResponseInclude(pub ArtistResponseType);
+pub struct MakeAWrappedTemplate(pub String);
 
 pub struct StartTsWithDefault(pub u64);
 pub struct EndTSWithDefault(pub u64);
@@ -320,6 +321,19 @@ impl<S: Send + Sync> FromRequestParts<S> for ResponseFilterWithDefault {
     }
 }
 
+impl<S: Send + Sync> FromRequestParts<S> for MakeAWrappedTemplate {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let queries = queries_from_request_parts(parts, state).await?;
+
+        return Ok(Self::from_query(&queries)?);
+    }
+}
+
 // These don't have a default and can be optional
 impl<S: Send + Sync> OptionalFromRequestParts<S> for Timezone {
     type Rejection = ApiError;
@@ -463,6 +477,16 @@ impl QueryParam for ArtistRoles {
             .split(",").collect();
 
         return Ok(Self(ArtistRole::from(artist_strings)))
+    }
+}
+
+impl QueryParam for MakeAWrappedTemplate {
+    fn from_query(queries: &HashMap<String, String>) -> Result<Self, ApiError> {
+        let template = queries.get("template").ok_or_else(|| {
+            ApiError::MissingParameter("Template not specified".into())
+        })?;
+
+        return Ok(Self(template.clone()));
     }
 }
 

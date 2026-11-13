@@ -4,6 +4,7 @@ pub mod single;
 pub mod most_played;
 pub mod extract;
 pub mod distribution;
+pub mod make_a_wrapped;
 
 use std::collections::{HashMap, HashSet};
 use tokio::sync::RwLock;

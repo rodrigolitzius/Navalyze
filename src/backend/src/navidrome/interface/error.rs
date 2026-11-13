@@ -1,7 +1,5 @@
-use std::error::Error;
-
 use reqwest::StatusCode;
-use crate::{reqwest::ReqwestApiError, api::error::ApiError};
+use crate::{reqwest::{ReqwestApiError, ReqwestErrorExt}, api::error::ApiError};
 
 pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
@@ -37,11 +35,11 @@ impl From<NavidromeSessionError> for ApiError {
     fn from(value: NavidromeSessionError) -> Self {
         return match value {
             NavidromeSessionError::Reqwest(e) => ApiError::Internal(
-                format!("Reqwest failed: {}", get_reqwest_error_msg(e))
+                format!("Reqwest failed: {}", e.error_msg())
             ),
 
             NavidromeSessionError::Unreachable(e) => ApiError::NavidromeUnreachable(
-                format!("Navidrome could not be reached: {}", get_reqwest_error_msg(e))
+                format!("Navidrome could not be reached: {}", e)
             ),
 
             NavidromeSessionError::Unauthorized => ApiError::Unauthorized(
@@ -73,16 +71,4 @@ impl From<NavidromeSessionError> for ApiError {
             ),
         }
     }
-}
-
-fn get_reqwest_error_msg(error: reqwest::Error) -> String {
-    let mut full_error = String::from(error.to_string());
-
-    let mut error = error.source();
-    while let Some(source) = error {
-        full_error.push_str(format!(" => {}", source.to_string()).as_str());
-        error = source.source();
-    }
-
-    return full_error;
 }

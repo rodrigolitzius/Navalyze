@@ -17,11 +17,12 @@ use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*,make_a_wrapped::*},
+        other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
-        distribution::{languages::*, release_types::*}
+        distribution::{languages::*, release_types::*},
+        make_a_wrapped::{wrapped::*, templates::*}
     }
 };
 
@@ -43,7 +44,8 @@ async fn start_backend(state: ApiState, binding_address: String, dist_dir: Strin
         .route("/api/login", post(login))
         .route("/api/auth-check", get(auth_check))
         .route("/api/server-settings", get(server_settings))
-        .route("/api/make-a-wrapped", get(make_a_wrapped))
+        .route("/api/make-a-wrapped/generate", get(make_a_wrapped))
+        .route("/api/make-a-wrapped/templates", get(templates))
 
         // most-played
         .route("/api/most-played/artists", get(most_played_artists))

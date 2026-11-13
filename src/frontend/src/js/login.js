@@ -59,6 +59,13 @@ form.addEventListener("submit", async function (event) {
         if (data.id) {
             localStorage.setItem("token", data.id)
             localStorage.setItem("timezone", timezone)
+
+            let make_a_wrapped_enabled = await api.get_server_settings(username, password, url)
+            make_a_wrapped_enabled = await make_a_wrapped_enabled.json()
+            make_a_wrapped_enabled = make_a_wrapped_enabled.make_a_wrapped
+
+            localStorage.setItem("make_a_wrapped", make_a_wrapped_enabled)
+
             window.location.replace("index.html")
         } else {
             alert("Login failed: token not received")

@@ -16,6 +16,8 @@ page.insertAdjacentHTML("afterbegin", sidebar_html)
 page.insertAdjacentHTML("afterbegin", popover_filter)
 page.insertAdjacentHTML("afterbegin", popover_settings)
 
+document.getElementById("make-a-wrapped-link").hidden = !(localStorage.getItem("make_a_wrapped") == "true")
+
 // ===== Active sidebar item =====
 const current_page = window.location.pathname.split("/").pop() || "dashboard.html"
 const parent_page = {

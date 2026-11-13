@@ -1,12 +1,17 @@
-use reqwest::Client;
-use bytes::Bytes;
-use serde::Serialize;
+pub mod error;
 
-use crate::reqwest::{ReqwestAPiErrorExt, ReqwestApiError};
+use reqwest::{multipart::{Form, Part}, Client};
+use serde_json::to_string;
+use bytes::Bytes;
+use serde::{Serialize, Deserialize};
+
+use crate::{
+    make_a_wrapped::error::MakeAWrappedError, navidrome::interface::Image, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
+};
 
 pub enum WrappedFormat {
-    #[allow(unused)]
     Png,
+    #[allow(unused)]
     Svg
 }
 
@@ -23,6 +28,11 @@ struct WrappedBody {
 }
 
 #[derive(Serialize)]
+struct PeriodData {
+    label: String
+}
+
+#[derive(Serialize)]
 struct WrappedData {
     artists: Vec<String>,
     tracks: Vec<String>,
@@ -31,9 +41,22 @@ struct WrappedData {
     period: PeriodData
 }
 
-#[derive(Serialize)]
-struct PeriodData {
-    label: String
+#[derive(Deserialize, Serialize)]
+pub struct TemplatesResponse {
+    pub templates: Vec<Template>
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TemplateCreator {
+    pub name: String,
+    pub website: String
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Template {
+    pub creator: TemplateCreator,
+    pub name: String,
+    pub slug: String
 }
 
 impl MakeAWrapped {
@@ -49,30 +72,80 @@ impl MakeAWrapped {
         artists: Vec<String>,
         tracks: Vec<String>,
         minutes: u64,
-        genre: String,
-        format: &WrappedFormat
-    ) -> Result<Bytes, ReqwestApiError> {
+        genre: &str,
+        format: &WrappedFormat,
+        image: Option<Image>,
+        template: &str
+    ) -> Result<Bytes, MakeAWrappedError> {
         let data = WrappedBody {
             format: format.to_format_param().into(),
-            template: "black".into(),
+            template: template.to_string(),
             data: WrappedData {
-                artists, tracks, minutes, genre,
+                artists, tracks, minutes,
+                genre: genre.to_string(),
                 period: PeriodData {
                     label: "This is not visible in the generated image. I think".into()
                 }
             }
         };
 
+        let payload_str = to_string(&data).map_err(|e| {
+            error::MakeAWrappedError::PayloadToText(e)
+        })?;
+
         let url = format!("{}/wrapped", self.url);
-        let response = self.client.post(url)
-            .json(&data)
-            .send()
-            .await.map_reqwest_api_err()?
-            .bytes().await.map_err(|e| {
-                ReqwestApiError::Other(e)
+
+        let response = if let Some(image) = image {
+            let form: Form = Form::new()
+                .part("payload", Part::text(payload_str)
+                    .mime_str("application/json")
+                    .map_err(|e| error::MakeAWrappedError::SetMime(e))?)
+                .part("artwork", Part::stream(image.bytes)
+                    .file_name("gay-furry.sex") // Doesn't work without this
+                    .mime_str(image.content_type.to_str()
+                    .map_err(|e| error::MakeAWrappedError::ImageContentTypeToStr(e))?)
+                    .map_err(|e| error::MakeAWrappedError::SetMime(e))?);
+
+            let response = self.client.post(url)
+                .multipart(form)
+                .send().await
+                .map_reqwest_api_err()
+                .map_err(|e| {
+                    error::MakeAWrappedError::Reqwest(e)
+                })?;
+
+            response
+        }
+
+        else {
+            let response = self.client.post(url)
+                .json(&data)
+                .send().await
+                .map_reqwest_api_err()
+                .map_err(|e| {
+                    error::MakeAWrappedError::Reqwest(e)
+                })?;
+
+            response
+        };
+
+        return Ok(response.bytes().await.map_err(|e| {error::MakeAWrappedError::ResponseToBytes(e)})?);
+    }
+
+    pub async fn get_templates(&self) -> Result<Vec<Template>, MakeAWrappedError> {
+        let url = format!("{}/templates?limit=50", self.url);
+
+        let response: TemplatesResponse = self.client
+            .get(url)
+            .send().await
+            .map_reqwest_api_err().map_err(|e| {
+                MakeAWrappedError::Reqwest(e)
+            })?
+            .into_json().await.map_err(|e| {
+                MakeAWrappedError::Reqwest(e)
             })?;
 
-        return Ok(response);
+        return Ok(response.templates);
     }
 }
 

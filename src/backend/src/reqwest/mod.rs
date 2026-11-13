@@ -1,3 +1,5 @@
+use std::{error::Error as StdError};
+
 use reqwest::{Error, StatusCode, Response};
 use serde::{de::DeserializeOwned};
 
@@ -16,6 +18,10 @@ pub trait ReqwestAPiErrorExt {
     fn map_reqwest_api_err(self) -> Result<Response, ReqwestApiError>;
     fn from_status_code(status: StatusCode) -> Option<ReqwestApiError>;
     fn handle_err(error: Error) -> ReqwestApiError;
+}
+
+pub trait ReqwestErrorExt {
+    fn error_msg(self) -> String;
 }
 
 impl ReqwestAPiErrorExt for ReqwestResponseError {
@@ -54,6 +60,20 @@ impl ReqwestAPiErrorExt for ReqwestResponseError {
         } else {
             return ReqwestApiError::Other(error)
         }
+    }
+}
+
+impl ReqwestErrorExt for Error {
+    fn error_msg(self) -> String {
+        let mut full_error = String::from(self.to_string());
+
+        let mut error = self.source();
+        while let Some(source) = error {
+            full_error.push_str(format!(" => {}", source.to_string()).as_str());
+            error = source.source();
+        }
+
+        return full_error;
     }
 }
 

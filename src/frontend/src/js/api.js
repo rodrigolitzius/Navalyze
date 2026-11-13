@@ -202,6 +202,18 @@ class Api {
         return fetch(request)
     }
 
+    get_wrapped(template) {
+        var request = this.new_request(`make-a-wrapped/generate`, {template: template})
+
+        return fetch(request)
+    }
+
+    get_templates() {
+        var request = this.new_request(`make-a-wrapped/templates`)
+
+        return fetch(request)
+    }
+
     login(username, password, url) {
         var request = new Request("/api/login", {
             method: "POST",
@@ -232,4 +244,15 @@ async function get_image_url(api, id, size) {
     return URL.createObjectURL(image_blob);
 }
 
-export {Api, get_image_url}
+async function get_wrapped_url(api, template) {
+    const image_response = await api.get_wrapped(template)
+
+    if (!image_response.ok) {
+        throw new Error(`Fetch failed: Status ${image_response.status}`)
+    }
+
+    let image_blob = await image_response.blob();
+    return URL.createObjectURL(image_blob);
+}
+
+export {Api, get_image_url, get_wrapped_url}

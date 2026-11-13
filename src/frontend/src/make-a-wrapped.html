@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Make A Wrapped</title>
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" href="css/make-a-wrapped.css">
+	<script type="module" src="js/redirect-login.js" defer></script>
+	<script type="module" src="js/make-a-wrapped.js" defer></script>
+	<script type="module" src="js/load-sidebar.js" defer></script>
+</head>
+<body>
+    <div id="layout">
+        <main>
+            <section class="card">
+                <h1 class="card-name">Make a Wrapped</h1>
+                <p class="card-desc" id="attribution">
+                    Generate an image with the stats for your library.<br>
+                    Powered by <a href="https://wrapped.devmatei.com/">Make A Wrapped API</a>. Courtesy of <a href="https://devmatei.com/">DevMatei</a>. All credit to him. Show some support!
+                </p>
+                <p>
+                    Checkout the available templates <a href="https://wrapped.devmatei.com/marketplace">here</a>
+                </p>
+
+                <div id="controls">
+                    <span id="loaded" hidden>
+                        <button id="generate" class="default-button">Generate Wrapped</button>
+                        <select name="templates" id="templates"></select>
+                    </span>
+                    <span id="loading">
+                        <h1>Loading...</h1>
+                    </span>
+                </div>
+
+                <div id="wrapped">
+                    <div class="placeholder-img">
+                        <h1>Image goes here</h1>
+                    </div>
+                    <img hidden>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

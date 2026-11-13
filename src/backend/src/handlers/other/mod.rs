@@ -4,4 +4,3 @@ pub mod stats;
 pub mod art;
 pub mod auth_check;
 pub mod server_settings;
-pub mod make_a_wrapped;

@@ -1,12 +1,13 @@
 pub mod error;
 
-use reqwest::{multipart::{Form, Part}, Client};
+use reqwest::{multipart::{Form, Part}, Client, header::{HeaderMap, HeaderValue}};
 use serde_json::to_string;
 use bytes::Bytes;
 use serde::{Serialize, Deserialize};
 
 use crate::{
-    make_a_wrapped::error::MakeAWrappedError, navidrome::interface::Image, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt}
+    make_a_wrapped::error::MakeAWrappedError, navidrome::interface::Image, reqwest::{ReqwestAPiErrorExt, ResponseJsonExt},
+    APP_NAME
 };
 
 pub enum WrappedFormat {
@@ -61,9 +62,15 @@ pub struct Template {
 
 impl MakeAWrapped {
     pub fn new(url: &str) -> Self {
+        let mut default_headers = HeaderMap::new();
+
+        default_headers.insert("X-Wrapped-Client", HeaderValue::from_static(APP_NAME));
+
         return Self {
             url: url.to_string(),
-            client: Client::new()
+            client: Client::builder()
+                .default_headers(default_headers)
+                .build().expect("Failed to build Make a Wrapped reqwest client")
         };
     }
 

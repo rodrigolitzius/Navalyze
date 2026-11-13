@@ -38,8 +38,6 @@ const data = playlist.tracks.map((element, index) => ({
     ratio: element.played_hours/max
 }))
 
-console.log(data)
-
 function render() {
     scroller.renderViewport(
         track_list.clientHeight,

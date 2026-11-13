@@ -63,7 +63,6 @@ let album_page_size = 20
 let album_page = 0
 
 if (artist.albums.length > album_page_size) {
-    console.log(document.getElementById("page-change"))
     document.getElementById("page-change").hidden = false
 }
 

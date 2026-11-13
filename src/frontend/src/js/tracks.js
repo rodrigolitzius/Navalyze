@@ -21,8 +21,6 @@ if (artist_id) {
     tracks = await tracks.json()
 }
 
-console.log(tracks)
-
 let list = document.getElementById("tracks-list")
 let images = new Array()
 for (let i = 0; i < tracks.length; i++) {

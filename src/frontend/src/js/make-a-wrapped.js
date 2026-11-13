@@ -24,7 +24,7 @@ try {
     }
 
     document.getElementById("generate").addEventListener("click", async () => {
-        wrapped = document.getElementById("wrapped")
+        let wrapped = document.getElementById("wrapped")
 
         wrapped.querySelector(".placeholder-img h1").textContent = "Loading..."
 

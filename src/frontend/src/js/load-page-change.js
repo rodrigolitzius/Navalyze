@@ -2,7 +2,10 @@ const PAGE_SIZE = 20
 
 function get_page_size() {
     let page_size_input = document.getElementById("page-size-selector")
-    page_size_input.value = localStorage.getItem("page-size") ?? localStorage.setItem("page-size", PAGE_SIZE)
+
+    localStorage.getItem("page-size") ?? localStorage.setItem("page-size", PAGE_SIZE)
+
+    page_size_input.value = localStorage.getItem("page-size")
 
     return parseInt(page_size_input.value, 10)
 }

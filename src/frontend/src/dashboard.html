@@ -96,12 +96,31 @@
             </section>
 
             <section id="graphs">
-                <div class="graph-card card">
-                    <div>
-                        <h3 class="card-name">Daily frequency</h3>
-                        <p class="card-desc">Your activity during a day</p>
+                <div class="graph-card card" id="graph-hour">
+                    <div class="card-expandable">
+                        <div>
+                            <h3 class="card-name">All time activity</h3>
+                        </div>
+                        <div>
+                            <form class="ts-row graph-type-selection">
+                                <span>
+                                    <label>All time</label>
+                                    <input class="graph-type-time" type="radio" name="size" value="small">
+                                </span>
+
+                                <span>
+                                    <label>Daily</label>
+                                    <input class="graph-type-daily" type="radio" name="size" value="medium" checked>
+                                </span>
+
+                                <span>
+                                    <label>Weekly</label>
+                                    <input class="graph-type-weekly" type="radio" name="size" value="large">
+                                </span>
+                            </form>
+                        </div>
                     </div>
-                    <canvas id="graph-hour"><canvas/>
+                    <canvas><canvas/>
                 </div>
             </section>
         </main>

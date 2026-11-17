@@ -1,12 +1,12 @@
 use crate::handlers::time::prelude::*;
 use crate::handlers::extract::ResponseFilterWithDefault;
-use crate::analysis::time::genres;
+use crate::analysis::group::genres;
 
 pub async fn genres_time(
     SessionExtractor(session): SessionExtractor,
     Timezone(timezone): Timezone,
-    Resolution(resolution): Resolution,
     RangeWithDefault(range): RangeWithDefault,
+    graph_type: GraphTypeAndResolution,
     ResponseFilterWithDefault(response_filter): ResponseFilterWithDefault,
     weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
@@ -19,7 +19,13 @@ pub async fn genres_time(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let all_genres = genres::group(&scrobbles, resolution, timezone);
+    let mut all_genres: HashMap<String, HashMap<u64, f64>> = HashMap::new();
+
+    for (genre, datetimes) in genres::group(&scrobbles, timezone).into_iter() {
+        let grouped = group_type(&datetimes, graph_type.resolution, &graph_type.graph_type);
+
+        all_genres.entry(genre).or_insert(grouped);
+    }
 
     let mut sorted_genres: Vec<(String, HashMap<u64, f64>)> = all_genres.into_iter().collect();
     sorted_genres.sort_by(|a, b| {

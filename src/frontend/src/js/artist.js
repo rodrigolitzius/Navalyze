@@ -1,6 +1,6 @@
 import { Api } from "./api.js"
-import { build_content_stats, album_link, build_round_list} from "./html.js";
-import { format_hours, build_time_graph, load_images } from "./util.js";
+import { build_content_stats, album_link, build_round_list, build_configurable_graph, GraphDataSource} from "./html.js";
+import { format_hours, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -50,10 +50,17 @@ for (const album of artist.albums) {
 
 load_images(api, images)
 
-let artist_activity = await api.get_artist_graph(artist_id, 50)
-artist_activity = await artist_activity.json()
+let graph_element = document.getElementById("graph")
 
-build_time_graph(document.getElementById("graph-artist"), {[artist.name]: artist_activity})
+build_configurable_graph(
+    graph_element.querySelector("canvas"),
+    graph_element.querySelector(".graph-type-selection"),
+    new class extends GraphDataSource {
+        async daily()    { return {[artist.name]: await api.get_artist_graph(artist_id, 48, "daily").then((v) => v.json())} }
+        async weekly()   { return {[artist.name]: await api.get_artist_graph(artist_id, 7, "weekly").then((v) => v.json())} }
+        async all_time() { return {[artist.name]: await api.get_artist_graph(artist_id, 50, "all_time").then((v) => v.json())} }
+    }
+)
 
 // This should, preferrably, be a multiple of all possible grid row lengths.
 // This is to avoid the last row of a page being incomplete, making the user think

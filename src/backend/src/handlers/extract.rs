@@ -69,6 +69,10 @@ bitflags! {
     }
 }
 
+pub enum GraphTypeEnum {
+    AllTime, Daily, Weekly
+}
+
 pub struct StartTs(pub u64);
 pub struct EndTS(pub u64);
 pub struct Limit(pub usize);
@@ -78,6 +82,7 @@ pub struct Resolution(pub u64);
 pub struct Weekdays(pub WeekdaySet);
 pub struct ArtistRoles(pub ArtistRole);
 pub struct ArtistResponseInclude(pub ArtistResponseType);
+pub struct GraphType(pub GraphTypeEnum);
 pub struct MakeAWrappedTemplate(pub String);
 
 pub struct StartTsWithDefault(pub u64);
@@ -89,6 +94,7 @@ pub struct ResponseFilterWithDefault(pub ResponseFilter);
 pub struct ArtistRolesWithDefault(pub ArtistRole);
 
 pub struct WeekdaysAndTimezone {pub set: WeekdaySet, pub timezone: Tz}
+pub struct GraphTypeAndResolution {pub graph_type: GraphTypeEnum, pub resolution: Option<u64>}
 
 // ============================
 // ===== FromRequestParts =====
@@ -224,6 +230,42 @@ impl<S: Send + Sync> FromRequestParts<S> for ArtistResponseInclude {
         let queries = queries_from_request_parts(parts, state).await?;
 
         return Self::from_query(&queries)
+    }
+}
+
+impl<S: Send + Sync> FromRequestParts<S> for GraphTypeAndResolution {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
+        let queries = queries_from_request_parts(parts, state).await?;
+
+        let graph_type = GraphType::from_query(&queries)?.0;
+        let resolution = Resolution::from_query(&queries);
+
+        let resolution = match graph_type {
+            GraphTypeEnum::Weekly => {
+                match resolution {
+                    Ok(v) => Ok(Some(v.0)),
+                    Err(e) => {
+                        match e {
+                            ApiError::MissingParameter(_) => Ok(None),
+                            _ => Err(e)
+                        }
+                    }
+                }
+            },
+            _ => {
+                Ok(Some(resolution?.0))
+            }
+        }?;
+
+        return Ok(Self {
+            graph_type: GraphType::from_query(&queries)?.0,
+            resolution: resolution
+        })
     }
 }
 
@@ -439,7 +481,7 @@ impl QueryParam for Weekdays {
 impl QueryParam for Resolution {
     fn from_query(queries: &HashMap<String, String>) -> Result<Self, ApiError> {
         let resolution = queries.get("res").ok_or_else(|| {
-            ApiError::BadRequest("No resolution specified".into())
+            ApiError::MissingParameter("No resolution specified".into())
         })?;
 
         let resolution: u64 = resolution.parse().map_err(|_| {
@@ -508,6 +550,25 @@ impl QueryParam for ArtistResponseInclude {
                 }
             }
         }
+
+        return Ok(Self(result))
+    }
+}
+
+impl QueryParam for GraphType {
+    fn from_query(queries: &HashMap<String, String>) -> Result<Self, ApiError> {
+        let graph_type: &str = queries.get("graph_type")
+            .ok_or_else(|| ApiError::MissingParameter("'graph_type' not specified.".into()))?;
+
+        let result = match graph_type {
+            "all_time" => GraphTypeEnum::AllTime,
+            "daily" => GraphTypeEnum::Daily,
+            "weekly" => GraphTypeEnum::Weekly,
+            v => {
+                return Err(ApiError::BadRequest(
+                    format!("{} on 'graph_type' parameter is not valid", v)));
+            }
+        };
 
         return Ok(Self(result))
     }

@@ -1,12 +1,12 @@
 use crate::handlers::time::prelude::*;
 use crate::handlers::extract::ResponseFilterWithDefault;
-use crate::analysis::time::release_types;
+use crate::analysis::group::release_types;
 
 pub async fn release_types_time(
     SessionExtractor(session): SessionExtractor,
     Timezone(timezone): Timezone,
-    Resolution(resolution): Resolution,
     RangeWithDefault(range): RangeWithDefault,
+    graph_type: GraphTypeAndResolution,
     ResponseFilterWithDefault(response_filter): ResponseFilterWithDefault,
     weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
@@ -19,7 +19,13 @@ pub async fn release_types_time(
         scrobbles = scrobbles.filter_weekdays(days.set, days.timezone)
     }
 
-    let all_release_types = release_types::group(&scrobbles, resolution, timezone);
+    let mut all_release_types: HashMap<String, HashMap<u64, f64>> = HashMap::new();
+
+    for (release_type, datetimes) in release_types::group(&scrobbles, timezone).into_iter() {
+        let grouped = group_type(&datetimes, graph_type.resolution, &graph_type.graph_type);
+
+        all_release_types.entry(release_type).or_insert(grouped);
+    }
 
     let mut sorted_release_types: Vec<(String, HashMap<u64, f64>)> = all_release_types.into_iter().collect();
     sorted_release_types.sort_by(|a, b| {

@@ -1,7 +1,6 @@
 import { Api } from "./api.js"
-import { track_link } from "./html.js"
+import { build_configurable_graph, GraphDataSource, track_link } from "./html.js"
 import { relative_time, format_hours, load_images } from "./util.js"
-import { Chart } from "chart.js/auto"
 
 const api = new Api()
 
@@ -158,35 +157,18 @@ async function load_recent() {
 
 async function load_graphs() {
     try {
-        let frequency_graph = document.getElementById("graph-hour")
+        let graph_element = document.getElementById("graph-hour")
 
-        let graph_data = await api.frequency(48)
-        graph_data = await graph_data.json()
-
-        let data = new Array
-        for (const [key, value] of Object.entries(graph_data)) {
-            let [hour_part, minute_part] = [
-                Math.trunc(key / (60 * 60)).toString().padStart(2, "0"),
-                ((key / 60) % 60).toString().padEnd(2, "0")
-            ]
-            data.push({
-                x: `${hour_part}:${minute_part}`,
-                y: value
-            })
-        }
-
-        new Chart(frequency_graph, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: "Hours",
-                    data: data
-                }]
-            },
-            options: {
-                maintainAspectRatio: false
+        build_configurable_graph(
+            graph_element.querySelector("canvas"),
+            graph_element.querySelector(".graph-type-selection"),
+            new class extends GraphDataSource {
+                async daily()    { return {"Every scrobble": await api.get_all_graph(48, "daily").then((v) => v.json())} }
+                async weekly()   { return {"Every scrobble": await api.get_all_graph(7, "weekly").then((v) => v.json())} }
+                async all_time() { return {"Every scrobble": await api.get_all_graph(50, "all_time").then((v) => v.json())} }
             }
-        });
+        )
+
     } catch (error) {
         console.error("Failed to load graph", error)
     }

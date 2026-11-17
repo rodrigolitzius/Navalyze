@@ -6,3 +6,5 @@ pub mod playlists;
 pub mod stats;
 pub mod genres;
 pub mod distribution;
+
+pub mod group;

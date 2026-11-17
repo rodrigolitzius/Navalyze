@@ -48,7 +48,7 @@ function build_time_graph(ctx, api_data) {
         })
     })
 
-    new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'line',
         data: {
             datasets: datasets
@@ -62,6 +62,94 @@ function build_time_graph(ctx, api_data) {
                 x: {
                     type: "time"
                 }
+            }
+        },
+    });
+}
+
+function build_daily_graph(ctx, api_data) {
+    let datasets = new Array
+
+    Object.entries(api_data).forEach((k, _) => {
+        let data = new Array
+
+        Object.entries(k[1]).forEach((k2, _) => {
+            let day_sec = parseInt(k2[0])
+            let [hour_part, minute_part] = [
+                Math.trunc(day_sec / (60 * 60)).toString().padStart(2, "0"),
+                ((day_sec / 60) % 60).toString().padEnd(2, "0")
+            ]
+
+            data.push({
+                x: `${hour_part}:${minute_part}`,
+                y: k2[1]
+            })
+        })
+
+        datasets.push({
+            label: k[0],
+            data: data
+        })
+    })
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: datasets
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
+            }
+        },
+    });
+}
+
+function build_weekly_graph(ctx, api_data) {
+    let datasets = new Array
+
+    Object.entries(api_data).forEach((k, _) => {
+        let data = new Array
+
+        Object.entries(k[1]).forEach((k2, _) => {
+            let weekday = "None"
+
+            switch (k2[0]) {
+                case "0": weekday = "Mon"; break;
+                case "1": weekday = "Tue"; break;
+                case "2": weekday = "Wed"; break;
+                case "3": weekday = "Thu"; break;
+                case "4": weekday = "Fri"; break;
+                case "5": weekday = "Sat"; break;
+                case "6": weekday = "Sun"; break;
+            }
+
+            data.push({
+                x: weekday,
+                y: k2[1]
+            })
+        })
+
+        datasets.push({
+            label: k[0],
+            data: data
+        })
+    })
+
+    return new Chart(ctx, {
+        type: 'bar',
+        data: {
+            datasets: datasets
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
             }
         },
     });
@@ -141,4 +229,4 @@ function sleep_ms(time) {
     });
 }
 
-export {relative_time, format_hours, build_time_graph, load_images, setup_timezone_select }
+export {relative_time, format_hours, build_time_graph, build_daily_graph, build_weekly_graph, load_images, setup_timezone_select }

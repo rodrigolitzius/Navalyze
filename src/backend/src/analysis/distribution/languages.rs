@@ -12,7 +12,7 @@ pub fn get_languages(scrobbles_with_songs: &Vec<ScrobbleWithSong>) -> HashMap<St
 
         let track_languages_str = match scrobble.track.languages_to_str() {
             Some(v) => v,
-            None => continue
+            None => "Unknown".to_string()
         };
 
         *result.entry(track_languages_str).or_insert(0.0) += duration;

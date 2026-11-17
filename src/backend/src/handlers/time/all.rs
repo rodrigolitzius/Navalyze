@@ -1,11 +1,10 @@
 use crate::handlers::time::prelude::*;
-use crate::analysis::time::frequency;
 
-pub async fn frequency(
+pub async fn all(
     SessionExtractor(session): SessionExtractor,
     Timezone(timezone): Timezone,
-    Resolution(resolution): Resolution,
     RangeWithDefault(range): RangeWithDefault,
+    graph_type: GraphTypeAndResolution,
     weekdays: Option<WeekdaysAndTimezone>
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &session.read().await.navidrome_interface;
@@ -19,7 +18,7 @@ pub async fn frequency(
 
     let data = to_datetime_duration_vec(scrobbles, timezone);
 
-    let result = frequency::group(&data, resolution);
+    let result = group_type(&data, graph_type.resolution, &graph_type.graph_type);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

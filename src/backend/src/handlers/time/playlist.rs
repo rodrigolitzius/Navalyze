@@ -4,8 +4,8 @@ pub async fn playlist_time(
     SessionExtractor(session): SessionExtractor,
     Path(id): Path<String>,
     Timezone(timezone): Timezone,
-    Resolution(resolution): Resolution,
     RangeWithDefault(range): RangeWithDefault,
+    graph_type: GraphTypeAndResolution,
     weekdays: Option<WeekdaysAndTimezone>
 )  -> Result<Json<serde_json::Value>, ApiError> {
     let navidrome = &session.read().await.navidrome_interface;
@@ -23,7 +23,7 @@ pub async fn playlist_time(
 
     let data = to_datetime_duration_vec(scrobbles, timezone);
 
-    let result = date::group(&data, resolution);
+    let result = group_type(&data, graph_type.resolution, &graph_type.graph_type);
 
     return Ok(Json(serde_json::to_value(result).unwrap()));
 }

@@ -20,7 +20,7 @@ use crate::{
         other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
-        time::{frequency::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
+        time::{all::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
         distribution::{languages::*, release_types::*},
         make_a_wrapped::{wrapped::*, templates::*}
     }
@@ -61,7 +61,7 @@ async fn start_backend(state: ApiState, binding_address: String, dist_dir: Strin
         .route("/api/track/{*id}", get(track_info))
 
         // time
-        .route("/api/time/frequency", get(frequency))
+        .route("/api/time/all", get(all))
         .route("/api/time/artist/{*id}", get(artist_time))
         .route("/api/time/album/{*id}", get(album_time))
         .route("/api/time/track/{*id}", get(track_time))

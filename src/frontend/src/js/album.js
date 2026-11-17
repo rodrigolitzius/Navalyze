@@ -1,6 +1,6 @@
 import { Api } from "./api.js"
-import { build_link_list, build_content_stats, build_round_list, artist_link, track_link } from "./html.js";
-import { format_hours, build_time_graph, load_images } from "./util.js";
+import { build_link_list, build_content_stats, build_configurable_graph, build_round_list, artist_link, track_link, GraphDataSource } from "./html.js";
+import { format_hours, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -47,7 +47,14 @@ for (const track of album.tracks) {
     track_list.querySelector(".track:last-of-type").style.setProperty("--ratio", track.played_hours/max)
 }
 
-let album_activity = await api.get_album_graph(album_id, 50)
-album_activity = await album_activity.json()
+let graph_element = document.getElementById("graph")
 
-build_time_graph(document.getElementById("graph-album"), {[album.name]: album_activity})
+build_configurable_graph(
+    graph_element.querySelector("canvas"),
+    graph_element.querySelector(".graph-type-selection"),
+    new class extends GraphDataSource {
+        async daily()    { return {[album.name]: await api.get_album_graph(album_id, 48, "daily").then((v) => v.json())} }
+        async weekly()   { return {[album.name]: await api.get_album_graph(album_id, 7, "weekly").then((v) => v.json())} }
+        async all_time() { return {[album.name]: await api.get_album_graph(album_id, 50, "all_time").then((v) => v.json())} }
+    }
+)

@@ -384,6 +384,14 @@ input#page-size-selector {
     }
 }
 
+.graph-type-selection {
+    display: flex;
+
+    span {
+        width: 80px;
+    }
+}
+
 .link-list {
     a {
         padding-right: 0px;

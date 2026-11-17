@@ -47,50 +47,50 @@ class Api {
         return request
     }
 
-    async frequency(resolution) {
-        var request = this.new_request(`time/frequency`, {res: resolution})
+    async get_all_graph(resolution, type) {
+        var request = this.new_request(`time/all`, {res: resolution, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_playlist_graph(id, resolution) {
-        var request = this.new_request(`time/playlist/${id}`, {res: resolution})
+    async get_playlist_graph(id, resolution, type) {
+        var request = this.new_request(`time/playlist/${id}`, {res: resolution, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_artist_graph(id, resolution) {
-        var request = this.new_request(`time/artist/${id}`, {res: resolution})
+    async get_artist_graph(id, resolution, type) {
+        var request = this.new_request(`time/artist/${id}`, {res: resolution, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_album_graph(id, resolution) {
-        var request = this.new_request(`time/album/${id}`, {res: resolution})
+    async get_album_graph(id, resolution, type) {
+        var request = this.new_request(`time/album/${id}`, {res: resolution, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_languages_graph(resolution, limit) {
-        var request = this.new_request(`time/languages`, {res: resolution, limit: limit})
+    async get_languages_graph(resolution, limit, type) {
+        var request = this.new_request(`time/languages`, {res: resolution, limit: limit, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_genres_graph(resolution, limit) {
-        var request = this.new_request(`time/genres`, {res: resolution, limit: limit})
+    async get_genres_graph(resolution, limit, type) {
+        var request = this.new_request(`time/genres`, {res: resolution, limit: limit, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_release_types_graph(resolution, limit) {
-        var request = this.new_request(`time/release-types`, {res: resolution, limit: limit})
+    async get_release_types_graph(resolution, limit, type) {
+        var request = this.new_request(`time/release-types`, {res: resolution, limit: limit, graph_type: type})
 
         return fetch(request)
     }
 
-    async get_track_graph(id, resolution) {
-        var request = this.new_request(`time/track/${id}`, {res: resolution})
+    async get_track_graph(id, resolution, type) {
+        var request = this.new_request(`time/track/${id}`, {res: resolution, graph_type: type})
 
         return fetch(request)
     }

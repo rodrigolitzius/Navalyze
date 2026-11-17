@@ -30,11 +30,30 @@
             </section>
             <section id="graph">
                 <div class="graph-card card">
-                    <div>
-                        <h3 class="card-name">Scrobble history</h3>
-                        <p class="card-desc">How much you played this playlist across time</p>
+                    <div class="card-expandable">
+                        <div>
+                            <h3 class="card-name">Playlist activity</h3>
+                        </div>
+                        <div>
+                            <form class="ts-row graph-type-selection">
+                                <span>
+                                    <label>All time</label>
+                                    <input class="graph-type-time" type="radio" name="size" value="small" checked>
+                                </span>
+
+                                <span>
+                                    <label>Daily</label>
+                                    <input class="graph-type-daily" type="radio" name="size" value="medium">
+                                </span>
+
+                                <span>
+                                    <label>Weekly</label>
+                                    <input class="graph-type-weekly" type="radio" name="size" value="large">
+                                </span>
+                            </form>
+                        </div>
                     </div>
-                    <canvas id="graph-playlist"><canvas/>
+                    <canvas><canvas/>
                 </div>
             </section>
         </main>

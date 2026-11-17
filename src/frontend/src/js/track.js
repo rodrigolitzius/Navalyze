@@ -1,6 +1,6 @@
 import { Api } from "./api.js"
-import { build_link_list, build_content_stats, artist_link, album_link } from "./html.js"
-import { format_hours, build_time_graph, load_images } from "./util.js";
+import { build_link_list, build_content_stats, artist_link, album_link, build_configurable_graph, GraphDataSource } from "./html.js"
+import { format_hours, load_images } from "./util.js";
 
 const api = new Api()
 
@@ -43,7 +43,14 @@ if (Array.isArray(track)) {
     ])
 }
 
-let track_activity = await api.get_track_graph(track_id, 50)
-track_activity = await track_activity.json()
+let graph_element = document.getElementById("graph")
 
-build_time_graph(document.getElementById("graph-track"), {[track.name]: track_activity})
+build_configurable_graph(
+    graph_element.querySelector("canvas"),
+    graph_element.querySelector(".graph-type-selection"),
+    new class extends GraphDataSource {
+        async daily()    { return {[track.name]: await api.get_track_graph(track_id, 48, "daily").then((v) => v.json())} }
+        async weekly()   { return {[track.name]: await api.get_track_graph(track_id, 7, "weekly").then((v) => v.json())} }
+        async all_time() { return {[track.name]: await api.get_track_graph(track_id, 50, "all_time").then((v) => v.json())} }
+    }
+)

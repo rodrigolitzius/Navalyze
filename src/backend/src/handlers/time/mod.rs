@@ -1,14 +1,14 @@
 pub mod prelude {
     pub use crate::{
         handlers::*,
-        handlers::extract::{RangeWithDefault, Resolution, WeekdaysAndTimezone, Timezone, SessionExtractor},
+        handlers::extract::{RangeWithDefault, WeekdaysAndTimezone, Timezone, SessionExtractor, GraphTypeAndResolution},
         handlers::time::to_datetime_duration_vec,
         navidrome::interface::scrobble::ScrobbleWithSongFilter,
-        analysis::time::date
+        analysis::time::group_type
     };
 }
 
-pub mod frequency;
+pub mod all;
 pub mod artist;
 pub mod album;
 pub mod track;

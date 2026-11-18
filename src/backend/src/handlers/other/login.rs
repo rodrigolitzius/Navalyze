@@ -64,13 +64,28 @@ pub async fn login(
 
     if state.settings.scrobble_update_interval > 0 {
         let login_session_copy = Arc::downgrade(&login_session);
+        let scrobble_update_interval_copy = state.settings.scrobble_update_interval;
 
         tokio::spawn(async move {
             update_scrobbles_background_task(
                 login_session_copy,
-                state.settings.scrobble_update_interval
+                scrobble_update_interval_copy
             ).await
         });
+    }
+
+    if (state.sessions.read().await.len() >= (state.settings.max_sessions as usize)) &&
+    (state.settings.max_sessions != 0) {
+        let mut existing_sessions = Vec::new();
+
+        for session in state.sessions.read().await.iter() {
+            let session = session.1.read().await;
+            existing_sessions.push((session.uuid, session.created_at));
+        }
+
+        if let Some(min) = existing_sessions.into_iter().min_by_key(|s| s.1) {
+            state.logout(&min.0).await;
+        }
     }
 
     state.sessions.write().await.insert(uuid, login_session);

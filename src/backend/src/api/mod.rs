@@ -1,6 +1,6 @@
 pub mod error;
 
-use std::{collections::HashMap, str::FromStr, sync::Arc};
+use std::{collections::HashMap, str::FromStr, sync::Arc, time::{SystemTime, UNIX_EPOCH}};
 
 use tokio::sync::RwLock;
 use serde::Deserialize;
@@ -19,8 +19,8 @@ use crate::{
 
 pub struct LoginSession {
     pub navidrome_interface: NavidromeInterface,
-    #[allow(unused)]
     pub uuid: uuid::Uuid,
+    pub created_at: u128,
     pub db_domain_id: i64
 }
 
@@ -47,6 +47,7 @@ pub struct Settings {
     pub make_a_wrapped_url: Option<String>,
     pub dist_dir: String,
     pub scrobble_update_interval: u64,
+    pub max_sessions: u64,
 }
 
 #[derive(Clone)]
@@ -71,7 +72,7 @@ impl ApiState {
         return Ok(result);
     }
 
-    pub async fn logout(self, uuid: &Uuid) {
+    pub async fn logout(&self, uuid: &Uuid) {
         self.sessions.write().await.remove(uuid);
     }
 }
@@ -82,7 +83,8 @@ impl LoginSession {
         navidrome_interface: NavidromeInterface,
         uuid: Uuid
     ) -> Self {
-        return Self {db_domain_id, navidrome_interface, uuid};
+        let created_at = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+        return Self {db_domain_id, navidrome_interface, uuid, created_at};
     }
 }
 
@@ -101,6 +103,7 @@ impl Settings {
             .arg(Arg::new("allow-invalid-certs").short('c').help("Whether to allow connections to Navidrome instances without a valid SSL certificate.").action(ArgAction::SetTrue))
             .arg(Arg::new("dist-dir").short('d').help("The directory with the website files"))
             .arg(Arg::new("update-interval").short('i').help("The interval for checking new scrobbles periodically").value_parser(clap::value_parser!(u64)))
+            .arg(Arg::new("max-sessions").short('s').help("The maximum number of simutaneous sessions allowed").value_parser(clap::value_parser!(u64)))
             .get_matches();
 
         if let Some(v) = matches.get_one::<String>("bind") { self.bind = v.clone(); }
@@ -108,6 +111,7 @@ impl Settings {
         if let Some(v) = matches.get_one::<String>("make-a-wrapped-url") { self.make_a_wrapped_url = Some(v.clone()) }
         if let Some(v) = matches.get_one::<String>("dist-dir") { self.dist_dir = v.clone(); }
         if let Some(v) = matches.get_one::<u64>("update-interval") { self.scrobble_update_interval = *v; }
+        if let Some(v) = matches.get_one::<u64>("max-sessions") { self.max_sessions = *v; }
 
         if let Some(v) = matches.get_one::<String>("lbz-token") {
             self.lbz_token = Some(Uuid::from_str(v.as_str())?);

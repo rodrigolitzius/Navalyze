@@ -22,3 +22,7 @@ scrobble_update_interval = 30
 
 # This determines the folder containing the files for Navalyze's website. This setting is ignored while running docker
 dist_dir = "./dist"
+
+# The maximum number of simultaneous sessions. Any new login after the max is reached logs out the oldest session
+# zero means unlimited sessions
+max_sessions = 5

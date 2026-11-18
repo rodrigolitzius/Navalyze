@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 use tokio::time::{Duration, interval};
 
 use crate::{
@@ -6,13 +6,18 @@ use crate::{
     navidrome::interface::NavidromeInterface
 };
 
-async fn update_scrobbles_background_task(login_session: Arc<RwLock<LoginSession>>, update_interval: u64) {
+async fn update_scrobbles_background_task(login_session: Weak<RwLock<LoginSession>>, update_interval: u64) {
     let mut interval = interval(Duration::from_secs(update_interval));
 
     loop {
         interval.tick().await;
 
-        let new_scrobbles = login_session.read().await.navidrome_interface.get_new_scrobbles().await;
+        let session = match login_session.upgrade() {
+            Some(v) => v,
+            None => return
+        };
+
+        let new_scrobbles = session.read().await.navidrome_interface.get_new_scrobbles().await;
 
         let new_scrobbles = match new_scrobbles {
             Ok(v) => v,
@@ -24,7 +29,7 @@ async fn update_scrobbles_background_task(login_session: Arc<RwLock<LoginSession
             None => continue
         };
 
-        match login_session.write().await.navidrome_interface.apply_new_scrobbles(new_scrobbles).await {
+        match session.write().await.navidrome_interface.apply_new_scrobbles(new_scrobbles).await {
             Ok(_) => {}
             Err(_) => println!("Failed to apply new scrobbles")
         }
@@ -58,7 +63,7 @@ pub async fn login(
     )));
 
     if state.settings.scrobble_update_interval > 0 {
-        let login_session_copy = login_session.clone();
+        let login_session_copy = Arc::downgrade(&login_session);
 
         tokio::spawn(async move {
             update_scrobbles_background_task(

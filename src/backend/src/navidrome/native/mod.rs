@@ -9,9 +9,7 @@ use crate::navidrome::interface::ArtistRole;
 pub struct NavidromeNativeSession {
     pub url: String,
     pub client: reqwest::Client,
-
-    #[allow(unused)]
-    pub token: String
+    pub token_exp: usize
 }
 
 #[derive(Deserialize)]

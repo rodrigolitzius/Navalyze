@@ -96,9 +96,14 @@ class Api {
     }
 
     async auth_check() {
-        let request;
+        let request
 
-        try { request = await fetch(this.new_request(`auth-check`)) }
+        try {
+            request = await fetch(new Request("/api/update-auth", {
+                headers: { "Authorization": localStorage.getItem("token") },
+                method: "POST",
+            }))
+        }
         catch { return false }
 
         return request.status == 200

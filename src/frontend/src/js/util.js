@@ -229,4 +229,9 @@ function sleep_ms(time) {
     });
 }
 
-export {relative_time, format_hours, build_time_graph, build_daily_graph, build_weekly_graph, load_images, setup_timezone_select }
+function logout() {
+    // token, timezone and the filter (start_ts, end_ts, weekdays) all live in localStorage
+    localStorage.clear()
+}
+
+export {relative_time, format_hours, build_time_graph, build_daily_graph, build_weekly_graph, load_images, setup_timezone_select, logout }

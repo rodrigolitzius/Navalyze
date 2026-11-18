@@ -43,7 +43,7 @@ async fn start_backend(state: ApiState, binding_address: String, dist_dir: Strin
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
         .route("/api/logout", post(logout))
-        .route("/api/auth-check", get(auth_check))
+        .route("/api/update-auth", post(update_auth))
         .route("/api/server-settings", get(server_settings))
         .route("/api/make-a-wrapped/generate", get(make_a_wrapped))
         .route("/api/make-a-wrapped/templates", get(templates))

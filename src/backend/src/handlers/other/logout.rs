@@ -7,7 +7,7 @@ pub async fn logout(
     SessionExtractor(session): SessionExtractor,
     State(state): State<ApiState>,
 ) -> Result<(), ApiError> {
-    state.sessions.write().await.remove(&session.read().await.uuid);
+    state.logout(&session.read().await.uuid).await;
 
     return Ok(());
 }

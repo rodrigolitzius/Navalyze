@@ -244,6 +244,11 @@ impl NavidromeInterface {
             }
         }
     }
+
+    // ===== AUTH =====
+    pub async fn token_valid(&self, now: usize) -> bool {
+        return self.native_session.token_exp > now;
+    }
 }
 
 trait FromNative {

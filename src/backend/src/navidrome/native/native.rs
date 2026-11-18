@@ -5,6 +5,7 @@ use std::{collections::HashMap};
 
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
+use jsonwebtoken::dangerous::insecure_decode_claims;
 
 use crate::{
     handlers::LoginRequest, navidrome::{
@@ -73,6 +74,11 @@ struct DeserializeArtist {
     mbz_artist_id: Option<Uuid>
 }
 
+#[derive(Deserialize)]
+struct Claims {
+    exp: usize
+}
+
 impl NativeArtist {
     fn from_deserialize_artist(artist: DeserializeArtist) -> Self {
         return Self {
@@ -114,6 +120,10 @@ impl NavidromeNativeSession {
 
         let login_response: LoginResponse = response.into_json().await?;
 
+        let token = insecure_decode_claims::<Claims>(&login_response.token).map_err(|e| {
+            NavidromeSessionError::InvalidToken(e)
+        })?;
+
         let mut default_headers = HeaderMap::new();
         default_headers.insert(
             "x-nd-authorization",
@@ -129,7 +139,7 @@ impl NavidromeNativeSession {
         return Ok(Self {
             url: login_request.url.to_string(),
             client: client,
-            token: login_response.token,
+            token_exp: token.exp,
         });
     }
 

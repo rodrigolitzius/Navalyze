@@ -1,10 +1,12 @@
 use reqwest::StatusCode;
+use jsonwebtoken::errors::Error as JwtError;
 use crate::{reqwest::{ReqwestApiError, ReqwestErrorExt}, api::error::ApiError};
 
 pub enum NavidromeSessionError {
     Reqwest(reqwest::Error),
     Unreachable(reqwest::Error),
     ParseJson(serde_json::Error),
+    InvalidToken(JwtError),
     ParseHeader(String),
     NoContentType,
     Status(StatusCode),
@@ -52,6 +54,10 @@ impl From<NavidromeSessionError> for ApiError {
 
             NavidromeSessionError::Status(s) => ApiError::Internal(
                 format!("Navidrome returned an unexpected status code: {}", s.as_str())
+            ),
+
+            NavidromeSessionError::InvalidToken(e) => ApiError::Internal(
+                format!("Navidrome returned an invalid JWT token: {}", e.to_string())
             ),
 
             NavidromeSessionError::NoContentType => ApiError::Internal(

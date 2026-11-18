@@ -70,6 +70,10 @@ impl ApiState {
 
         return Ok(result);
     }
+
+    pub async fn logout(self, uuid: &Uuid) {
+        self.sessions.write().await.remove(uuid);
+    }
 }
 
 impl LoginSession {

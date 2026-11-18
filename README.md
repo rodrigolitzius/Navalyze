@@ -41,9 +41,6 @@ Navalyze, however, is entirely integrated with Navidrome. Any information presen
 
 Finally, a lot of services don't provide much info about your history. Navalyze tries to give you as much as possible.
 
-## Known issues
-- Your Navalyze session can, rarely, expire and the website doesn't realize it, so it just breaks, forcing the user to log out and back in again
-
 # How to use
 > [!NOTE]
 Only Navidrome versions 0.64.0 and above are supported.

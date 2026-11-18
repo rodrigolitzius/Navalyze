@@ -100,7 +100,7 @@ impl Settings {
             .arg(Arg::new("make-a-wrapped-url").short('w').help("The address for a Make A Wrapped API"))
             .arg(Arg::new("allow-invalid-certs").short('c').help("Whether to allow connections to Navidrome instances without a valid SSL certificate.").action(ArgAction::SetTrue))
             .arg(Arg::new("dist-dir").short('d').help("The directory with the website files"))
-            .arg(Arg::new("update-interval").short('i').help("The interval for checking new scrobbles periodically"))
+            .arg(Arg::new("update-interval").short('i').help("The interval for checking new scrobbles periodically").value_parser(clap::value_parser!(u64)))
             .get_matches();
 
         if let Some(v) = matches.get_one::<String>("bind") { self.bind = v.clone(); }

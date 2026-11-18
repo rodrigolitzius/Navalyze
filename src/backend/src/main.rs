@@ -17,7 +17,7 @@ use tower_http::{cors::{Any, CorsLayer}, services::{ServeDir}};
 use crate::{
     api::{ApiState, Settings},
     handlers::{
-        other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*},
+        other::{login::*, recent::*, stats::*, auth_check::*, art::*, server_settings::*, logout::*},
         most_played::{artists::*, albums::*, tracks::*, playlists::*, genres::*},
         single::{artist::*, album::*, playlist::*, track::*},
         time::{all::*, artist::*, album::*, track::*, playlist::*, languages::*, genres::*, release_types::*},
@@ -42,6 +42,7 @@ async fn start_backend(state: ApiState, binding_address: String, dist_dir: Strin
         .route("/api/recent", get(recent))
         .route("/api/stats", get(stats))
         .route("/api/login", post(login))
+        .route("/api/logout", post(logout))
         .route("/api/auth-check", get(auth_check))
         .route("/api/server-settings", get(server_settings))
         .route("/api/make-a-wrapped/generate", get(make_a_wrapped))

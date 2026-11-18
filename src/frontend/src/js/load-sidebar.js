@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill'
 import { setup_timezone_select } from './util'
+import { Api } from './api'
 
 const page = document.getElementById("layout")
 
@@ -326,7 +327,18 @@ document.getElementById("clear-filter").addEventListener("click", function () {
     window.location.reload()
 })
 
-document.getElementById("logout-btn").addEventListener("click", function () {
+document.getElementById("logout-btn").addEventListener("click", async function () {
+    let api = new Api()
+
+    try {
+        let logout_response = await api.logout()
+        if (!logout_response.ok) {
+            throw new Error()
+        }
+    } catch {
+        alert("Logout failed. Your session might not have been fully deleted from the server")
+    }
+
     // token, timezone and the filter (start_ts, end_ts, weekdays) all live in localStorage
     localStorage.clear()
 

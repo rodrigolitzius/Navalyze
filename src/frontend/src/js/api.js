@@ -224,6 +224,15 @@ class Api {
         return fetch(request)
     }
 
+    async logout() {
+        var request = new Request("/api/logout", {
+            headers: { "Authorization": localStorage.getItem("token") },
+            method: "POST",
+        })
+
+        return await fetch(request)
+    }
+
     get_server_settings() {
         var request = new Request("/api/server-settings", {
             method: "GET",

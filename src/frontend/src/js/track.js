@@ -9,6 +9,8 @@ let track_id = new URLSearchParams(window.location.search).get("id");
 let track_response = await api.get_track(track_id)
 let track = await track_response.json()
 
+document.title = track.name
+
 let header = document.getElementById("img-header")
 load_images(api, [{ id: track_id, size: 700, container: header }])
 

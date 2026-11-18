@@ -9,6 +9,8 @@ let album_id = new URLSearchParams(window.location.search).get("id");
 let album = await api.get_album(album_id)
 album = await album.json()
 
+document.title = album.name
+
 let header = document.getElementById("img-header")
 load_images(api, [{id: album_id, size: 700, container: header}])
 

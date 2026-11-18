@@ -10,6 +10,8 @@ let playlist_id = new URLSearchParams(window.location.search).get("id");
 let playlist = await api.get_playlist(playlist_id)
 playlist = await playlist.json()
 
+document.title = playlist.name
+
 let header = document.getElementById("img-header")
 load_images(api, [{ id: playlist_id, size: 700, container: header }])
 

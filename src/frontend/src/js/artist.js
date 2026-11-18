@@ -9,6 +9,8 @@ let artist_id = new URLSearchParams(window.location.search).get("id");
 let artist = await api.get_artist(artist_id, "albums")
 artist = await artist.json()
 
+document.title = artist.name
+
 let header = document.getElementById("img-header")
 load_images(api, [{ id: artist_id, size: 700, container: header }])
 

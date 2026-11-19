@@ -41,6 +41,9 @@ Navalyze, however, is entirely integrated with Navidrome. Any information presen
 
 Finally, a lot of services don't provide much info about your history. Navalyze tries to give you as much as possible.
 
+# The catch
+there is one catch though... It only works for Navidrome and will only grap the scrobbles you have inside Navidrome's database. Navidrome started saving scrobbles since sometime december 2025, so your history may be incomplete. if you want to have your full history, you'll have to find a way to get your it from your main scrobble services (Like ListenBrainz or last.fm) and put them inside Navidrome's DB. if a tool to automate this process has enough demand, i might make one.
+
 # How to use
 > [!NOTE]
 Only Navidrome versions 0.64.0 and above are supported.

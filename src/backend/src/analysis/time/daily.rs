@@ -14,7 +14,7 @@ pub fn group(
         (time, d.1)
     }).collect();
 
-    return insert_bin(resolution, 24*60*60, &values)
+    return insert_bin(resolution as f64, 24.0*60.0*60.0, &values)
         .unwrap_or(values)
         .into_iter().collect();
 }

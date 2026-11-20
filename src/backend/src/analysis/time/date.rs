@@ -21,7 +21,7 @@ pub fn group(
         (timestamp, d.1)
     }).collect();
 
-    return insert_bin(resolution, elapsed as u64, &values)
+    return insert_bin(resolution as f64, elapsed as f64, &values)
         .unwrap_or(values)
         .into_iter()
         .map(|t| (t.0 + (*min as u64), t.1))

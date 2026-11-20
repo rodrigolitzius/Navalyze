@@ -13,7 +13,7 @@ pub fn group(
         (weekday, d.1)
     }).collect();
 
-    return insert_bin(7, 6, &values)
+    return insert_bin(7.0, 6.0, &values)
         .unwrap_or(values)
         .into_iter().collect();
 }
